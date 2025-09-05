@@ -1,0 +1,166 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum CategoryItem {
+  SNEAKER
+  SHOE
+  COLLECTIBLE
+  CLOTHING
+  ACCESSORY
+  OTHER
+}
+
+
+// Enum per tipo di sizing
+enum SizingType {
+  UK
+  US
+  IT
+}
+
+enum Gender {
+  MEN
+  WOMEN
+  UNISEX
+  KIDS
+}
+
+model Brand {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  description String?
+  logoUrl     String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  products    SellingItem[]
+  
+  @@map("brands")
+}
+
+// Modello per il prezzo (con supporto per sconti e offerte)
+model Price {
+  id          String   @id @default(cuid())
+  basePrice   Float
+  salePrice   Float?
+  hidden      Boolean  @default(false)
+  currency    String   @default("EUR")
+  validFrom   DateTime @default(now())
+  validUntil  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relazione one-to-one con SellingItem
+  productId   String   @unique
+  product     SellingItem @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@map("prices")
+}
+
+model Sizing {
+  id        String     @id @default(cuid())
+  size      Float     
+  type      SizingType
+  createdAt DateTime   @default(now())
+  
+  // Relazioni
+  products  SellingItem[]
+  
+  @@unique([size, type])
+  @@map("sizings")
+}
+
+// Modello principale per i prodotti in vendita
+model SellingItem {
+  id          String           @id @default(cuid())
+  name        String
+  description String?
+  category    CategoryItem
+  condition   Float @default(10)
+  stock       Int              @default(0)
+  sku         String?          @unique
+  gender      Gender           @default(MEN)
+  isActive    Boolean          @default(true)
+  isFeatured  Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  // Relazioni
+  brandId     String
+  brand       Brand      @relation(fields: [brandId], references: [id])
+  
+  sizeId      String
+  size        Sizing     @relation(fields: [sizeId], references: [id])
+  
+  price       Price?
+  photos      Photo[]
+  wishlistItems WishlistItem[]
+  
+  @@map("selling_items")
+}
+
+// Modello per le foto prodotto
+model Photo {
+  id          String   @id @default(cuid())
+  name        String
+  url         String
+  altText     String?
+  isMain      Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  
+  // Relazioni
+  productId   String
+  product     SellingItem @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@map("photos")
+}
+
+// Modello per gli utenti
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  passwordHash String
+  firstName String
+  lastName  String
+  phone     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  wishlistItems WishlistItem[]
+  
+  @@map("users")
+}
+
+
+
+// Modello per la wishlist
+model WishlistItem {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  productId String
+  product   SellingItem @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, productId])
+  @@map("wishlist_items")
+}
+
+
