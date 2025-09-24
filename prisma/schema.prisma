@@ -1,8 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Schema Prisma ottimizzato per e-commerce
+// Versione ottimizzata con correzioni di errori e miglioramenti delle performance
 
 generator client {
   provider = "prisma-client-js"
@@ -13,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
+// Enum per categoria prodotto
 enum CategoryItem {
   SNEAKER
   SHOE
@@ -23,12 +20,13 @@ enum CategoryItem {
   OTHER
 }
 
-
 // Enum per tipo di sizing
 enum SizingType {
   UK
   US
   IT
+  OFA
+  OTHER
 }
 
 enum Gender {
@@ -38,129 +36,224 @@ enum Gender {
   KIDS
 }
 
-model Brand {
-  id          String        @id @default(cuid())
-  name        String        @unique
-  description String?
-  logoUrl     String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  
-  products    SellingItem[]
-  
-  @@map("brands")
+enum ListingCondition {
+  NEW
+  LIKE_NEW
+  VERY_GOOD
+  GOOD
+  ACCEPTABLE
+  POOR
 }
 
-// Modello per il prezzo (con supporto per sconti e offerte)
-model Price {
+// Modello per i brand
+model Brand {
   id          String   @id @default(cuid())
-  basePrice   Float
-  salePrice   Float?
-  hidden      Boolean  @default(false)
-  currency    String   @default("EUR")
-  validFrom   DateTime @default(now())
-  validUntil  DateTime?
+  name        String   @unique
+  description String?
+  logoUrl     String?
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  // Relazione one-to-one con SellingItem
-  productId   String   @unique
-  product     SellingItem @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
-  @@map("prices")
-}
-
-model Sizing {
-  id        String     @id @default(cuid())
-  size      Float     
-  type      SizingType
-  createdAt DateTime   @default(now())
-  
   // Relazioni
-  products  SellingItem[]
-  
-  @@unique([size, type])
-  @@map("sizings")
+  items Item[]
+
+  // Indici per performance
+  @@index([name])
+  @@index([isActive])
+  @@map("brands")
 }
 
-// Modello principale per i prodotti in vendita
-model SellingItem {
-  id          String           @id @default(cuid())
+// Modello principale per i prodotti
+model Item {
+  id          String       @id @default(cuid())
   name        String
   description String?
   category    CategoryItem
-  condition   Float @default(10)
-  stock       Int              @default(0)
-  sku         String?          @unique
-  gender      Gender           @default(MEN)
-  isActive    Boolean          @default(true)
-  isFeatured  Boolean          @default(false)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  sku         String?      @unique
+  gender      Gender       @default(MEN)
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  // Foreign keys
+  brandId String
   
   // Relazioni
-  brandId     String
-  brand       Brand      @relation(fields: [brandId], references: [id])
-  
-  sizeId      String
-  size        Sizing     @relation(fields: [sizeId], references: [id])
-  
-  price       Price?
-  photos      Photo[]
+  brand     Brand          @relation(fields: [brandId], references: [id])
+  listings  Listing[]
   wishlistItems WishlistItem[]
   
-  @@map("selling_items")
+  // Indici per performance
+  @@index([category])
+  @@index([gender])
+  @@index([brandId])
+  @@index([isActive])
+  @@index([name])
+  @@index([category, gender]) // Indice composito per filtri comuni
+  @@map("items")
 }
 
 // Modello per le foto prodotto
 model Photo {
-  id          String   @id @default(cuid())
-  name        String
-  url         String
-  altText     String?
-  isMain      Boolean  @default(false)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  altText   String?
+  isMain    Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  
+  // Foreign keys
+  listingId String
   
   // Relazioni
-  productId   String
-  product     SellingItem @relation(fields: [productId], references: [id], onDelete: Cascade)
+  listing Listing? @relation(fields: [listingId], references: [id], onDelete: Cascade)
   
+  // Indici per performance
+  @@index([listingId])
+  @@index([isMain])
   @@map("photos")
+}
+
+// Modello per le taglie
+model Sizing {
+  id        String     @id @default(cuid())
+  size      String
+  type      SizingType
+  createdAt DateTime   @default(now())
+  
+  // Relazioni
+  listings ListingSizing[]
+  
+  // Constraint di unicità
+  @@unique([size, type])
+  @@index([type])
+  @@map("sizings")
+}
+
+// Modello per i prezzi
+model Price {
+  id         String    @id @default(cuid())
+  basePrice  Decimal   @db.Decimal(10, 2)
+  salePrice  Decimal?  @db.Decimal(10, 2)
+  validFrom  DateTime  @default(now())
+  validUntil DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  
+  // Foreign keys
+  listingId String @unique
+  
+  // Relazioni
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  
+  // Indici per performance
+  @@index([validFrom])
+  @@index([validUntil])
+  @@map("prices")
+}
+
+// Modello per i listing/annunci
+model Listing {
+  id          String           @id @default(cuid())
+  description String?
+  condition   ListingCondition @default(NEW)
+  stock       Int             @default(1)
+  isActive    Boolean         @default(true)
+  isFeatured  Boolean         @default(false)
+  
+  startDate   DateTime        @default(now())
+  endDate     DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  
+  // Foreign keys
+  itemId String
+  
+  // Relazioni
+  item          Item            @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  price         Price?
+  photos        Photo[]
+  sizings       ListingSizing[]
+  wishlistItems WishlistItem[]
+  
+  // Indici per performance
+  @@index([itemId])
+  @@index([isActive])
+  @@index([isFeatured])
+  @@index([startDate])
+  @@index([endDate])
+  @@index([condition])
+  @@index([isActive, isFeatured]) // Indice composito per listing attivi e in evidenza
+  @@index([itemId, isActive]) // Indice composito per query per prodotto
+  @@map("listings")
+}
+
+// Tabella di collegamento per listing e taglie (many-to-many)
+model ListingSizing {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  
+  // Foreign keys
+  listingId String
+  sizingId  String
+  
+  // Relazioni
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  sizing  Sizing  @relation(fields: [sizingId], references: [id], onDelete: Cascade)
+  
+  // Constraint di unicità
+  @@unique([listingId, sizingId])
+  @@index([listingId])
+  @@index([sizingId])
+  @@map("listing_sizings")
 }
 
 // Modello per gli utenti
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id           String   @id @default(cuid())
+  email        String   @unique
   passwordHash String
-  firstName String
-  lastName  String
-  phone     String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  firstName    String
+  lastName     String
+  isActive     Boolean  @default(true)
+  isVerified   Boolean  @default(false)
+  role         String   @default("USER")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
   
+  // Relazioni
   wishlistItems WishlistItem[]
   
+  // Indici per performance
+  @@index([email])
+  @@index([isActive])
+  @@index([role])
   @@map("users")
 }
-
-
 
 // Modello per la wishlist
 model WishlistItem {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   
+  // Foreign keys
   userId    String
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId    String?
+  listingId String?
   
-  productId String
-  product   SellingItem @relation(fields: [productId], references: [id], onDelete: Cascade)
+  // Relazioni
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item    Item?    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  listing Listing? @relation(fields: [listingId], references: [id], onDelete: Cascade)
   
-  @@unique([userId, productId])
+  // Constraint: almeno un elemento deve essere specificato
+  // Constraint di unicità per evitare duplicati
+  @@unique([userId, itemId], name: "unique_user_item")
+  @@unique([userId, listingId], name: "unique_user_listing")
+  @@index([userId])
+  @@index([itemId])
+  @@index([listingId])
   @@map("wishlist_items")
 }
-
-
