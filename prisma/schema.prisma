@@ -67,7 +67,7 @@ model Brand {
 // Modello principale per i prodotti
 model Item {
   id          String       @id @default(cuid())
-  name        String
+  name        String       @unique
   description String?
   category    CategoryItem
   sku         String?      @unique
@@ -84,7 +84,7 @@ model Item {
   listings  Listing[]
   wishlistItems WishlistItem[]
   
-  // Indici per performance
+  // Indici per performance 
   @@index([category])
   @@index([gender])
   @@index([brandId])

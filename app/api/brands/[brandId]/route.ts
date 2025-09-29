@@ -1,94 +1,96 @@
-import prisma from "@/app/lib/prisma";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/app/lib/prisma";
+import { ZodError } from "zod";
+import { brandSchema } from "@/app/lib/validation/brand.schema";
 
-const brandNotFoundResponse = () => NextResponse.json(
-    {
-        error: "Brand not found",
-    },
-    { status: 404 }
-);
+// GET brand by id
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { brandId: string } }
+) {
+  try {
+    const { brandId } = params;
+    const brand = await prisma.brand.findUnique({
+      where: { id: brandId },
+    });
 
-const brandIdMissingResponse = () => NextResponse.json(
-    {
-        error: "Brand ID is required",
-    },
-    { status: 400 }
-);
-
-const brandErrorResponse = (error: any) => NextResponse.json(
-    {
-        error: error.message || "Internal Server Error",
-    },
-    { status: 500 }
-);
-
-const brandSuccessResponse = (brand: any, message: string) => NextResponse.json(
-    {
-        message,
-        brand
-    },
-    { status: 200 }
-);
-
-export async function GET(request: NextRequest, params: Promise<{ brandId: string }> ) {
-    try {
-        const { brandId } = await params;
-        if (!brandId) {
-            return brandIdMissingResponse();
-        }
-
-        const brand = await prisma.brand.findUnique({
-            where: { id: brandId },
-            select: {
-                id: true,
-                name: true,
-                description: true,
-                logoUrl: true,
-            }
-        });
-
-        if (!brand) {
-            return brandNotFoundResponse();
-        }
-        return brandSuccessResponse(brand, "Brand fetched successfully");
-
-    } catch (error: any) {
-        console.error("Error in fetching brand by ID:", error);
-        return brandErrorResponse(error);
+    if (!brand) {
+      return NextResponse.json({ error: "Brand non trovato" }, { status: 404 });
     }
+
+    return NextResponse.json(brand);
+  } catch (error: any) {
+    console.error("Errore GET brand:", error);
+    return NextResponse.json({ error: "Errore interno" }, { status: 500 });
+  }
 }
 
-export async function DELETE(request: NextRequest,  params: Promise<{ brandId: string }> ) {
-    try {
-        const { brandId } = await params;
-        if (!brandId) { return brandIdMissingResponse(); }
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { brandId: string } }
+) {
+  try {
+    const { brandId } = params;
+    const body = await request.json();
+    const parsed = brandSchema.parse(body);
 
-        await prisma.brand.delete({
-            where: { id: brandId }
-        });
+    const updated = await prisma.brand.update({
+      where: { id: brandId },
+      data: parsed,
+    });
 
-        return brandSuccessResponse(null, "Brand deleted successfully");
-    } catch (error: any) {
-        console.error("Error in deleting brand by ID:", error);
-        return brandErrorResponse(error);
+    return NextResponse.json(updated);
+  } catch (error: any) {
+    if (error instanceof ZodError) {
+      return NextResponse.json(
+        { error: "Validation error", details: error.message },
+        { status: 400 }
+      );
     }
+
+    console.error("Errore PUT brand:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
 
-export async function PATCH(request: NextRequest, params: Promise<{ brandId: string }>) {
-    try {
-        const { brandId } = await params;
-        if (!brandId) { return brandIdMissingResponse(); }
-        const body = await request.json();
-        const updatedBrand = await prisma.brand.update({
-            where: { id: brandId },
-            data: body
-        });
-        return brandSuccessResponse(updatedBrand, "Brand patched successfully");
-    } catch (error: any) {
-        console.error("Error in patching brand by ID:", error);
-        return brandErrorResponse(error);
-    }
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { brandId: string } }
+) {
+  try {
+    const body = await request.json();
+    // per PATCH uso partial() dello schema
+    const parsed = brandSchema.partial().parse(body);
+
+    const updated = await prisma.brand.update({
+      where: { id: params.brandId },
+      data: parsed,
+    });
+
+    return NextResponse.json(updated);
+  } catch (error: any) {
+    console.error("Errore PATCH brand:", error);
+    return NextResponse.json({ error: error.message }, { status: 400 });
+  }
 }
-export async function PUT(request: NextRequest, params: Promise<{ brandId: string }> ) {
-    PATCH(request, params);
+
+// DELETE
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: { brandId: string } }
+) {
+  try {
+    await prisma.brand.delete({
+      where: { id: params.brandId },
+    });
+
+    return NextResponse.json({ message: "Brand eliminato" });
+  } catch (error: any) {
+    console.error("Errore DELETE brand:", error);
+    return NextResponse.json({ error: "Errore interno" }, { status: 500 });
+  }
 }
