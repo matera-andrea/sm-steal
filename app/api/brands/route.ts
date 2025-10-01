@@ -1,64 +1,56 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import prisma from "@/app/lib/prisma";
 import { brandSchema } from "@/app/lib/validation/brand.schema";
 import { NextRequest, NextResponse } from "next/server";
-import z from "zod";
+import { z } from "zod";
 
-const standardBrandFetchingNumber = 10;
+const querySchema = z.object({
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(10),
+  search: z.string().optional(),
+  isActive: z.enum(["true", "false"]).optional(),
+  includeItems: z.enum(["true", "false"]).default("false"),
+});
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(
-      searchParams.get("limit") || String(standardBrandFetchingNumber)
+    const rawParams = Object.fromEntries(
+      new URL(request.url).searchParams.entries()
     );
-    const search = searchParams.get("search") || "";
-    const isActive = searchParams.get("isActive");
-    const includeItems = searchParams.get("includeItems") === "true" || false;
-    const skip = (page - 1) * limit;
+    const params = querySchema.parse(rawParams);
 
-    // Costruisci il filtro where
-    const where: any = {};
+    const skip = (params.page - 1) * params.limit;
+    const where: Record<string, unknown> = {};
 
-    if (search) {
-      where.name = {
-        contains: search,
-        mode: "insensitive",
-      };
+    if (params.search) {
+      where.name = { contains: params.search, mode: "insensitive" };
+    }
+    if (params.isActive) {
+      where.isActive = params.isActive === "true";
     }
 
-    if (isActive !== null && isActive !== undefined) {
-      where.isActive = isActive === "true";
-    }
+    const include =
+      params.includeItems === "true"
+        ? {
+            items: {
+              where: { isActive: true },
+              select: {
+                id: true,
+                name: true,
+                category: true,
+                gender: true,
+              },
+            },
+            _count: { select: { items: true } },
+          }
+        : { _count: { select: { items: true } } };
 
-    // Query per ottenere i brand
     const [brands, total] = await Promise.all([
       prisma.brand.findMany({
         where,
         skip,
-        take: limit,
+        take: params.limit,
         orderBy: { name: "asc" },
-        include: includeItems
-          ? {
-              items: {
-                where: { isActive: true },
-                select: {
-                  id: true,
-                  name: true,
-                  category: true,
-                  gender: true,
-                },
-              },
-              _count: {
-                select: { items: true },
-              },
-            }
-          : {
-              _count: {
-                select: { items: true },
-              },
-            },
+        include,
       }),
       prisma.brand.count({ where }),
     ]);
@@ -66,13 +58,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       data: brands,
       pagination: {
-        page,
-        limit,
+        page: params.page,
+        limit: params.limit,
         total,
-        pages: Math.ceil(total / limit),
+        pages: Math.ceil(total / params.limit),
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching brands:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -81,10 +73,12 @@ export async function GET(request: NextRequest) {
   }
 }
 
+//
+// POST brand
+//
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-
     const validatedData = brandSchema.parse(body);
 
     const existingBrand = await prisma.brand.findUnique({
@@ -100,15 +94,11 @@ export async function POST(request: NextRequest) {
 
     const brand = await prisma.brand.create({
       data: validatedData,
-      include: {
-        _count: {
-          select: { items: true },
-        },
-      },
+      include: { _count: { select: { items: true } } },
     });
 
-    return NextResponse.json(brand, { status: 201 });
-  } catch (error) {
+    return NextResponse.json({ data: brand }, { status: 201 });
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.message },
