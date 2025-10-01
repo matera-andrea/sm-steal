@@ -3,15 +3,18 @@ import prisma from "@/app/lib/prisma";
 import { itemSchema } from "@/app/lib/validation/item.schema";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
     const search = searchParams.get("search") || undefined;
-    const isActiveParam = searchParams.get("isActive");
-    const isActive =
-      isActiveParam !== null ? isActiveParam === "true" : undefined;
-
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "50");
+    const isActive = searchParams.get("isActive");
+    const skip = (page - 1) * limit;
+    const includeListing =
+      searchParams.get("includeListings") === "true" || false;
     const brandId = searchParams.get("brandId") || undefined;
     const category = searchParams.get("category") as
       | "SNEAKER"
@@ -21,33 +24,69 @@ export async function GET(request: NextRequest) {
       | "ACCESSORY"
       | "OTHER";
     const sku = searchParams.get("sku") || undefined;
+
     const gender = searchParams.get("gender") as
       | "MEN"
       | "WOMEN"
       | "UNISEX"
       | "KIDS";
 
-    const items = await prisma.item.findMany({
-      where: {
-        ...(search && {
-          name: { contains: search, mode: "insensitive" },
-        }),
-        ...(isActive !== undefined && { isActive }),
-        ...(brandId && { brandId }),
-        ...(category && { category }),
-        ...(sku && { sku }),
-        ...(gender && { gender }),
+    const where: any = {};
+
+    if (search) {
+      where.name = {
+        contains: search,
+        mode: "insensitive",
+      };
+    }
+
+    if (isActive !== null && isActive !== undefined) {
+      where.isActive = isActive === "true";
+    }
+    const [items, total] = await Promise.all([
+      prisma.item.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { name: "asc" },
+        include: includeListing
+          ? {
+              listings: {
+                where: { isActive: true },
+                select: {
+                  id: true,
+                  description: true,
+                  condition: true,
+                  stock: true,
+                },
+              },
+              _count: {
+                select: { listings: true },
+              },
+            }
+          : {
+              _count: {
+                select: { listings: true },
+              },
+            },
+      }),
+      prisma.item.count({ where }),
+    ]);
+
+    return Response.json({
+      data: items,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
       },
     });
-
-    return Response.json(items);
   } catch (error) {
-    console.error(error);
-    return new Response(
-      JSON.stringify({ error: "Errore nel recupero items" }),
-      {
-        status: 500,
-      }
+    console.error("Error fetching items: ", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
     );
   }
 }
@@ -66,9 +105,16 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    const item = await prisma.item.create({
-      data: validatedData,
-    });
+    const [item, _] = await prisma.$transaction([
+      prisma.item.create({
+        data: validatedData,
+      }),
+      prisma.brand.update({
+        where: { id: validatedData.brandId },
+        data: { itemsCount: { increment: 1 } },
+      }),
+    ]);
+
     return NextResponse.json(item, { status: 201 });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
@@ -77,7 +123,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    console.error("Error creating brand:", error);
+    console.error("Error creating item:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

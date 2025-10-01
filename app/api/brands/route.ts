@@ -16,7 +16,6 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || "";
     const isActive = searchParams.get("isActive");
     const includeItems = searchParams.get("includeItems") === "true" || false;
-
     const skip = (page - 1) * limit;
 
     // Costruisci il filtro where
@@ -32,8 +31,6 @@ export async function GET(request: NextRequest) {
     if (isActive !== null && isActive !== undefined) {
       where.isActive = isActive === "true";
     }
-
-    console.log("Where filter for brands:", where);
 
     // Query per ottenere i brand
     const [brands, total] = await Promise.all([

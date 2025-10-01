@@ -54,7 +54,8 @@ model Brand {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+  itemsCount  Int      @default(0)
+
   // Relazioni
   items Item[]
 
@@ -75,6 +76,8 @@ model Item {
   isActive    Boolean      @default(true)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  listingCount Int         @default(0)
+  wishlistItemsCount Int   @default(0)
   
   // Foreign keys
   brandId String
