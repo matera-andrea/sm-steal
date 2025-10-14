@@ -1,21 +1,32 @@
-import z from "zod";
-export const itemSchema = z.object({
-  name: z.string().min(1, "Il nome dell'articolo è obbligatorio"),
-  description: z.string().optional(),
-  brandId: z.string().min(1, "L'ID del brand è obbligatorio"),
+// /lib/validation/item.schema.ts
 
-  category: z.enum(
-    ["SNEAKER", "SHOE", "COLLECTIBLE", "CLOTHING", "ACCESSORY", "OTHER"],
-    {
-      error:
-        "La categoria è obbligatoria e deve essere una tra SNEAKER, SHOE, COLLECTIBLE, CLOTHING, ACCESSORY, OTHER",
-    }
-  ),
+import { z } from "zod";
+
+// Enum presi direttamente dallo schema Prisma per coerenza
+const CategoryItemEnum = z.enum([
+  "SNEAKER",
+  "SHOE",
+  "COLLECTIBLE",
+  "CLOTHING",
+  "ACCESSORY",
+  "OTHER",
+]);
+const GenderEnum = z.enum(["MEN", "WOMEN", "UNISEX", "KIDS"]);
+
+export const createItemSchema = z.object({
+  name: z
+    .string({ message: "Il nome è obbligatorio." })
+    .min(3, "Il nome deve contenere almeno 3 caratteri."),
+  description: z.string().optional(),
+  category: CategoryItemEnum,
   sku: z.string().optional(),
-  gender: z.enum(["MEN", "WOMEN", "UNISEX", "KIDS"], {
-    error:
-      "Il genere è obbligatorio e deve essere una tra MEN, WOMEN, UNISEX, KIDS",
+  gender: GenderEnum.default("UNISEX"),
+  sneakerModelId: z.string({
+    message: "L'ID del modello di sneaker è obbligatorio.",
   }),
 });
 
-export type Item = z.infer<typeof itemSchema>;
+export const updateItemSchema = createItemSchema.partial();
+
+export type CreateItemDto = z.infer<typeof createItemSchema>;
+export type UpdateItemDto = z.infer<typeof updateItemSchema>;

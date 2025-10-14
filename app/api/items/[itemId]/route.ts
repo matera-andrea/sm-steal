@@ -1,96 +1,127 @@
-import { NextRequest, NextResponse } from "next/server";
+// /api/items/[id]/route.ts
+
 import prisma from "@/app/lib/prisma";
-import { ZodError } from "zod";
-import { itemSchema } from "@/app/lib/validation/item.schema";
+import { updateItemSchema } from "@/app/lib/validation/item.schema";
+import { NextRequest, NextResponse } from "next/server";
 
-type RouteParams = { params: { itemId: string } };
+interface Params {
+  params: { id: string };
+}
 
-export async function GET(_request: NextRequest, { params }: RouteParams) {
+//
+// GET ITEM BY ID
+//
+export async function GET(request: NextRequest, { params }: Params) {
   try {
     const item = await prisma.item.findUnique({
-      where: { id: params.itemId },
+      where: { id: params.id },
+      include: {
+        sneakerModel: {
+          include: {
+            Brand: true,
+          },
+        },
+        listings: {
+          where: { isActive: true },
+          take: 10,
+          orderBy: { createdAt: "desc" },
+        },
+      },
     });
 
     if (!item) {
-      return NextResponse.json({ error: "Item not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Articolo non trovato." },
+        { status: 404 }
+      );
     }
 
-    return NextResponse.json({ data: item });
-  } catch (error: unknown) {
-    console.error("Error fetching item:", error);
+    return NextResponse.json(item);
+  } catch (error) {
+    console.error("[ITEM_GET_BY_ID] Error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { message: "Internal server error" },
       { status: 500 }
     );
   }
 }
 
-export async function PUT(request: NextRequest, { params }: RouteParams) {
+//
+// UPDATE ITEM BY ID
+//
+export async function PATCH(request: NextRequest, { params }: Params) {
   try {
     const body = await request.json();
-    const parsed = itemSchema.parse(body);
+    const validation = updateItemSchema.safeParse(body);
 
-    const updated = await prisma.item.update({
-      where: { id: params.itemId },
-      data: parsed,
-    });
-
-    return NextResponse.json({ data: updated });
-  } catch (error: unknown) {
-    if (error instanceof ZodError) {
+    if (!validation.success) {
       return NextResponse.json(
-        { error: "Validation error", details: error.message },
+        { message: "Dati non validi", errors: validation.error.issues },
         { status: 400 }
       );
     }
 
-    console.error("Error updating item:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function PATCH(request: NextRequest, { params }: RouteParams) {
-  try {
-    const body = await request.json();
-    const parsed = itemSchema.partial().parse(body);
-
-    const updated = await prisma.item.update({
-      where: { id: params.itemId },
-      data: parsed,
+    // Controlla che l'item da aggiornare esista
+    const existingItem = await prisma.item.findUnique({
+      where: { id: params.id },
     });
-
-    return NextResponse.json({ data: updated });
-  } catch (error: unknown) {
-    if (error instanceof ZodError) {
+    if (!existingItem) {
       return NextResponse.json(
-        { error: "Validation error", details: error.message },
-        { status: 400 }
+        { message: "Articolo non trovato." },
+        { status: 404 }
       );
     }
 
-    console.error("Error patching item:", error);
+    const updatedItem = await prisma.item.update({
+      where: { id: params.id },
+      data: validation.data,
+    });
+
+    return NextResponse.json(updatedItem);
+  } catch (error) {
+    console.error("[ITEM_PATCH] Error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { message: "Internal server error" },
       { status: 500 }
     );
   }
 }
 
-export async function DELETE(_request: NextRequest, { params }: RouteParams) {
+//
+// DELETE ITEM BY ID
+//
+export async function DELETE(request: NextRequest, { params }: Params) {
   try {
-    await prisma.item.delete({
-      where: { id: params.itemId },
+    // Controlla che l'item da eliminare esista per ottenere l'ID del modello
+    const itemToDelete = await prisma.item.findUnique({
+      where: { id: params.id },
+      select: { sneakerModelId: true },
     });
 
-    // 204 = No Content → niente body
-    return new NextResponse(null, { status: 204 });
-  } catch (error: unknown) {
-    console.error("Error deleting item:", error);
+    if (!itemToDelete) {
+      return NextResponse.json(
+        { message: "Articolo non trovato." },
+        { status: 404 }
+      );
+    }
+
+    // Usa una transazione per eliminare l'item e decrementare il contatore
+    await prisma.$transaction(async (tx) => {
+      await tx.item.delete({
+        where: { id: params.id },
+      });
+
+      await tx.sneakerModel.update({
+        where: { id: itemToDelete.sneakerModelId },
+        data: { itemsCount: { decrement: 1 } },
+      });
+    });
+
+    return new NextResponse(null, { status: 204 }); // 204 No Content
+  } catch (error) {
+    console.error("[ITEM_DELETE] Error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { message: "Internal server error" },
       { status: 500 }
     );
   }

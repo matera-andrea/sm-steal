@@ -40,9 +40,9 @@ export async function GET(request: NextRequest) {
                 gender: true,
               },
             },
-            _count: { select: { items: true } },
+            _count: { select: { sneakerModels: true } },
           }
-        : { _count: { select: { items: true } } };
+        : { _count: { select: { sneakerModels: true } } };
 
     const [brands, total] = await Promise.all([
       prisma.brand.findMany({
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     const brand = await prisma.brand.create({
       data: validatedData,
-      include: { _count: { select: { items: true } } },
+      include: { _count: { select: { sneakerModels: true } } },
     });
 
     return NextResponse.json({ data: brand }, { status: 201 });

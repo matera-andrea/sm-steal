@@ -10,7 +10,7 @@ import {
   MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import { HeartIcon, UserIcon } from "lucide-react";
+import { Heart, User, Search } from "lucide-react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 
@@ -34,9 +34,27 @@ export default function NavBar() {
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="relative flex h-20 items-center justify-between">
-              {/* Bottone menu mobile */}
-              <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+            {/* Prima riga: Barra di ricerca, Logo, Icone */}
+            <div className="flex h-20 items-center justify-between gap-8">
+              {/* Barra di ricerca - sinistra */}
+              <div className="hidden sm:flex flex-1 max-w-lg">
+                <div className="relative w-full">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Search
+                      className="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <input
+                    type="search"
+                    placeholder="Cerca prodotti..."
+                    className="block w-full rounded-md border-0 bg-gray-700 py-2 pl-10 pr-3 text-gray-300 placeholder:text-gray-400 focus:bg-gray-600 focus:text-white focus:ring-2 focus:ring-white sm:text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Bottone menu mobile - sinistra su mobile */}
+              <div className="sm:hidden">
                 <DisclosureButton className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
@@ -47,57 +65,33 @@ export default function NavBar() {
                 </DisclosureButton>
               </div>
 
-              {/* Logo + link */}
-              <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                <div className="flex flex-shrink-0 items-center">
-                  <Image
-                    src="/logo_white.png"
-                    alt="Your Company"
-                    width={56}
-                    height={56}
-                    className="h-14 w-auto"
-                  />
-                </div>
-                <div className="hidden sm:ml-8 sm:flex sm:items-center">
-                  <div className="flex space-x-6">
-                    {navigation.map((item) => {
-                      const isActive = pathname === item.href;
-                      return (
-                        <a
-                          key={item.name}
-                          href={item.href}
-                          aria-current={isActive ? "page" : undefined}
-                          className={classNames(
-                            isActive
-                              ? "bg-gray-900 text-white"
-                              : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                            "flex items-center rounded-md px-4 py-3 text-base font-medium"
-                          )}
-                        >
-                          {item.name}
-                        </a>
-                      );
-                    })}
-                  </div>
-                </div>
+              {/* Logo - centro */}
+              <div className="flex flex-shrink-0 items-center">
+                <Image
+                  src="/logo_white.png"
+                  alt="Your Company"
+                  width={56}
+                  height={56}
+                  className="h-14 w-auto"
+                />
               </div>
 
-              {/* Icone lato destro */}
-              <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+              {/* Icone - destra (solo desktop) */}
+              <div className="hidden sm:flex flex-1 items-center justify-end gap-4">
                 <button
                   type="button"
                   className="relative rounded-full p-1 text-gray-400 hover:text-white focus:outline-none"
                 >
                   <span className="sr-only">View favorites</span>
-                  <HeartIcon className="h-6 w-6" aria-hidden="true" />
+                  <Heart className="h-6 w-6" aria-hidden="true" />
                 </button>
 
                 {/* Dropdown profilo */}
-                <Menu as="div" className="relative ml-4">
+                <Menu as="div" className="relative">
                   <div>
                     <MenuButton className="flex rounded-full text-sm focus:outline-none text-gray-400 hover:text-white">
                       <span className="sr-only">Open user menu</span>
-                      <UserIcon className="h-6 w-6" aria-hidden="true" />
+                      <User className="h-6 w-6" aria-hidden="true" />
                     </MenuButton>
                   </div>
                   <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg focus:outline-none">
@@ -143,31 +137,98 @@ export default function NavBar() {
                   </MenuItems>
                 </Menu>
               </div>
+
+              {/* Spazio vuoto a destra su mobile per centrare il logo */}
+              <div className="sm:hidden w-10"></div>
+            </div>
+
+            {/* Seconda riga: Link di navigazione - solo desktop */}
+            <div className="hidden sm:block border-t border-gray-700 mt-4">
+              <div className="flex justify-center space-x-8 py-4">
+                {navigation.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      aria-current={isActive ? "page" : undefined}
+                      className={classNames(
+                        isActive
+                          ? "bg-gray-900 text-white"
+                          : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                        "rounded-md px-4 py-2 text-base font-medium"
+                      )}
+                    >
+                      {item.name}
+                    </a>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
           {/* Menu mobile */}
           <DisclosurePanel className="sm:hidden">
-            <div className="space-y-1 px-2 pb-3 pt-2">
-              {navigation.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <DisclosureButton
-                    key={item.name}
-                    as="a"
-                    href={item.href}
-                    aria-current={isActive ? "page" : undefined}
-                    className={classNames(
-                      isActive
-                        ? "bg-gray-900 text-white"
-                        : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                      "block rounded-md px-3 py-2 text-base font-medium"
-                    )}
+            <div className="border-t border-gray-700">
+              {/* Barra di ricerca mobile */}
+              <div className="px-4 py-3">
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Search
+                      className="h-5 w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <input
+                    type="search"
+                    placeholder="Cerca prodotti..."
+                    className="block w-full rounded-md border-0 bg-gray-700 py-2 pl-10 pr-3 text-gray-300 placeholder:text-gray-400 focus:bg-gray-600 focus:text-white focus:ring-2 focus:ring-white sm:text-sm"
+                  />
+                </div>
+              </div>
+
+              {/* Link di navigazione */}
+              <div className="space-y-1 px-2 pb-3">
+                {navigation.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <DisclosureButton
+                      key={item.name}
+                      as="a"
+                      href={item.href}
+                      aria-current={isActive ? "page" : undefined}
+                      className={classNames(
+                        isActive
+                          ? "bg-gray-900 text-white"
+                          : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                        "block rounded-md px-3 py-2 text-base font-medium"
+                      )}
+                    >
+                      {item.name}
+                    </DisclosureButton>
+                  );
+                })}
+              </div>
+
+              {/* Icone e profilo nel menu mobile */}
+              <div className="border-t border-gray-700 px-2 pb-3 pt-4">
+                <div className="flex items-center justify-around">
+                  <a
+                    href="#"
+                    className="flex flex-col items-center gap-1 text-gray-300 hover:text-white"
                   >
-                    {item.name}
-                  </DisclosureButton>
-                );
-              })}
+                    <Heart className="h-6 w-6" />
+                    <span className="text-xs">Favorites</span>
+                  </a>
+                  <a
+                    href="/my-account"
+                    className="flex flex-col items-center gap-1 text-gray-300 hover:text-white"
+                  >
+                    <User className="h-6 w-6" />
+                    <span className="text-xs">Profile</span>
+                  </a>
+                </div>
+              </div>
             </div>
           </DisclosurePanel>
         </>
