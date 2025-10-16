@@ -12,7 +12,6 @@ const ListingConditionEnum = z.enum([
   "POOR",
 ]);
 
-// Schema per la CREAZIONE di un Listing
 export const createListingSchema = z.object({
   description: z.string().optional(),
   condition: ListingConditionEnum.default("NEW"),
@@ -23,22 +22,14 @@ export const createListingSchema = z.object({
   isActive: z.boolean().default(true),
   isFeatured: z.boolean().default(false),
   endDate: z.date().optional(),
-  itemId: z
-    .string({ error: "L'ID dell'articolo è obbligatorio." })
-    .cuid("L'ID dell'articolo non è valido."),
+  itemId: z.cuid("L'ID dell'articolo non è valido."),
 
-  // AGGIUNTA: Array degli ID delle taglie (Sizing) da associare.
-  // Questo è il modo corretto per gestire una relazione many-to-many.
   sizingIds: z
     .array(z.string().cuid("Uno o più ID di taglia non sono validi."))
     .min(1, "È richiesta almeno una taglia."),
 });
 
-// Schema per l'AGGIORNAMENTO, con tutti i campi opzionali.
-// `sizingIds` è opzionale qui per permettere di aggiornare solo altri campi
-// senza dover specificare di nuovo le taglie.
 export const updateListingSchema = createListingSchema.partial();
 
-// Tipi inferiti per l'utilizzo nel codice
 export type CreateListingDto = z.infer<typeof createListingSchema>;
 export type UpdateListingDto = z.infer<typeof updateListingSchema>;

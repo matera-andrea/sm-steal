@@ -68,34 +68,50 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    // Clausola `include` per caricare dati correlati
-    const include = {
-      sneakerModel: {
-        select: {
-          id: true,
-          name: true,
-          Brand: { select: { id: true, name: true } },
+    const itemsFromDb = await prisma.item.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+      include: {
+        sneakerModel: {
+          select: { name: true, Brand: { select: { name: true } } },
+        },
+        listings: {
+          where: { isActive: true },
+          select: { price: true }, // Non ci servono più le taglie qui
+        },
+        // FIX: Includiamo esplicitamente il conteggio degli wishlistItems
+        _count: {
+          select: { wishlistItems: true },
         },
       },
-      _count: {
-        select: { listings: true, wishlistItems: true },
-      },
-    };
+    });
+    const itemsForClient = itemsFromDb.map((item) => {
+      const { listings, _count, ...restOfItem } = item;
 
-    // Esecuzione delle query in parallelo per efficienza
-    const [items, total] = await prisma.$transaction([
-      prisma.item.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: "desc" },
-        include,
-      }),
-      prisma.item.count({ where }),
-    ]);
+      // Calcoliamo il range di prezzo
+      const prices = listings.map((l) => l.price);
+      const minPrice = listings.length > 0 ? Math.min(...prices) : null;
+      const maxPrice = listings.length > 0 ? Math.max(...prices) : null;
+
+      // La prop `availableSizesCount` non è più necessaria qui perché la gestiamo nel modale.
+      // Includiamo i conteggi con nomi chiari.
+      return {
+        ...restOfItem,
+        minPrice,
+        maxPrice,
+        // Usiamo il conteggio dei listing ATTIVI che abbiamo recuperato
+        listingCount: listings.length,
+        // Usiamo il conteggio dalla relazione _count
+        wishlistItemsCount: _count?.wishlistItems ?? 0,
+      };
+    });
+
+    const total = await prisma.item.count({ where });
 
     return NextResponse.json({
-      data: items,
+      data: itemsForClient, // Invia i dati mappati
       pagination: {
         page,
         limit,

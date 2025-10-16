@@ -5,7 +5,7 @@ import { updateSneakerModelSchema } from "@/app/lib/validation/sneakerModel.sche
 import { NextRequest, NextResponse } from "next/server";
 
 interface Params {
-  params: { id: string };
+  params: { sneakerModelId: string };
 }
 
 //
@@ -14,7 +14,7 @@ interface Params {
 export async function GET(request: NextRequest, { params }: Params) {
   try {
     const model = await prisma.sneakerModel.findUnique({
-      where: { id: params.id },
+      where: { id: params.sneakerModelId },
       include: {
         Brand: true, // Include tutti i dati del brand
         items: {
@@ -59,7 +59,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
     // Controlla che il modello da aggiornare esista
     const existingModel = await prisma.sneakerModel.findUnique({
-      where: { id: params.id },
+      where: { id: params.sneakerModelId },
     });
     if (!existingModel) {
       return NextResponse.json(
@@ -69,7 +69,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     }
 
     const updatedModel = await prisma.sneakerModel.update({
-      where: { id: params.id },
+      where: { id: params.sneakerModelId },
       data: validation.data,
     });
 
@@ -90,7 +90,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   try {
     // Controlla che il modello esista per ottenere il brandId associato
     const modelToDelete = await prisma.sneakerModel.findUnique({
-      where: { id: params.id },
+      where: { id: params.sneakerModelId },
       select: { brandId: true },
     });
 
@@ -108,7 +108,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       // Se questo non è il comportamento desiderato, la policy `onDelete`
       // nello schema Prisma andrebbe cambiata (es. `Restrict` o `SetNull`).
       await tx.sneakerModel.delete({
-        where: { id: params.id },
+        where: { id: params.sneakerModelId },
       });
 
       await tx.brand.update({

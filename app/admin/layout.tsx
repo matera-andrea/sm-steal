@@ -16,8 +16,10 @@ export default function RootLayout({
 }>) {
   const navigation = [
     { text: "Ritorna al sito", href: "/" },
-    { text: "Modelli", href: "/admin/items" },
     { text: "Brand", href: "/admin/brands" },
+    { text: "Modelli", href: "/admin/sneakerModels" },
+    { text: "Sottomodelli", href: "/admin/items" },
+    { text: "Annunci", href: "/admin/listings" },
   ];
 
   return (

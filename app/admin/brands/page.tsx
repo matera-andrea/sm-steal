@@ -1,24 +1,15 @@
-"use client";
-import { useState, useEffect } from "react";
+// /app/admin/brands/page.tsx
 
-import BrandTable from "@/app/components/tables/brand/BrandTable";
+import BrandTableClient from "./brandTableClient";
 
+// Questa è una Server Component. È leggera e veloce da caricare.
 export default function BrandsPage() {
-  const [data, setData] = useState(null);
-  const [isLoading, setLoading] = useState(true);
-  useEffect(() => {
-    fetch("/api/brands")
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-        setLoading(false);
-      });
-  }, []);
-  if (isLoading) return <p >Loading...</p>;
-  if (!data) return <p>No data</p>;
   return (
     <div>
-      <BrandTable initialData={data} />
+      {/* Qui puoi aggiungere altri elementi della pagina che beneficiano
+        del rendering lato server, come titoli, descrizioni, ecc.
+      */}
+      <BrandTableClient />
     </div>
   );
 }
