@@ -1,10 +1,9 @@
-
 import prisma from "@/app/lib/prisma";
 import { updateListingSchema } from "@/app/lib/validation/listing.schema";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Params {
-  params: { id: string };
+  params: { listingId: string };
 }
 
 //
@@ -13,7 +12,7 @@ interface Params {
 export async function GET(request: NextRequest, { params }: Params) {
   try {
     const listing = await prisma.listing.findUnique({
-      where: { id: params.id },
+      where: { id: await params.listingId },
       include: {
         item: {
           include: {
@@ -59,7 +58,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
     // Controlla che il listing da aggiornare esista
     const existingListing = await prisma.listing.findUnique({
-      where: { id: params.id },
+      where: { id: params.listingId },
     });
     if (!existingListing) {
       return NextResponse.json(
@@ -73,7 +72,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     const updatedListing = await prisma.$transaction(async (tx) => {
       // 1. Aggiorna i dati principali del listing
       const listing = await tx.listing.update({
-        where: { id: params.id },
+        where: { id: params.listingId },
         data: listingData,
       });
 
@@ -81,12 +80,12 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       if (sizingIds) {
         // Elimina le associazioni esistenti
         await tx.listingSizing.deleteMany({
-          where: { listingId: params.id },
+          where: { listingId: params.listingId },
         });
         // Crea le nuove associazioni
         await tx.listingSizing.createMany({
           data: sizingIds.map((sizingId) => ({
-            listingId: params.id,
+            listingId: params.listingId,
             sizingId: sizingId,
           })),
         });
@@ -109,8 +108,8 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 //
 export async function DELETE(request: NextRequest, { params }: Params) {
   try {
-    const listingToDelete = await prisma.listing.findUnique({
-      where: { id: params.id },
+    const listingToDelete = await prisma.listing.findFirst({
+      where: { id: params.listingId },
       select: { itemId: true },
     });
 
@@ -125,7 +124,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     // Dobbiamo solo preoccuparci di aggiornare il contatore.
     await prisma.$transaction(async (tx) => {
       await tx.listing.delete({
-        where: { id: params.id },
+        where: { id: params.listingId },
       });
 
       await tx.item.update({

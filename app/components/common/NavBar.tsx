@@ -1,18 +1,17 @@
 "use client";
 
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Heart, User, Search } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { FaUser } from "react-icons/fa";
 
 const navigation = [
   { name: "Home", href: "/" },
@@ -85,57 +84,14 @@ export default function NavBar() {
                   <span className="sr-only">View favorites</span>
                   <Heart className="h-6 w-6" aria-hidden="true" />
                 </button>
-
-                {/* Dropdown profilo */}
-                <Menu as="div" className="relative">
-                  <div>
-                    <MenuButton className="flex rounded-full text-sm focus:outline-none text-gray-400 hover:text-white">
-                      <span className="sr-only">Open user menu</span>
-                      <User className="h-6 w-6" aria-hidden="true" />
-                    </MenuButton>
-                  </div>
-                  <MenuItems className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg focus:outline-none">
-                    <MenuItem>
-                      {({ active }) => (
-                        <a
-                          href="/my-account"
-                          className={classNames(
-                            active ? "bg-gray-100" : "",
-                            "block px-4 py-2 text-sm text-gray-700"
-                          )}
-                        >
-                          Your Profile
-                        </a>
-                      )}
-                    </MenuItem>
-                    <MenuItem>
-                      {({ active }) => (
-                        <a
-                          href="#"
-                          className={classNames(
-                            active ? "bg-gray-100" : "",
-                            "block px-4 py-2 text-sm text-gray-700"
-                          )}
-                        >
-                          Settings
-                        </a>
-                      )}
-                    </MenuItem>
-                    <MenuItem>
-                      {({ active }) => (
-                        <a
-                          href="#"
-                          className={classNames(
-                            active ? "bg-gray-100" : "",
-                            "block px-4 py-2 text-sm text-gray-700"
-                          )}
-                        >
-                          Sign out
-                        </a>
-                      )}
-                    </MenuItem>
-                  </MenuItems>
-                </Menu>
+                <SignedIn>
+                  <UserButton />
+                </SignedIn>
+                <SignedOut>
+                  <Link href="/login">
+                    <FaUser color="white" />
+                  </Link>
+                </SignedOut>
               </div>
 
               {/* Spazio vuoto a destra su mobile per centrare il logo */}
@@ -217,7 +173,9 @@ export default function NavBar() {
                     href="#"
                     className="flex flex-col items-center gap-1 text-gray-300 hover:text-white"
                   >
-                    <Heart className="h-6 w-6" />
+                    <Link href="whishlist">
+                      <Heart className="h-6 w-6" />
+                    </Link>
                     <span className="text-xs">Favorites</span>
                   </a>
                   <a

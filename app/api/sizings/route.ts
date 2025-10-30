@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(sizing, { status: 201 });
+    return NextResponse.json({ data: sizing }, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

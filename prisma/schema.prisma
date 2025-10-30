@@ -127,8 +127,6 @@ model Photo {
   
   listingId String
   
-  // FIX: La relazione con Listing deve essere obbligatoria (Listing e non Listing?).
-  // Una foto deve sempre appartenere a un annuncio.
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
   
   @@index([listingId])

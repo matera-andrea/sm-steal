@@ -5,7 +5,6 @@ import { createListingSchema } from "@/app/lib/validation/listing.schema";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-// Schema di validazione per i parametri della query
 const querySchema = z.object({
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(20),
@@ -17,6 +16,7 @@ const querySchema = z.object({
     .optional(),
   minPrice: z.coerce.number().min(0).optional(),
   maxPrice: z.coerce.number().positive().optional(),
+  sizingId: z.string().cuid().optional(), // Nuovo filtro per taglia
 });
 
 //
@@ -46,19 +46,32 @@ export async function GET(request: NextRequest) {
       condition,
       minPrice,
       maxPrice,
+      sizingId,
     } = validation.data;
+
     const skip = (page - 1) * limit;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: Record<string, any> = {};
+
     if (isActive) where.isActive = isActive === "true";
     if (isFeatured) where.isFeatured = isFeatured === "true";
     if (itemId) where.itemId = itemId;
     if (condition) where.condition = condition;
+
     if (minPrice !== undefined || maxPrice !== undefined) {
       where.price = {};
       if (minPrice !== undefined) where.price.gte = minPrice;
       if (maxPrice !== undefined) where.price.lte = maxPrice;
+    }
+
+    // Filtro per taglia - usa la relazione many-to-many
+    if (sizingId) {
+      where.sizings = {
+        some: {
+          sizingId: sizingId,
+        },
+      };
     }
 
     const [listings, total] = await prisma.$transaction([
@@ -69,8 +82,22 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: "desc" },
         include: {
           item: { select: { id: true, name: true, sku: true } },
-          sizings: { include: { sizing: true } }, // Include le taglie associate
-          _count: { select: { photos: true } },
+          sizings: {
+            include: {
+              sizing: {
+                select: {
+                  id: true,
+                  size: true,
+                },
+              },
+            },
+          },
+          photos: {
+            orderBy: [{ isMain: "desc" }, { order: "asc" }],
+            select: {
+              url: true,
+            },
+          },
         },
       }),
       prisma.listing.count({ where }),
@@ -87,9 +114,7 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-//
+} //
 // CREATE A NEW LISTING
 //
 export async function POST(request: NextRequest) {

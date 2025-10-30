@@ -1,12 +1,7 @@
-import type { Metadata } from "next";
+import Footer from "../components/common/Footer";
 import NavBar from "../components/common/NavBar";
 
-export const metadata: Metadata = {
-  title: "sm.steal",
-  description: "Find here your grail",
-};
-
-export default function PublicLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -14,7 +9,15 @@ export default function PublicLayout({
   return (
     <>
       <NavBar />
-      {children}
+      <div className="flex flex-col items-center">
+        <div
+          className="relative w-full
+                h-[calc(100vh-167px)] xs:h-[50vh]"
+        >
+          {children}
+        </div>
+      </div>
+      <Footer />
     </>
   );
 }

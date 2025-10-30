@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "brandfetch.com",
       },
+      {
+        protocol: "https",
+        hostname: "pub-764b2f9992e44491998ffd3f90e860c7.r2.dev",
+      },
     ],
   },
 };
