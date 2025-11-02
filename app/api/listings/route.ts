@@ -121,7 +121,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const validation = createListingSchema.safeParse(body);
-
     if (!validation.success) {
       return NextResponse.json(
         { message: "Dati non validi", errors: validation.error.issues },

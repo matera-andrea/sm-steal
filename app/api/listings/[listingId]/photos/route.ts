@@ -121,6 +121,8 @@ export async function POST(
       isMain: formData.get("isMain"),
       order: formData.get("order"),
     };
+
+    console.log(formValues);
     const bodyValidation = createPhotoSchema.safeParse(formValues);
 
     if (!bodyValidation.success) {

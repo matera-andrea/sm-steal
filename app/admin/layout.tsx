@@ -19,6 +19,7 @@ export default function RootLayout({
     { text: "Modelli", href: "/admin/sneakerModels" },
     { text: "Sottomodelli", href: "/admin/items" },
     { text: "Annunci", href: "/admin/listings" },
+    { text: "Aggiungi annuncio", href: "/admin/addListing" },
   ];
 
   return (

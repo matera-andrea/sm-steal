@@ -25,7 +25,7 @@ export const createListingSchema = z.object({
   itemId: z.cuid("L'ID dell'articolo non è valido."),
 
   sizingIds: z
-    .array(z.string().cuid("Uno o più ID di taglia non sono validi."))
+    .array(z.cuid("Uno o più ID di taglia non sono validi."))
     .min(1, "È richiesta almeno una taglia."),
 });
 
