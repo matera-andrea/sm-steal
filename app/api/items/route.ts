@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       // Questo check ora è ridondante con safeParse ma lo teniamo per sicurezza
       return NextResponse.json(
-        { message: "Validation error", errors: error.flatten() },
+        { message: "Validation error", errors: error },
         { status: 400 }
       );
     }

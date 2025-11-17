@@ -91,9 +91,8 @@ model SneakerModel{
 model Item {
   id                 String       @id @default(cuid())
   name               String       @unique
-  description        String?
   category           CategoryItem
-  sku                String?      @unique
+  sku                String?
   gender             Gender       @default(MEN)
   isActive           Boolean      @default(true)
   createdAt          DateTime     @default(now())

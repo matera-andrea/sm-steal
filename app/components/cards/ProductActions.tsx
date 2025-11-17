@@ -48,7 +48,7 @@ export function ProductActions({ listing }: ProductActionsProps) {
       {/* Sezione Selezione Taglia (Dinamica) */}
       {hasSizings && (
         <div className="mt-6">
-          <h3 className="text-sm font-medium text-white mb-2">
+          <h3 className="text-sm font-medium mb-2">
             Seleziona Taglia:
           </h3>
           <fieldset aria-label="Scegli una taglia">
@@ -75,7 +75,7 @@ export function ProductActions({ listing }: ProductActionsProps) {
                       ${
                         selectedSizingId === listingSizing.sizingId
                           ? "ring-2 ring-primary-500 border-primary-500 bg-primary-50 text-primary-600"
-                          : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50 dark:bg-gray-400 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-300"
+                          : "border-gray-200 bg-white text-gray-500 hover:bg-gray-50 "
                       }
                     `}
                   >
@@ -95,7 +95,7 @@ export function ProductActions({ listing }: ProductActionsProps) {
           type="button"
           onClick={handleAddToFavorites}
           title="Aggiungi ai preferiti"
-          className="flex items-center justify-center py-2.5 px-5 text-sm font-medium text-gray-500 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-300 dark:bg-gray-400 dark:text-gray-400 dark:border-gray-200 dark:hover:text-white dark:hover:bg-gray-500 w-full sm:w-auto"
+          className="flex items-center justify-center py-2.5 px-5 text-sm font-medium focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-100  w-full sm:w-auto"
         >
           <svg
             className="w-5 h-5 -ms-2 me-2"

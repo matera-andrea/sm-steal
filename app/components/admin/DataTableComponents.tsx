@@ -41,7 +41,9 @@ export function EditRow<T, TForm>({
 }) {
   const [formData, setFormData] = useState<TForm>(item);
 
-  const handleSave = () => onSave(formData);
+  const handleSave = () => {
+    onSave(formData);
+  };
 
   const baseClasses =
     "w-full px-3 py-2 border border-gray-300 rounded focus:outline-none";

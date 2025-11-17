@@ -56,7 +56,9 @@ const getItemColumns = (
       <input
         type="text"
         value={formData.name || ""}
-        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        onChange={(e) =>
+          setFormData({ ...formData, name: e.target.value })
+        }
         className={className}
         placeholder="Item name"
         required

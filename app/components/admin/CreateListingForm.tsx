@@ -216,7 +216,7 @@ export default function CreateListingForm() {
 
       // Redirect alla pagina del listing dopo 2 secondi
       setTimeout(() => {
-        router.push(`/shop/${newListing.id}`);
+        router.refresh();
       }, 2000);
     } catch (err) {
       console.error("Error creating listing:", err);
@@ -256,7 +256,7 @@ export default function CreateListingForm() {
 
       {success && (
         <div className="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
-          ✓ Listing creato con successo! Reindirizzamento in corso...
+          ✓ Listing creato con successo!
         </div>
       )}
 

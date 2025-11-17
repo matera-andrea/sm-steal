@@ -5,7 +5,7 @@ import { updateItemSchema } from "@/app/lib/validation/item.schema";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Params {
-  params: { id: string };
+  params: { itemId: string };
 }
 
 //
@@ -13,8 +13,9 @@ interface Params {
 //
 export async function GET(request: NextRequest, { params }: Params) {
   try {
+    const { itemId } = await params;
     const item = await prisma.item.findUnique({
-      where: { id: params.id },
+      where: { id: itemId },
       include: {
         sneakerModel: {
           include: {
@@ -51,10 +52,12 @@ export async function GET(request: NextRequest, { params }: Params) {
 //
 export async function PATCH(request: NextRequest, { params }: Params) {
   try {
+    const { itemId } = await params;
     const body = await request.json();
     const validation = updateItemSchema.safeParse(body);
 
     if (!validation.success) {
+      console.log("Validation errors:", validation.error.issues);
       return NextResponse.json(
         { message: "Dati non validi", errors: validation.error.issues },
         { status: 400 }
@@ -63,7 +66,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
     // Controlla che l'item da aggiornare esista
     const existingItem = await prisma.item.findUnique({
-      where: { id: params.id },
+      where: { id: itemId },
     });
     if (!existingItem) {
       return NextResponse.json(
@@ -73,7 +76,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     }
 
     const updatedItem = await prisma.item.update({
-      where: { id: params.id },
+      where: { id: itemId },
       data: validation.data,
     });
 
@@ -93,8 +96,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 export async function DELETE(request: NextRequest, { params }: Params) {
   try {
     // Controlla che l'item da eliminare esista per ottenere l'ID del modello
+    const { itemId } = await params;
     const itemToDelete = await prisma.item.findUnique({
-      where: { id: params.id },
+      where: { id: itemId },
       select: { sneakerModelId: true },
     });
 
@@ -108,7 +112,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     // Usa una transazione per eliminare l'item e decrementare il contatore
     await prisma.$transaction(async (tx) => {
       await tx.item.delete({
-        where: { id: params.id },
+        where: { id: itemId },
       });
 
       await tx.sneakerModel.update({
