@@ -235,8 +235,8 @@ export default function ListingForm() {
         // Per sicurezza, passiamo lo SKU e i nomi. Se l'item esiste, l'API userà quello.
         payloadData = {
           // Fallback values se useItems non ha le relazioni popolate
-          brandName: selectedItem.sneakerModel?.Brand?.name || "Generic Brand",
-          modelName: selectedItem.sneakerModel?.name || "Generic Model",
+          brandName: selectedItem.name || "Generic Brand",
+          modelName: selectedItem.name || "Generic Model",
           itemName: selectedItem.name,
           sku: selectedItem.sku,
           category: selectedItem.category,
