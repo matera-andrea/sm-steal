@@ -1,56 +1,35 @@
-// /api/sneaker-models/route.ts
-
+// app/api/sneakerModels/route.ts
 import prisma from "@/app/lib/prisma";
+import { querySchema } from "@/app/lib/validation/query.schema";
 import { createSneakerModelSchema } from "@/app/lib/validation/sneakerModel.schema";
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-// Schema per la validazione dei parametri della query string
-const querySchema = z.object({
-  search: z.string().optional(),
-  page: z.coerce.number().min(1).default(1),
-  limit: z.coerce.number().min(1).max(100).default(20),
-  isActive: z.enum(["true", "false"]).optional(),
-  brandId: z.string().cuid("ID del brand non valido.").optional(),
+const sneakerModelsQuerySchema = querySchema.extend({
+  brandId: z.cuid("ID del brand non valido.").optional(),
 });
 
-//
-// GET ALL SNEAKER MODELS (con filtri e paginazione)
-//
+// GET ALL SNEAKER MODELS
 export async function GET(request: NextRequest) {
   try {
     const searchParams = Object.fromEntries(request.nextUrl.searchParams);
-    const validation = querySchema.safeParse(searchParams);
+    const validation = sneakerModelsQuerySchema.safeParse(searchParams);
 
     if (!validation.success) {
       return NextResponse.json(
-        {
-          message: "Parametri di ricerca non validi",
-          errors: validation.error.issues,
-        },
-        { status: 400 }
+        { message: "Parametri non validi", errors: validation.error.issues },
+        { status: 400 },
       );
     }
 
-    const params = validation.data;
-    const { page, limit, search, isActive, brandId } = params;
-
+    const { page, limit, search, isActive, brandId } = validation.data;
     const skip = (page - 1) * limit;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: Record<string, any> = {};
+    const where: Prisma.SneakerModelWhereInput = {};
     if (search) where.name = { contains: search, mode: "insensitive" };
     if (isActive) where.isActive = isActive === "true";
     if (brandId) where.brandId = brandId;
-
-    const include = {
-      Brand: {
-        select: { id: true, name: true },
-      },
-      _count: {
-        select: { items: true },
-      },
-    };
 
     const [sneakerModels, total] = await prisma.$transaction([
       prisma.sneakerModel.findMany({
@@ -58,7 +37,10 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
         orderBy: { name: "asc" },
-        include,
+        include: {
+          Brand: { select: { id: true, name: true } },
+          _count: { select: { items: true } },
+        },
       }),
       prisma.sneakerModel.count({ where }),
     ]);
@@ -76,14 +58,12 @@ export async function GET(request: NextRequest) {
     console.error("[SNEAKER_MODELS_GET] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-//
 // CREATE SNEAKER MODEL
-//
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -92,44 +72,41 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         { message: "Dati non validi", errors: validation.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const { name, brandId, ...rest } = validation.data;
 
-    // Controllo se esiste già un modello con lo stesso nome
+    // Verifica esistenza duplicato
     const existingModel = await prisma.sneakerModel.findUnique({
       where: { name },
     });
     if (existingModel) {
       return NextResponse.json(
-        { message: `Un modello con il nome '${name}' esiste già.` },
-        { status: 409 }
+        { message: `Il modello '${name}' esiste già.` },
+        { status: 409 },
       );
     }
 
-    // Controllo che il brand esista prima di creare il modello
+    // Verifica esistenza Brand
     const brandExists = await prisma.brand.findUnique({
       where: { id: brandId },
     });
     if (!brandExists) {
       return NextResponse.json(
-        { message: `Il brand con ID '${brandId}' non è stato trovato.` },
-        { status: 404 }
+        { message: "Brand di riferimento non trovato." },
+        { status: 404 },
       );
     }
 
     const newModel = await prisma.$transaction(async (tx) => {
       const model = await tx.sneakerModel.create({
-        data: {
-          name,
-          brandId,
-          ...rest,
-        },
+        data: { name, brandId, ...rest },
+        include: { Brand: true },
       });
 
-      // Incrementa il contatore dei modelli nel brand corrispondente
+      // Aggiorniamo il contatore globale del Brand (itemsCount o modelsCount a seconda del tuo naming)
       await tx.brand.update({
         where: { id: brandId },
         data: { itemsCount: { increment: 1 } },
@@ -143,7 +120,7 @@ export async function POST(request: NextRequest) {
     console.error("[SNEAKER_MODELS_POST] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

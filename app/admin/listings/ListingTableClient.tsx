@@ -1,11 +1,11 @@
-// /app/admin/listings/ListingTableClient.tsx
-
+// app/admin/listings/ListingTableClient.tsx
 "use client";
 
-import { useState, Dispatch, SetStateAction } from "react";
 import DataTable, { ColumnDef } from "@/app/components/admin/DataTable";
+import { useBrands } from "@/hooks/useBrands";
 import { useItems } from "@/hooks/useItems";
 import { useSizings } from "@/hooks/useSizings";
+import { useSneakerModels } from "@/hooks/useSneakerModels";
 import {
   Listing,
   Item,
@@ -13,73 +13,20 @@ import {
   ListingSizing,
   ListingCondition,
 } from "@prisma/client";
-import { ChevronDown } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
+import { useMemo } from "react"; // <--- 1. Importa useMemo
 
-// TIPO: Definisce la struttura dei dati come arrivano dall'API per la visualizzazione
 type ListingWithRelations = Listing & {
   item: Pick<Item, "id" | "name"> | null;
   sizings: (ListingSizing & { sizing: Sizing })[];
-  // Aggiungiamo sizingIds qui per renderlo compatibile con il form
-  sizingIds?: string[];
+  variants?: {
+    sizingId: string;
+    price: number;
+    condition: ListingCondition;
+    stock: number;
+  }[];
 };
 
-// ----------------------------------------------------------------
-// HELPER COMPONENT: Multi-Select (locale a questo file)
-// ----------------------------------------------------------------
-const SizingMultiSelect = ({
-  availableSizings,
-  selectedIds,
-  onChange,
-  className,
-}: {
-  availableSizings: Sizing[];
-  selectedIds: string[];
-  onChange: (ids: string[]) => void;
-  className: string;
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const handleSelect = (id: string) => {
-    const newSelection = selectedIds.includes(id)
-      ? selectedIds.filter((sid) => sid !== id)
-      : [...selectedIds, id];
-    onChange(newSelection);
-  };
-  return (
-    <div className="relative">
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={`${className} flex justify-between items-center text-left`}
-      >
-        <span>{selectedIds.length} size(s) selected</span>{" "}
-        <ChevronDown size={16} />
-      </button>
-      {isOpen && (
-        <div className="fixed z-100 w-full bg-white border rounded shadow-lg max-h-48 overflow-y-auto mt-1">
-          {availableSizings.map((sizing) => (
-            <label
-              key={sizing.id}
-              className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer"
-            >
-              <input
-                type="checkbox"
-                checked={selectedIds.includes(sizing.id)}
-                onChange={() => handleSelect(sizing.id)}
-              />
-              <span>
-                {sizing.type}: {sizing.size}
-              </span>
-            </label>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ----------------------------------------------------------------
-// CONFIGURAZIONE
-// ----------------------------------------------------------------
 const conditionOptions: ListingCondition[] = [
   "NEW",
   "LIKE_NEW",
@@ -92,25 +39,28 @@ const conditionOptions: ListingCondition[] = [
 const getListingColumns = (
   items: ReturnType<typeof useItems>["items"],
   itemsLoading: boolean,
-  sizings: ReturnType<typeof useSizings>["sizings"]
+  availableSizings: Sizing[],
 ): ColumnDef<ListingWithRelations>[] => [
   {
     header: "Item",
     accessorKey: "itemId",
     renderCell: (listing) => (
-      <p className="font-semibold">{listing.item?.name || "N/A"}</p>
+      <div className="py-2">
+        <p className="font-black uppercase italic tracking-tighter text-gray-900">
+          {listing.item?.name || "N/A"}
+        </p>
+        <p className="text-[10px] text-gray-400 font-mono">{listing.id}</p>
+      </div>
     ),
     renderEditCell: (formData, setFormData, className) => (
       <select
         value={formData.itemId || ""}
         onChange={(e) => setFormData({ ...formData, itemId: e.target.value })}
-        className={className}
+        className={`${className} font-bold uppercase text-xs`}
         disabled={itemsLoading}
         required
       >
-        <option value="" disabled>
-          {itemsLoading ? "Loading..." : "Select Item"}
-        </option>
+        <option value="">Select Item</option>
         {items.map((item) => (
           <option key={item.id} value={item.id}>
             {item.name}
@@ -120,90 +70,216 @@ const getListingColumns = (
     ),
   },
   {
-    header: "Details",
-    accessorKey: "price",
-    renderCell: (listing) => (
-      <div>
-        <p className="font-bold">€{listing.price.toFixed(2)}</p>
-        <p className="text-xs">Stock: {listing.stock}</p>{" "}
-        <p className="text-xs text-gray-600">{listing.condition}</p>
-      </div>
-    ),
-    renderEditCell: (formData, setFormData, className) => (
-      <div className="space-y-1">
-        <label>Prezzo</label>
-        <input
-          type="number"
-          step="0.01"
-          value={formData.price || 0}
-          onChange={(e) =>
-            setFormData({ ...formData, price: parseFloat(e.target.value) })
-          }
-          className={className}
-          placeholder="Price"
-          required
-        />
-        <label>Stock</label>
-        <input
-          type="number"
-          value={formData.stock || 1}
-          onChange={(e) =>
-            setFormData({ ...formData, stock: parseInt(e.target.value) })
-          }
-          className={className}
-          placeholder="Stock"
-          required
-        />
-        <label>Condizione</label>
-
-        <select
-          value={formData.condition || "NEW"}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              condition: e.target.value as ListingCondition,
-            })
-          }
-          className={className}
-        >
-          {conditionOptions.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt}
-            </option>
-          ))}
-        </select>
-      </div>
+    header: "Price Range & Condition",
+    accessorKey: "id",
+    renderCell: (listing) => {
+      const prices = listing.sizings.map((s) => s.price);
+      const min = Math.min(...prices);
+      const max = Math.max(...prices);
+      return (
+        <div className="space-y-1">
+          <p className="font-black text-amber-500">
+            {prices.length > 0
+              ? min === max
+                ? `€${min}`
+                : `€${min} - €${max}`
+              : "N/A"}
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {Array.from(new Set(listing.sizings.map((s) => s.condition))).map(
+              (c) => (
+                <span
+                  key={c}
+                  className="text-[9px] bg-gray-100 px-1 font-bold uppercase"
+                >
+                  {c}
+                </span>
+              ),
+            )}
+          </div>
+        </div>
+      );
+    },
+    renderEditCell: () => (
+      <span className="text-[10px] text-gray-400 italic">
+        Managed in Variants →
+      </span>
     ),
   },
   {
-    header: "Sizes",
-    accessorKey: "id",
+    header: "Variants (Size / Price / Stock)",
+    accessorKey: "sizings",
     renderCell: (listing) => (
-      <div className="flex flex-wrap gap-1 max-w-xs z-100">
+      <div className="grid grid-cols-1 gap-1 min-w-[200px]">
         {listing.sizings.map((s) => (
-          <span
+          <div
             key={s.id}
-            className="text-xs bg-gray-200 px-2 py-1 rounded-full"
+            className="text-[10px] border border-gray-100 p-1.5 rounded bg-gray-50 flex items-center justify-between gap-2"
           >
-            {s.sizing.type}: {s.sizing.size}
-          </span>
+            <div className="flex gap-2">
+              <span className="font-bold w-12">
+                {s.sizing.size}{" "}
+                <span className="text-gray-400 font-normal">
+                  {s.sizing.type}
+                </span>
+              </span>
+              <span className="text-gray-500 uppercase text-[9px] w-16 truncate">
+                {s.condition.replace("_", " ")}
+              </span>
+            </div>
+
+            <div className="flex gap-3">
+              <span className="text-amber-600 font-black w-12 text-right">
+                €{s.price}
+              </span>
+              <span
+                className={`font-mono font-bold w-8 text-center rounded ${
+                  s.stock > 0
+                    ? "bg-white text-black border border-gray-200"
+                    : "bg-red-100 text-red-500"
+                }`}
+              >
+                x{s.stock}
+              </span>
+            </div>
+          </div>
         ))}
       </div>
     ),
-    // NOTA: Poiché il tuo DataTable usa un solo tipo generico, qui dobbiamo gestire la conversione.
-    // Quando si modifica, popoliamo `sizingIds` dall'array `sizings`.
-    renderEditCell: (formData, setFormData, className) => {
-      // Inizializza sizingIds se non esiste (la prima volta che si clicca "edit")
-      if (formData.sizingIds === undefined) {
-        formData.sizingIds = formData.sizings?.map((s) => s.sizingId) || [];
+    renderEditCell: (formData, setFormData) => {
+      if (formData.variants === undefined) {
+        formData.variants =
+          formData.sizings?.map((s) => ({
+            sizingId: s.sizingId,
+            price: s.price,
+            condition: s.condition,
+            stock: s.stock ?? 1,
+          })) || [];
       }
+
+      const addVariant = () => {
+        setFormData({
+          ...formData,
+          variants: [
+            ...(formData.variants || []),
+            { sizingId: "", price: 0, condition: "NEW", stock: 1 },
+          ],
+        });
+      };
+
+      const updateVariant = (
+        index: number,
+        field: keyof NonNullable<ListingWithRelations["variants"]>[number],
+        value: string | number,
+      ) => {
+        const newVariants = [...(formData.variants || [])];
+        newVariants[index] = { ...newVariants[index], [field]: value };
+        setFormData({ ...formData, variants: newVariants });
+      };
+
+      const removeVariant = (index: number) => {
+        setFormData({
+          ...formData,
+          variants: formData.variants?.filter((_, i) => i !== index),
+        });
+      };
+
       return (
-        <SizingMultiSelect
-          availableSizings={sizings}
-          selectedIds={formData.sizingIds || []}
-          onChange={(ids) => setFormData({ ...formData, sizingIds: ids })}
-          className={className}
-        />
+        <div className="space-y-3 min-w-[450px] p-3 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="flex justify-between items-center pb-2 border-b border-gray-200">
+            <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">
+              Manage Variants (Size • Price • Stock)
+            </span>
+            <button
+              onClick={addVariant}
+              type="button"
+              className="bg-black text-white p-1.5 rounded hover:bg-amber-500 hover:text-black transition-colors"
+            >
+              <Plus size={14} />
+            </button>
+          </div>
+
+          <div className="space-y-2 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
+            {formData.variants.length === 0 && (
+              <div className="text-center py-4 text-xs text-gray-400 italic">
+                No variants added.
+              </div>
+            )}
+
+            {formData.variants.map((v, i) => (
+              <div
+                key={i}
+                className="flex gap-2 items-center bg-white p-2 rounded-md shadow-sm border border-gray-100 group"
+              >
+                <select
+                  value={v.sizingId}
+                  onChange={(e) => updateVariant(i, "sizingId", e.target.value)}
+                  className="text-[10px] font-bold p-1.5 border border-gray-200 rounded w-1/4 outline-none focus:border-black"
+                >
+                  <option value="">Size</option>
+                  {availableSizings.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.size} ({s.type})
+                    </option>
+                  ))}
+                </select>
+
+                <div className="relative w-1/5">
+                  <span className="absolute left-1.5 top-1.5 text-[10px] text-gray-400">
+                    €
+                  </span>
+                  <input
+                    type="number"
+                    placeholder="0"
+                    value={v.price}
+                    onChange={(e) =>
+                      updateVariant(i, "price", parseFloat(e.target.value))
+                    }
+                    className="text-[10px] font-bold p-1.5 pl-4 border border-gray-200 rounded w-full outline-none focus:border-black"
+                  />
+                </div>
+
+                <div className="relative w-[15%]">
+                  <span className="absolute left-1.5 top-1.5 text-[10px] text-gray-400">
+                    #
+                  </span>
+                  <input
+                    type="number"
+                    placeholder="Qty"
+                    min="0"
+                    value={v.stock}
+                    onChange={(e) =>
+                      updateVariant(i, "stock", parseInt(e.target.value))
+                    }
+                    className="text-[10px] font-bold p-1.5 pl-4 border border-gray-200 rounded w-full outline-none focus:border-black"
+                  />
+                </div>
+
+                <select
+                  value={v.condition}
+                  onChange={(e) =>
+                    updateVariant(i, "condition", e.target.value)
+                  }
+                  className="text-[10px] font-bold p-1.5 border border-gray-200 rounded w-1/4 outline-none focus:border-black"
+                >
+                  {conditionOptions.map((o) => (
+                    <option key={o} value={o}>
+                      {o.replace("_", " ")}
+                    </option>
+                  ))}
+                </select>
+
+                <button
+                  type="button"
+                  onClick={() => removeVariant(i)}
+                  className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       );
     },
   },
@@ -212,19 +288,13 @@ const getListingColumns = (
     accessorKey: "isActive",
     renderCell: (listing) => (
       <span
-        className={`relative inline-block px-3 py-1 font-semibold ${
-          listing.isActive ? "text-green-900" : "text-red-900"
+        className={`text-[10px] font-black uppercase px-2 py-1 rounded ${
+          listing.isActive
+            ? "bg-green-100 text-green-700"
+            : "bg-red-100 text-red-700"
         }`}
       >
-        <span
-          aria-hidden
-          className={`absolute inset-0 opacity-50 rounded-full ${
-            listing.isActive ? "bg-green-200" : "bg-red-200"
-          }`}
-        ></span>
-        <span className="relative">
-          {listing.isActive ? "Active" : "Inactive"}
-        </span>
+        {listing.isActive ? "Online" : "Offline"}
       </span>
     ),
     renderEditCell: (formData, setFormData, className) => (
@@ -242,30 +312,79 @@ const getListingColumns = (
   },
 ];
 
-// ----------------------------------------------------------------
-// COMPONENTE PRINCIPALE
-// ----------------------------------------------------------------
+interface ListingFilters {
+  brandId?: string;
+  sneakerModelId?: string;
+}
+
 export default function ListingTableClient() {
   const { items, loading: itemsLoading } = useItems();
-  const { sizings, loading: sizingsLoading } = useSizings();
-  const columns = getListingColumns(items, itemsLoading, sizings);
+  const { sizings } = useSizings();
+  const { brands } = useBrands();
+  const { models } = useSneakerModels();
 
-  // L'oggetto per la riga "Aggiungi" ora include `sizingIds`
-  const emptyListing: Partial<ListingWithRelations> = {
-    itemId: "",
-    price: 0,
-    stock: 1,
-    condition: "NEW",
-    isActive: true,
-    sizingIds: [],
-  };
+  // 2. Utilizza useMemo per evitare il loop infinito
+  const columns = useMemo(() => {
+    return getListingColumns(items, itemsLoading, sizings);
+  }, [items, itemsLoading, sizings]);
 
   return (
-    <DataTable<ListingWithRelations>
+    <DataTable<ListingWithRelations, ListingFilters>
       modelName="Listing"
       apiEndpoint="/api/listings"
       columns={columns}
-      initialEmptyRow={emptyListing}
+      initialEmptyRow={{ itemId: "", isActive: true, variants: [] }}
+      initialFilters={{ brandId: "", sneakerModelId: "" }}
+      renderFilters={(filters, setFilters) => (
+        <div className="flex items-center gap-2">
+          <select
+            value={filters.brandId || ""}
+            onChange={(e) =>
+              setFilters({
+                ...filters,
+                brandId: e.target.value,
+                sneakerModelId: "",
+              })
+            }
+            className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black"
+          >
+            <option value="">All Brands</option>
+            {brands?.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={filters.sneakerModelId || ""}
+            onChange={(e) =>
+              setFilters({ ...filters, sneakerModelId: e.target.value })
+            }
+            className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black"
+          >
+            <option value="">All Models</option>
+            {models
+              ?.filter(
+                (m) => !filters.brandId || m.Brand?.name === filters.brandId,
+              )
+              .map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name}
+                </option>
+              ))}
+          </select>
+
+          {(filters.brandId || filters.sneakerModelId) && (
+            <button
+              onClick={() => setFilters({ brandId: "", sneakerModelId: "" })}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-black"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+      )}
     />
   );
 }

@@ -5,7 +5,7 @@ import { updateItemSchema } from "@/app/lib/validation/item.schema";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Params {
-  params: { itemId: string };
+  params: Promise<{ itemId: string }>;
 }
 
 //
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     if (!item) {
       return NextResponse.json(
         { message: "Articolo non trovato." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     console.error("[ITEM_GET_BY_ID] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -60,7 +60,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       console.log("Validation errors:", validation.error.issues);
       return NextResponse.json(
         { message: "Dati non validi", errors: validation.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -71,7 +71,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     if (!existingItem) {
       return NextResponse.json(
         { message: "Articolo non trovato." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -85,7 +85,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     console.error("[ITEM_PATCH] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -105,7 +105,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     if (!itemToDelete) {
       return NextResponse.json(
         { message: "Articolo non trovato." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -126,7 +126,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     console.error("[ITEM_DELETE] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

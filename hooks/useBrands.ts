@@ -1,35 +1,39 @@
-// /hooks/useBrands.ts
-
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { Brand } from "@prisma/client";
-import { useState, useEffect } from "react";
 
-type SimpleBrand = Pick<Brand, "id" | "name">;
+export type SimpleBrand = Pick<Brand, "id" | "name">;
+
+interface BrandApiResponse {
+  data: SimpleBrand[];
+}
 
 export function useBrands() {
-  const [brands, setBrands] = useState<SimpleBrand[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["brands-list"], // Chiave univoca per la cache
+    queryFn: async () => {
+      // Parametri fissi per la dropdown
+      const params = new URLSearchParams({
+        page: "1",
+        limit: "100",
+        isActive: "true",
+      });
 
-  useEffect(() => {
-    const fetchBrands = async () => {
-      try {
-        setLoading(true);
-        // Usiamo un limite alto per assicurarci di prenderli tutti per la select
-        const response = await fetch("/api/brands");
-        if (!response.ok) throw new Error("Failed to fetch brands");
+      const response = await fetch(`/api/brands?${params.toString()}`);
+      if (!response.ok) throw new Error("Failed to fetch brands");
 
-        const data = await response.json();
-        setBrands(data.data);
-      } catch (error) {
-        console.error("Error fetching brands for dropdown:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const json: BrandApiResponse = await response.json();
+      return json.data || [];
+    },
+    staleTime: 1000 * 60 * 15, // I brand non cambiano spesso: cache per 15 minuti
+    refetchOnWindowFocus: false, // Evita refetch se cambi tab
+  });
 
-    fetchBrands();
-  }, []);
-
-  return { brands, loading };
+  return {
+    brands: data || [],
+    loading: isLoading,
+    isError,
+    refetch,
+  };
 }

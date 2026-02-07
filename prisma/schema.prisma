@@ -99,13 +99,11 @@ model Item {
   updatedAt          DateTime     @updatedAt
   // Questi contatori sono gestiti dal database tramite transazioni, non dall'input dell'utente
   listingCount       Int          @default(0) 
-  wishlistItemsCount Int          @default(0)
   
   sneakerModelId String
 
   sneakerModel SneakerModel @relation(fields: [sneakerModelId], references: [id], onDelete: Cascade)
   listings     Listing[]
-  wishlistItems WishlistItem[]
   
   @@index([category])
   @@index([gender])
@@ -149,11 +147,9 @@ model Sizing {
 model Listing {
   id          String           @id @default(cuid())
   description String?
-  condition   ListingCondition @default(NEW)
-  stock       Int              @default(1)
   isActive    Boolean          @default(true)
   isFeatured  Boolean          @default(false)
-  price       Float            @default(0.0)
+  
   
   startDate   DateTime        @default(now())
   endDate     DateTime?
@@ -177,6 +173,9 @@ model Listing {
 model ListingSizing {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
+  condition   ListingCondition @default(NEW)
+  price       Float            @default(0.0)
+  stock       Int             @default(1)
   
   listingId String
   sizingId  String
@@ -184,7 +183,7 @@ model ListingSizing {
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
   sizing  Sizing  @relation(fields: [sizingId], references: [id], onDelete: Cascade)
   
-  @@unique([listingId, sizingId])
+  @@unique([listingId, sizingId, condition])
   @@index([listingId])
   @@index([sizingId])
   @@map("listing_sizings")
@@ -192,40 +191,37 @@ model ListingSizing {
 
 model User {
   id           String   @id @default(cuid())
+  clerkId      String   @unique // Mappa l'ID utente di Clerk qui
   email        String   @unique
-  passwordHash String
-  firstName    String
-  lastName     String
-  isActive     Boolean  @default(true)
-  isVerified   Boolean  @default(false)
-  role         Role     @default(USER) 
+  firstName    String?
+  lastName     String?
+  role         Role     @default(USER) // Sincronizza questo via Webhooks di Clerk
+  
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   
-  wishlistItems WishlistItem[]
   
   @@index([email])
-  @@index([isActive])
   @@index([role])
   @@map("users")
 }
 
 model WishlistItem {
   id        String   @id @default(cuid())
+  userId    String   
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
-  
-  userId    String
-  itemId    String?
-  listingId String?
-  
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  item    Item?    @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  listing Listing? @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  
-  @@unique([userId, itemId], name: "unique_user_item")
-  @@unique([userId, listingId], name: "unique_user_listing")
-  @@index([userId])
-  @@index([itemId])
-  @@index([listingId])
-  @@map("wishlist_items")
+
+  @@unique([userId, listingId])
+}
+
+model HeroSlide {
+  id        String   @id @default(cuid())
+  url       String
+  title     String?
+  subtitle  String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Prisma } from "@prisma/client"; // Importa i tipi generati
 
 // Definiamo un tipo più completo per la prop `listing`
-type ListingWithDetails = Prisma.ListingGetPayload<{
+export type ListingWithSizings = Prisma.ListingGetPayload<{
   include: {
     sizings: {
       include: {
@@ -16,14 +16,14 @@ type ListingWithDetails = Prisma.ListingGetPayload<{
 }>;
 
 interface ProductActionsProps {
-  listing: ListingWithDetails;
+  listing: ListingWithSizings;
 }
 
 export function ProductActions({ listing }: ProductActionsProps) {
   const [selectedSizingId, setSelectedSizingId] = useState<string | null>(null);
 
   const hasSizings = listing.sizings.length > 0;
-  const isOutOfStock = listing.stock < 1;
+  const isOutOfStock = listing.sizings.length < 1;
 
   // Disabilita il carrello se è fuori stock O se ci sono taglie ma nessuna è selezionata
   const isAddToCartDisabled = isOutOfStock || (hasSizings && !selectedSizingId);
@@ -48,9 +48,7 @@ export function ProductActions({ listing }: ProductActionsProps) {
       {/* Sezione Selezione Taglia (Dinamica) */}
       {hasSizings && (
         <div className="mt-6">
-          <h3 className="text-sm font-medium mb-2">
-            Seleziona Taglia:
-          </h3>
+          <h3 className="text-sm font-medium mb-2">Seleziona Taglia:</h3>
           <fieldset aria-label="Scegli una taglia">
             <div className="flex flex-wrap gap-3">
               {listing.sizings.map((listingSizing) => (

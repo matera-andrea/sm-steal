@@ -1,27 +1,43 @@
-interface ProductDetailsProps {
+"use client";
+
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+
+export function ProductDetails({
+  description,
+}: {
   description?: string | null;
-}
+}) {
+  const [isOpen, setIsOpen] = useState(true);
 
-export function ProductDetails({ description }: ProductDetailsProps) {
+  if (!description) return null;
+
   return (
-    <>
-      <hr className="my-6 md:my-8 border-gray-200" />
+    <div className="pt-8 border-t border-gray-100">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between group"
+      >
+        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-900 group-hover:text-amber-500 transition-colors">
+          Description & Details
+        </h3>
+        <ChevronDown
+          size={16}
+          className={`transition-transform duration-300 ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </button>
 
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">
-          Descrizione
-        </h2>
-
-        {description ? (
-          <p className="text-gray-600 whitespace-pre-line leading-relaxed">
-            {description}
-          </p>
-        ) : (
-          <p className="text-gray-400 italic">
-            Nessuna descrizione disponibile per questo prodotto.
-          </p>
-        )}
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+          isOpen ? "max-h-96 opacity-100 mt-4" : "max-h-0 opacity-0"
+        }`}
+      >
+        <p className="text-sm text-gray-600 leading-relaxed font-medium">
+          {description}
+        </p>
       </div>
-    </>
+    </div>
   );
 }

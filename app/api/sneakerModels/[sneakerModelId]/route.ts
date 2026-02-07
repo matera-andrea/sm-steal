@@ -5,7 +5,7 @@ import { updateSneakerModelSchema } from "@/app/lib/validation/sneakerModel.sche
 import { NextRequest, NextResponse } from "next/server";
 
 interface Params {
-  params: { sneakerModelId: string };
+  params: Promise<{ sneakerModelId: string }>;
 }
 
 //
@@ -14,7 +14,7 @@ interface Params {
 export async function GET(request: NextRequest, { params }: Params) {
   try {
     const model = await prisma.sneakerModel.findUnique({
-      where: { id: params.sneakerModelId },
+      where: { id: (await params).sneakerModelId },
       include: {
         Brand: true, // Include tutti i dati del brand
         items: {
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     if (!model) {
       return NextResponse.json(
         { message: "Modello non trovato." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     console.error("[SNEAKER_MODEL_GET_BY_ID] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -53,23 +53,23 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     if (!validation.success) {
       return NextResponse.json(
         { message: "Dati non validi", errors: validation.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Controlla che il modello da aggiornare esista
     const existingModel = await prisma.sneakerModel.findUnique({
-      where: { id: params.sneakerModelId },
+      where: { id: (await params).sneakerModelId },
     });
     if (!existingModel) {
       return NextResponse.json(
         { message: "Modello non trovato." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     const updatedModel = await prisma.sneakerModel.update({
-      where: { id: params.sneakerModelId },
+      where: { id: (await params).sneakerModelId },
       data: validation.data,
     });
 
@@ -78,7 +78,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     console.error("[SNEAKER_MODEL_PATCH] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -90,14 +90,14 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   try {
     // Controlla che il modello esista per ottenere il brandId associato
     const modelToDelete = await prisma.sneakerModel.findUnique({
-      where: { id: params.sneakerModelId },
+      where: { id: (await params).sneakerModelId },
       select: { brandId: true },
     });
 
     if (!modelToDelete) {
       return NextResponse.json(
         { message: "Modello non trovato." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -108,7 +108,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       // Se questo non è il comportamento desiderato, la policy `onDelete`
       // nello schema Prisma andrebbe cambiata (es. `Restrict` o `SetNull`).
       await tx.sneakerModel.delete({
-        where: { id: params.sneakerModelId },
+        where: { id: (await params).sneakerModelId },
       });
 
       await tx.brand.update({
@@ -122,7 +122,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     console.error("[SNEAKER_MODEL_DELETE] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

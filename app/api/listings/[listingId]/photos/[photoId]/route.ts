@@ -1,5 +1,6 @@
 // app/api/listings/[listingId]/photos/[photoId]/route.ts
 
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
 import prisma from "@/app/lib/prisma";
 import { R2_BUCKET_NAME, R2_PUBLIC_URL, s3Client } from "@/app/lib/r2";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
@@ -7,16 +8,18 @@ import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
+interface RouteParams {
+  params: Promise<{ listingId: string; photoId: string }>;
+}
+
 // Schema per la validazione dei parametri della rotta
 const paramsSchema = z.object({
-  listingId: z.string().cuid({ message: "ID del listing non valido." }),
-  photoId: z.string().cuid({ message: "ID della foto non valido." }),
+  listingId: z.cuid({ message: "ID del listing non valido." }),
+  photoId: z.cuid({ message: "ID della foto non valido." }),
 });
 
-// Schema per l'aggiornamento (PATCH) - SOLO Metadati
-// L'URL non è aggiornabile, va cancellata e ricaricata
 const updatePhotoSchema = z.object({
-  name: z.string().min(1, "Il nome è obbligatorio.").optional(),
+  name: z.string().min(1).optional(),
   altText: z.string().optional().nullable(),
   isMain: z.boolean().optional(),
   order: z.number().int().optional(),
@@ -35,19 +38,16 @@ const findPhotoByListing = (listingId: string, photoId: string) => {
 //
 // GET A SINGLE PHOTO (Invariato)
 //
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { listingId: string; photoId: string } }
-) {
+export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const paramsValidation = paramsSchema.safeParse(params);
+    const paramsValidation = paramsSchema.safeParse(await params);
     if (!paramsValidation.success) {
       return NextResponse.json(
         {
           message: "Parametri non validi",
           errors: paramsValidation.error.issues,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
     const { listingId, photoId } = paramsValidation.data;
@@ -59,7 +59,7 @@ export async function GET(
         {
           message: `Foto con ID '${photoId}' non trovata o non appartenente al listing '${listingId}'.`,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -68,7 +68,7 @@ export async function GET(
     console.error("[LISTING_PHOTO_GET] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -76,19 +76,18 @@ export async function GET(
 //
 // UPDATE A SINGLE PHOTO (Solo Metadati, R2 non coinvolto)
 //
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { listingId: string; photoId: string } }
-) {
+export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
-    const paramsValidation = paramsSchema.safeParse(params);
+    const authError = await checkAdmin();
+    if (authError) return authError;
+    const paramsValidation = paramsSchema.safeParse(await params);
     if (!paramsValidation.success) {
       return NextResponse.json(
         {
           message: "Parametri non validi",
           errors: paramsValidation.error.issues,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
     const { listingId, photoId } = paramsValidation.data;
@@ -99,14 +98,14 @@ export async function PATCH(
     if (!bodyValidation.success) {
       return NextResponse.json(
         { message: "Dati non validi", errors: bodyValidation.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (Object.keys(bodyValidation.data).length === 0) {
       return NextResponse.json(
         { message: "Nessun dato fornito per l'aggiornamento." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -140,15 +139,19 @@ export async function PATCH(
     ) {
       return NextResponse.json(
         {
-          message: `Foto con ID '${params.photoId}' non trovata o non appartenente al listing '${params.listingId}'.`,
+          message: `Foto con ID '${
+            (await params).photoId
+          }' non trovata o non appartenente al listing '${
+            (await params).listingId
+          }'.`,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
     console.error("[LISTING_PHOTO_PATCH] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -156,20 +159,19 @@ export async function PATCH(
 //
 // DELETE A SINGLE PHOTO (Elimina da DB e R2)
 //
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { listingId: string; photoId: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     // 1. Valida i parametri
-    const paramsValidation = paramsSchema.safeParse(params);
+    const paramsValidation = paramsSchema.safeParse(await params);
     if (!paramsValidation.success) {
       return NextResponse.json(
         {
           message: "Parametri non validi",
           errors: paramsValidation.error.issues,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
     const { listingId, photoId } = paramsValidation.data;
@@ -181,7 +183,7 @@ export async function DELETE(
         {
           message: `Foto con ID '${photoId}' non trovata o non appartenente al listing '${listingId}'.`,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -205,14 +207,14 @@ export async function DELETE(
           new DeleteObjectCommand({
             Bucket: R2_BUCKET_NAME,
             Key: key,
-          })
+          }),
         );
       } catch (r2Error) {
         // Non bloccare la risposta se l'eliminazione del file fallisce
         // (il record DB è già sparito), ma logga l'errore.
         console.error(
           `[R2_DELETE_ERROR] Impossibile eliminare il file ${photo.url} da R2:`,
-          r2Error
+          r2Error,
         );
       }
     }
@@ -226,15 +228,15 @@ export async function DELETE(
       // Questo caso è già gestito dal check iniziale, ma lo teniamo per sicurezza
       return NextResponse.json(
         {
-          message: `Foto con ID '${params.photoId}' non trovata.`,
+          message: `Foto con ID '${(await params).photoId}' non trovata.`,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
     console.error("[LISTING_PHOTO_DELETE] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

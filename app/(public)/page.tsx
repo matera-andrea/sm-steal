@@ -2,87 +2,137 @@
 /* eslint-disable @next/next/no-img-element */
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import ProductCard from "../components/cards/ProductCard";
+import { useQuery } from "@tanstack/react-query";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import FeaturedGrid from "../components/product/FeaturedGrid";
 
-const images = [
-  "/home-photos/unsplash-1.jpg",
-  "/home-photos/unsplash-2.jpg",
-  "/home-photos/unsplash-3.jpg",
-];
+// Tipo per le slide provenienti dall'API
+interface Slide {
+  id: string;
+  url: string;
+  title?: string;
+  subtitle?: string;
+}
 
 export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // FETCH SLIDES: Inserisci qui la tua route API
+  const { data: slides = [], isLoading } = useQuery<Slide[]>({
+    queryKey: ["home-slides"],
+    queryFn: async () => {
+      const res = await fetch("/api/slideshow");
+      if (!res.ok) throw new Error("Failed to fetch slides");
+      return res.json();
+    },
+  });
+
+  // Autoplay logic
   useEffect(() => {
+    if (slides.length === 0) return;
     const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 3000); // cambia immagine ogni 3 secondi
-
+      setCurrentIndex((prev) => (prev + 1) % slides.length);
+    }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [slides.length]);
 
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    );
-  };
+  const prevSlide = () =>
+    setCurrentIndex((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+  const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % slides.length);
 
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-  };
+  if (isLoading)
+    return <div className="h-screen w-full bg-gray-900 animate-pulse" />;
 
   return (
-    <>
-      {/* Immagini */}
-      {images.map((src, index) => (
-        <img
-          key={index}
-          src={src}
-          alt={`Slide ${index + 1}`}
-          className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out
-                ${index === currentIndex ? "opacity-100" : "opacity-0"}`}
-        />
-      ))}
-
-      {/* Overlay dimming */}
-      <div className="absolute top-0 left-0 w-full h-full pointer-events-none"></div>
-
-      {/* Testo centrato */}
-      <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-white z-10 px-4">
-        <h1 className="text-6xl sm:text-md font-bold mb-4">
-          Finally, real sneakers without the drama
-        </h1>
-        <Link href="/shop">
-          <div className="w-max-3xl bg-amber-400 hover:bg-amber-500 text-black font-semibold py-2 px-6 rounded transition-colors">
-            Find out
+    <main className="min-h-screen bg-white">
+      {/* --- HERO SECTION --- */}
+      <section className="relative h-[85vh] w-full overflow-hidden bg-black">
+        {slides.map((slide, index) => (
+          <div
+            key={slide.id || index}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              index === currentIndex ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <img
+              src={slide.url}
+              alt={slide.title || "Hero Slide"}
+              className="h-full w-full object-cover opacity-60 scale-105"
+            />
           </div>
-        </Link>
-      </div>
-
-      {/* Frecce */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full hover:bg-black/60 z-10"
-      >
-        ◀
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full hover:bg-black/60 z-10"
-      >
-        ▶
-      </button>
-      {/* Indicatori */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
-        {images.map((_, index) => (
-          <span
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-3 h-3 rounded-full cursor-pointer transition-colors
-                  ${index === currentIndex ? "bg-white" : "bg-white/50"}`}
-          ></span>
         ))}
-      </div>
-    </>
+
+        {/* Overlay con Gradiente per leggibilità testo */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+        {/* Contenuto Centrale */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6 z-20">
+          <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter mb-6 italic">
+            {slides[currentIndex]?.title || "Finally, real sneakers"}
+          </h1>
+          <p className="text-lg md:text-xl font-light mb-10 max-w-2xl text-gray-200">
+            {slides[currentIndex]?.subtitle ||
+              "No drama, just authentic grails delivered to your door."}
+          </p>
+
+          <Link href="/shop">
+            <button className="group flex items-center gap-3 bg-amber-400 hover:bg-amber-500 text-black font-bold py-4 px-10 rounded-full transition-all hover:scale-105 active:scale-95 shadow-xl">
+              SHOP NOW{" "}
+              <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          </Link>
+        </div>
+
+        {/* Navigazione Hero */}
+        <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between z-30 opacity-0 hover:opacity-100 transition-opacity">
+          <button
+            onClick={prevSlide}
+            className="p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white"
+          >
+            <ChevronLeft size={32} />
+          </button>
+          <button
+            onClick={nextSlide}
+            className="p-3 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full text-white"
+          >
+            <ChevronRight size={32} />
+          </button>
+        </div>
+
+        {/* Indicatori Lineari (stile moderno) */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-3 z-30">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={`h-1 transition-all duration-500 rounded-full ${
+                index === currentIndex ? "w-12 bg-amber-400" : "w-6 bg-white/30"
+              }`}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* --- SEZIONE FEATURED --- */}
+      <section className="container mx-auto py-20 px-4">
+        <div className="flex justify-between items-end mb-12">
+          <div>
+            <h2 className="text-4xl font-black uppercase italic tracking-tight">
+              New Arrivals
+            </h2>
+            <div className="h-1.5 w-20 bg-amber-400 mt-2" />
+          </div>
+          <Link
+            href="/shop"
+            className="text-sm font-bold uppercase tracking-widest hover:text-amber-500 transition-colors"
+          >
+            View All →
+          </Link>
+        </div>
+
+        {/* Griglia Prodotti (qui userai il tuo ProductCard) */}
+        <FeaturedGrid limit={4} showPagination={false} />
+      </section>
+    </main>
   );
 }

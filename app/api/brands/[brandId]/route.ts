@@ -3,12 +3,13 @@ import prisma from "@/app/lib/prisma";
 import { ZodError } from "zod";
 import { brandSchema } from "@/app/lib/validation/brand.schema";
 
-type RouteParams = { params: { brandId: string } };
+type RouteParams = { params: Promise<{ brandId: string }> };
 
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
+    const { brandId } = await params;
     const brand = await prisma.brand.findUnique({
-      where: { id: params.brandId },
+      where: { id: brandId },
     });
 
     if (!brand) {
@@ -20,7 +21,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
     console.error("Error fetching brand:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -29,9 +30,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
     const body = await request.json();
     const parsed = brandSchema.parse(body);
+    const { brandId } = await params;
 
     const updated = await prisma.brand.update({
-      where: { id: params.brandId },
+      where: { id: brandId },
       data: parsed,
     });
 
@@ -40,13 +42,13 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (error instanceof ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.message },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error updating brand:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -54,10 +56,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
     const body = await request.json();
+    const { brandId } = await params;
+
     const parsed = brandSchema.partial().parse(body);
 
     const updated = await prisma.brand.update({
-      where: { id: params.brandId },
+      where: { id: brandId },
       data: parsed,
     });
 
@@ -66,21 +70,23 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (error instanceof ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.message },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error patching brand:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
+    const { brandId } = await params;
+
     await prisma.brand.delete({
-      where: { id: params.brandId },
+      where: { id: brandId },
     });
 
     return new NextResponse(null, { status: 204 });
@@ -88,7 +94,7 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     console.error("Error deleting brand:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

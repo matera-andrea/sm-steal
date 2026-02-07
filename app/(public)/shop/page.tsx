@@ -1,23 +1,28 @@
-// /app/shop/page.tsx
+import ProductGrid from "@/app/components/ProductGrid";
+import { Suspense } from "react";
 
-import ProductGrid from "@/app/components/ProductGrid"; // Importa il nuovo Client Component
-
-// La pagina ora è un Server Component semplice e veloce
 export default function Shop() {
   return (
-    <div className="bg-white">
-      <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          Discover Our Collection
-        </h1>
-        <p className="mt-4 text-xl text-gray-600">
-          The best sneakers, accessories, and collectibles, all in one place.
-        </p>
-
-        <div className="mt-10">
-          {/* Renderizza il componente che si occuperà del fetching */}
-          <ProductGrid />
+    <div className="bg-white min-h-screen">
+      <header className="pt-20 pb-12 border-b border-gray-50">
+        <div className="container mx-auto px-4">
+          <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter italic">
+            Shop<span className="text-amber-400">.</span>
+          </h1>
+          <p className="mt-4 text-gray-500 font-medium max-w-xl text-lg uppercase tracking-tight">
+            Curated selection of the most sought-after grails on the market.
+          </p>
         </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-12">
+        <Suspense
+          fallback={
+            <div className="p-10 text-center">Caricamento filtri...</div>
+          }
+        >
+          <ProductGrid />
+        </Suspense>
       </div>
     </div>
   );

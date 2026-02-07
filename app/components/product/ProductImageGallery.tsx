@@ -1,11 +1,8 @@
 "use client";
-import Image from "next/image";
-import { useState } from "react";
 
-interface Photo {
-  id: string;
-  url: string;
-}
+import { useState } from "react";
+import Image from "next/image";
+import { Photo } from "@prisma/client"; // O il tuo tipo Photo
 
 interface ProductImageGalleryProps {
   photos: Photo[];
@@ -16,61 +13,55 @@ export function ProductImageGallery({
   photos,
   productName,
 }: ProductImageGalleryProps) {
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-
-  // Se non ci sono foto, usa un'immagine placeholder
-  const hasPhotos = photos && photos.length > 0;
-  const currentImage = hasPhotos
-    ? photos[selectedImageIndex].url
-    : "/placeholder-product.jpg";
+  // Se non ci sono foto, usiamo un placeholder
+  const safePhotos =
+    photos.length > 0
+      ? photos
+      : [{ id: "ph", url: "/placeholder.png", isMain: true }];
+  const [activePhoto, setActivePhoto] = useState(safePhotos[0].url);
 
   return (
-    <div className="shrink-0 max-w-md lg:max-w-lg mx-auto">
-      {/* Immagine principale */}
-      <div className="relative w-full aspect-square overflow-hidden rounded-lg bg-gray-50">
-        <Image
-          src={currentImage}
-          alt={productName}
-          width={500}
-          height={500}
-          priority
-          className="object-cover w-full h-full"
-          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 500px"
-        />
+    <div className="flex flex-col-reverse lg:flex-row gap-4 sticky top-28">
+      {/* THUMBNAILS (Verticali su Desktop, Orizzontali su Mobile) */}
+      <div className="flex lg:flex-col gap-4 overflow-x-auto lg:overflow-visible no-scrollbar">
+        {safePhotos.map((photo) => (
+          <button
+            key={photo.id}
+            onClick={() => setActivePhoto(photo.url)}
+            className={`relative w-20 h-20 lg:w-24 lg:h-24 flex-shrink-0 rounded-2xl border-2 overflow-hidden transition-all ${
+              activePhoto === photo.url
+                ? "border-black ring-1 ring-black"
+                : "border-transparent bg-gray-50 hover:border-gray-200"
+            }`}
+          >
+            <Image
+              src={photo.url}
+              alt="Thumbnail"
+              fill
+              className="object-contain p-2"
+            />
+          </button>
+        ))}
       </div>
 
-      {/* Galleria miniature */}
-      {hasPhotos && photos.length > 1 && (
-        <div className="grid grid-cols-5 gap-3 mt-4">
-          {photos.map((photo, index) => (
-            <button
-              key={photo.id}
-              onClick={() => setSelectedImageIndex(index)}
-              className={`relative aspect-square overflow-hidden rounded-lg bg-gray-50 border-2 transition-all hover:border-gray-400 ${
-                selectedImageIndex === index
-                  ? "border-gray-600 ring-2 ring-gray-200"
-                  : "border-gray-300"
-              }`}
-            >
-              <Image
-                src={photo.url}
-                alt={`${productName} - foto ${index + 1}`}
-                width={100}
-                height={100}
-                className="object-cover w-full h-full"
-                sizes="100px"
-              />
-            </button>
-          ))}
-        </div>
-      )}
+      {/* MAIN IMAGE */}
+      <div className="flex-1 relative aspect-square bg-gray-50 rounded-[2.5rem] overflow-hidden border border-gray-100">
+        {/* QUI APPLICHIAMO LA LOGICA "Option 3": 
+            Sfondo grigio chiaro + Immagine 'contain' + Mix Blend (opzionale) 
+         */}
+        <Image
+          src={activePhoto}
+          alt={productName}
+          fill
+          className="object-contain p-8 w-full h-full mix-blend-multiply transition-opacity duration-500"
+          priority
+        />
 
-      {/* Indicatore immagine corrente */}
-      {hasPhotos && photos.length > 1 && (
-        <div className="text-center mt-3 text-sm text-gray-600">
-          {selectedImageIndex + 1} di {photos.length}
+        {/* Badge "New Arrival" o altro */}
+        <div className="absolute top-6 left-6 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/50 shadow-sm">
+          Authentic Verified
         </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -1,53 +1,70 @@
-/* eslint-disable @next/next/no-img-element */
 // /app/components/cards/ProductCard.tsx
 
-import Link from "next/link"; // Usa Link per una navigazione veloce senza ricaricare la p
-import { ListingWithDetails } from "../ProductGrid";
+import { ListingWithDetails } from "@/app/lib/types/type";
+import Link from "next/link";
+import Image from "next/image";
+import WishlistButton from "../product/WishlistButton";
 
-// Funzione helper per formattare il prezzo
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat("it-IT", {
-    style: "currency",
-    currency: "EUR",
-  }).format(price);
-};
-
-// Il componente ora accetta solo la prop `listing` arricchita
-export default function ProductCard({
-  listing,
-}: {
+interface ProductCardProps {
   listing: ListingWithDetails;
-}) {
-  // Estraiamo i dati necessari per pulizia
-  const itemName = listing.item?.name || "Untitled Item";
-  const photoUrl = listing.photos?.[0]?.url;
-  const formattedPrice = formatPrice(listing.price);
-  const placeholderImage =
-    "https://placehold.co/500x500/F3F4F6/9CA3AF?text=No+Image";
+}
+
+export default function ProductCard({ listing }: ProductCardProps) {
+  const { item, sizings, photos } = listing;
+
+  // Calcolo sicuro del prezzo minimo
+  const prices = sizings.map((s) => s.price);
+  const startingPrice = prices.length > 0 ? Math.min(...prices) : 0;
+
+  const photoUrl = photos[0]?.url || "/placeholder.png";
+
+  // --- LOGICA ESTRAZIONE NOMI ---
+  const brandName = item.sneakerModel.Brand.name;
+  const modelName = item.sneakerModel.name;
+  const itemName = item.name;
+
+  // Calcolo Extra Name (es. "Panda", "Military Black")
+  let extraName = "";
+  if (itemName.startsWith(modelName)) {
+    extraName = itemName.slice(modelName.length).trim();
+  }
+
+  // Titolo principale da visualizzare (Brand + Modello)
+  const displayTitle = `${brandName} ${modelName}`;
 
   return (
-    <Link
-      href={`/shop/${listing.id}`}
-      className="group block overflow-hidden rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300"
-    >
-      <div className="relative">
-        <img
-          src={photoUrl || placeholderImage}
-          alt={itemName}
-          className="aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-105"
-        />
-        {/* Badge della condizione */}
-        <div className="absolute top-2 right-2 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-gray-800 backdrop-blur-sm">
-          {listing.condition.replace("_", " ")}
+    <Link href={`/shop/${listing.id}`}>
+      <div className="group flex flex-col h-full realtive">
+        {" "}
+        {/* h-full per allineare le card */}
+        {/* IMAGE CONTAINER */}
+        <div className="relative aspect-square overflow-hidden rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.05)] group-hover:shadow-[0_0_20px_rgba(0,0,0,0.1)] transition-shadow duration-300">
+          <Image
+            src={photoUrl}
+            alt={displayTitle}
+            fill
+            className="object-contain p-4 w-full h-full group-hover:scale-105 transition-transform duration-300"
+          />
         </div>
-      </div>
+        {/* INFO CONTAINER */}
+        <div className="mt-4 flex flex-col gap-1">
+          {/* Titolo Principale (Brand + Modello) */}
+          <h3 className="text-sm font-black uppercase italic leading-tight text-black">
+            {modelName}
+          </h3>
 
-      <div className="p-4 bg-white">
-        <h3 className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
-          {itemName}
-        </h3>
+          {/* Sottotitolo (Extra Name) se presente */}
+          {extraName && (
+            <p className="text-xs font-bold uppercase tracking-wide text-gray-400 line-clamp-1">
+              {extraName}
+            </p>
+          )}
 
-        <p className="mt-1 text-lg font-bold text-gray-900">{formattedPrice}</p>
+          {/* Prezzo */}
+          <p className="text-lg font-black mt-1">
+            {startingPrice > 0 ? `Da €${startingPrice}` : "Sold Out"}
+          </p>
+        </div>
       </div>
     </Link>
   );

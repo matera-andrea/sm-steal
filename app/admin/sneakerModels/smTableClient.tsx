@@ -5,10 +5,8 @@
 import DataTable, { ColumnDef } from "@/app/components/admin/DataTable";
 import { useBrands } from "@/hooks/useBrands";
 import { SneakerModel, Brand } from "@prisma/client";
+import { useMemo } from "react"; // <--- 1. Importa useMemo
 
-// FIX 1: Definiamo un tipo più accurato che rappresenta ESATTAMENTE
-// ciò che arriva dalla nostra API GET. Include sia la relazione `Brand`
-// sia l'oggetto `_count` per il numero di item.
 type SneakerModelWithRelations = SneakerModel & {
   Brand: Pick<Brand, "id" | "name"> | null;
   _count?: {
@@ -16,12 +14,9 @@ type SneakerModelWithRelations = SneakerModel & {
   };
 };
 
-// NOTA: Questa è una buona pratica. Definiamo le colonne come una funzione
-// che riceve i dati necessari (come la lista dei brand), rendendo il codice
-// più pulito e organizzato.
 const getSneakerModelColumns = (
   brands: Pick<Brand, "id" | "name">[],
-  brandsLoading: boolean
+  brandsLoading: boolean,
 ): ColumnDef<SneakerModelWithRelations>[] => [
   {
     header: "Model Name",
@@ -91,8 +86,6 @@ const getSneakerModelColumns = (
     renderCell: (model) => (
       <div className="text-center">
         <span className="inline-flex items-center justify-center bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-          {/* FIX 2: Ora accediamo a `_count.items` in modo sicuro, senza `any`.
-              Usiamo `itemsCount` come fallback se `_count` non fosse presente. */}
           {model._count?.items ?? model.itemsCount}
         </span>
       </div>
@@ -133,8 +126,6 @@ const getSneakerModelColumns = (
   },
 ];
 
-// FIX 3: L'oggetto per la riga di aggiunta DEVE corrispondere al tipo `Partial<T>`
-// che la DataTable si aspetta. In questo caso, `Partial<SneakerModelWithRelations>`.
 const emptySneakerModel: Partial<SneakerModelWithRelations> = {
   name: "",
   description: "",
@@ -142,13 +133,13 @@ const emptySneakerModel: Partial<SneakerModelWithRelations> = {
   isActive: true,
 };
 
-// Componente principale che ora gestisce il caricamento dei dati per le colonne
 export default function SneakerModelTableClient() {
-  // Carichiamo i brand qui, al livello più alto del componente client.
   const { brands, loading: brandsLoading } = useBrands();
 
-  // Passiamo i brand caricati alla funzione che genera le colonne.
-  const columns = getSneakerModelColumns(brands, brandsLoading);
+  // 2. Memorizza le colonne per evitare il loop infinito
+  const columns = useMemo(() => {
+    return getSneakerModelColumns(brands, brandsLoading);
+  }, [brands, brandsLoading]);
 
   return (
     <DataTable<SneakerModelWithRelations>

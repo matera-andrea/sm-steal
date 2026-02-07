@@ -16,13 +16,13 @@ export async function GET(request: NextRequest) {
           total,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: unknown) {
     console.log("Error fetching sizings: ", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     if (existingSize) {
       return NextResponse.json(
         { error: "Sizing already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -57,14 +57,14 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.message },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error creating sizing:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

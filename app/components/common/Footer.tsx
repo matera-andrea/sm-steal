@@ -1,100 +1,153 @@
-import { FaLinkedin, FaInstagram } from "react-icons/fa";
+// components/layout/Footer.tsx
+
+import { FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="px-4 divide-y dark:bg-gray-900">
-      <div className="container flex flex-col justify-between py-10 mx-auto space-y-8 lg:flex-row lg:space-y-0 text-white">
-        <div className="lg:w-1/3">
-          <a
-            rel="noopener noreferrer"
-            href="#"
-            className="flex justify-center space-x-3 lg:justify-start"
-          >
-            <div className="flex flex-shrink-0 items-center">
+    <footer className="bg-black text-white border-t z-50 border-white/10 relative">
+      <div className="container mx-auto px-6 py-16">
+        {/* MODIFICA: Griglia passata da 5 a 4 colonne per bilanciare la rimozione dello shop */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          {/* Colonna Brand & Mission (Occupa 2 spazi su 4) */}
+          <div className="lg:col-span-2 space-y-6">
+            <Link href="/" className="flex items-center gap-3">
               <Image
                 src="/logo_white.png"
-                alt="Your Company"
-                width={56}
-                height={56}
-                className="h-14 w-auto"
+                alt="Sm Steal Logo"
+                width={50}
+                height={50}
+                className="h-12 w-auto"
               />
+              <span className="text-2xl font-black uppercase italic tracking-tighter">
+                Sm steal<span className="text-amber-400">.</span>
+              </span>
+            </Link>
+            <p className="text-gray-400 text-sm max-w-sm leading-relaxed font-medium">
+              Il punto di riferimento per il resell autentico. Sneakers,
+              collectibles e grails selezionati con cura per veri appassionati.
+              No fake, just steals.
+            </p>
+            <div className="flex space-x-5">
+              <a
+                href="https://instagram.com/sm.steal"
+                target="_blank"
+                rel="noreferrer"
+                className="text-gray-400 hover:text-amber-400 transition-colors"
+              >
+                <FaInstagram size={22} />
+              </a>
+              <a
+                href="#"
+                className="text-gray-400 hover:text-amber-400 transition-colors"
+              >
+                <FaLinkedin size={22} />
+              </a>
+              <a
+                href="#"
+                className="text-gray-400 hover:text-amber-400 transition-colors"
+              >
+                <FaTwitter size={22} />
+              </a>
             </div>
-            <span className="self-center text-2xl font-semibold">Sm steal</span>
-          </a>
-        </div>
-        <div className="grid grid-cols-2 text-sm gap-x-3 gap-y-8 lg:w-2/3 sm:grid-cols-4 ">
-          <div className="space-y-3">
-            <h3 className="tracking-wide uppercase">Product</h3>
-            <ul className="space-y-1 text-white">
+          </div>
+
+          {/* Colonna Support */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-amber-400">
+              Support
+            </h3>
+            <ul className="space-y-3 text-sm font-bold uppercase tracking-tight text-gray-400">
               <li>
-                <a rel="noopener noreferrer" href="#">
-                  Features
-                </a>
+                <Link
+                  href="/how-it-works"
+                  className="hover:text-white transition-colors"
+                >
+                  How it works
+                </Link>
               </li>
               <li>
-                <a rel="noopener noreferrer" href="#">
-                  Integrations
-                </a>
+                {/* Aggiornato il link alla pagina corretta */}
+                <Link
+                  href="/shipping-returns"
+                  className="hover:text-white transition-colors"
+                >
+                  Shipping & Returns
+                </Link>
               </li>
               <li>
-                <a rel="noopener noreferrer" href="#">
-                  Pricing
-                </a>
-              </li>
-              <li>
-                <a rel="noopener noreferrer" href="#">
+                <Link
+                  href="/faq"
+                  className="hover:text-white transition-colors"
+                >
                   FAQ
-                </a>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact-us"
+                  className="hover:text-white transition-colors"
+                >
+                  Contact Us
+                </Link>
               </li>
             </ul>
           </div>
-          <div className="space-y-3">
-            <h3 className="tracking-wide uppercase  ">Company</h3>
-            <ul className="space-y-1">
+
+          {/* Colonna Legal */}
+          <div className="space-y-4">
+            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-amber-400">
+              Legal
+            </h3>
+            <ul className="space-y-3 text-sm font-bold uppercase tracking-tight text-gray-400">
               <li>
-                <a rel="noopener noreferrer" href="#">
-                  Privacy
-                </a>
+                <Link
+                  href="/privacy"
+                  className="hover:text-white transition-colors"
+                >
+                  Privacy Policy
+                </Link>
               </li>
               <li>
-                <a rel="noopener noreferrer" href="#">
+                <Link
+                  href="/terms"
+                  className="hover:text-white transition-colors"
+                >
                   Terms of Service
-                </a>
+                </Link>
+              </li>
+              <li>
+                {/* Aggiornato il link alla pagina corretta */}
+                <Link
+                  href="/cookie-policy"
+                  className="hover:text-white transition-colors"
+                >
+                  Cookie Policy
+                </Link>
               </li>
             </ul>
-          </div>
-          <div className="space-y-3">
-            <h3 className="uppercase ">Developers</h3>
-            <ul className="space-y-1">
-              <li>
-                <a rel="noopener noreferrer" href="#">
-                  Public API
-                </a>
-              </li>
-              <li>
-                <a rel="noopener noreferrer" href="#">
-                  Documentation
-                </a>
-              </li>
-              <li>
-                <a rel="noopener noreferrer" href="#">
-                  Guides
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div className="space-y-3">
-            <div className="uppercase ">Social media</div>
-            <div className="flex justify-start space-x-3">
-              <FaInstagram color="white" size={24} />
-              <FaLinkedin color="white" size={24} />
-            </div>
           </div>
         </div>
-      </div>
-      <div className="py-6 text-sm text-center dark:text-gray-600">
-        © 2022 Samuele Matera. VAT: 00000000000. All rights reserved.
+
+        {/* Barra inferiore */}
+        <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">
+          <div>© {new Date().getFullYear()} Sm Steal — All Rights Reserved</div>
+          <div className="flex gap-6">
+            <span>VAT: [INSERISCI P.IVA]</span>
+
+            {/* MODIFICA QUI: Rendi il testo un Link */}
+            <Link
+              href="/developer"
+              className="hover:text-white transition-colors group"
+            >
+              Designed by{" "}
+              <span className="group-hover:text-amber-400 transition-colors underline decoration-amber-400 underline-offset-4">
+                Andrea Matera
+              </span>
+            </Link>
+          </div>
+        </div>
       </div>
     </footer>
   );

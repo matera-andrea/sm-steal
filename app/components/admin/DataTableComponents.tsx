@@ -1,6 +1,4 @@
-// /components/ui/DataTableComponents.tsx
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Save,
   X,
@@ -9,91 +7,79 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useState, Fragment, ReactNode } from "react";
+import { useState, useEffect } from "react";
 import { ColumnDef } from "./DataTable";
-// Props comuni per le righe
-interface RowProps<T> {
-  item: T;
-  columns: ColumnDef<T>[];
-  onCancel: () => void;
-}
 
-// ==================================
-//      RIGA IN MODALITÀ EDIT/ADD
-// ==================================
-interface EditRowProps<T> extends RowProps<T> {
+// --- RIGA IN MODALITÀ EDIT/ADD ---
+interface EditRowProps<T> {
+  item: Partial<T>; // Può essere un item esistente o initialEmptyRow
+  columns: ColumnDef<T>[];
   onSave: (data: Partial<T>) => void;
+  onCancel: () => void;
   isAdding: boolean;
 }
 
-export function EditRow<T, TForm>({
+export function EditRow<T>({
   item,
   columns,
   onSave,
   onCancel,
   isAdding,
-}: {
-  item: TForm; // L'item in modifica è del tipo del form
-  columns: ColumnDef<T>[];
-  onSave: (data: TForm) => void;
-  onCancel: () => void;
-  isAdding: boolean;
-}) {
-  const [formData, setFormData] = useState<TForm>(item);
+}: EditRowProps<T>) {
+  // Inizializziamo lo stato con l'item passato (pieno o vuoto)
+  const [formData, setFormData] = useState<Partial<T>>(item);
 
-  const handleSave = () => {
-    onSave(formData);
-  };
+  // Se l'item cambia (es. passi da un edit a un altro), resettiamo il form
+  useEffect(() => {
+    setFormData(item);
+  }, [item]);
 
   const baseClasses =
-    "w-full px-3 py-2 border border-gray-300 rounded focus:outline-none";
+    "w-full px-3 py-2 border border-gray-300 rounded focus:outline-none transition-colors";
   const focusClasses = isAdding
-    ? "focus:border-green-500"
-    : "focus:border-blue-500";
+    ? "focus:border-green-500 bg-green-50/50"
+    : "focus:border-blue-500 bg-blue-50/50";
 
   return (
     <tr className={isAdding ? "bg-green-50" : "bg-blue-50"}>
       {columns.map((col, index) => (
         <td key={index} className="px-5 py-3 border-b border-gray-200 text-sm">
           {col.renderEditCell ? (
-            // Passiamo il formData di tipo TForm e la sua funzione di aggiornamento
             col.renderEditCell(
-              formData as any,
-              setFormData as any,
+              formData,
+              setFormData,
               `${baseClasses} ${focusClasses}`
             )
           ) : (
-            // Se non c'è un input di modifica, mostra un placeholder
-            <span className="text-gray-500 text-xs">
-              {col.renderCell ? col.renderCell(item as any) : "N/A"}
+            <span className="text-gray-400 italic text-xs">
+              Non modificabile
             </span>
           )}
         </td>
       ))}
       <td className="px-5 py-3 border-b border-gray-200 text-sm">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
-            onClick={handleSave}
-            className="text-green-600 hover:text-green-800"
-            title="Save"
+            onClick={() => onSave(formData)}
+            className="text-green-600 hover:text-green-800 transition-colors"
+            title="Salva"
           >
-            <Save size={18} />
+            <Save size={20} />
           </button>
           <button
             onClick={onCancel}
-            className="text-gray-600 hover:text-gray-800"
-            title="Cancel"
+            className="text-gray-500 hover:text-gray-700 transition-colors"
+            title="Annulla"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
       </td>
     </tr>
   );
 }
-// ==================================
-//    RIGA IN MODALITÀ VISUALIZZAZIONE
-// ==================================
+
+// --- RIGA IN MODALITÀ VISUALIZZAZIONE ---
 interface DataRowProps<T> {
   item: T;
   columns: ColumnDef<T>[];
@@ -108,7 +94,7 @@ export function DataRow<T>({
   onDelete,
 }: DataRowProps<T>) {
   return (
-    <tr>
+    <tr className="hover:bg-gray-50 transition-colors">
       {columns.map((col, index) => (
         <td
           key={index}
@@ -116,22 +102,26 @@ export function DataRow<T>({
         >
           {col.renderCell
             ? col.renderCell(item)
-            : (item as any)[col.accessorKey] || "-"}
+            : item[col.accessorKey]?.toString() || "-"}
         </td>
       ))}
       <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             onClick={onEdit}
-            className="text-blue-600 hover:text-blue-800"
-            title="Edit"
+            className="text-blue-600 hover:text-blue-800 transition-colors"
+            title="Modifica"
           >
             <Edit2 size={18} />
           </button>
           <button
-            onClick={onDelete}
-            className="text-red-600 hover:text-red-800"
-            title="Delete"
+            onClick={() => {
+              if (confirm("Sei sicuro di voler eliminare questo elemento?")) {
+                onDelete();
+              }
+            }}
+            className="text-red-600 hover:text-red-800 transition-colors"
+            title="Elimina"
           >
             <Trash2 size={18} />
           </button>
@@ -141,9 +131,7 @@ export function DataRow<T>({
   );
 }
 
-// ==================================
-//          PAGINAZIONE
-// ==================================
+// --- PAGINAZIONE ---
 export function Pagination({
   currentPage,
   totalPages,
@@ -155,7 +143,6 @@ export function Pagination({
   onPageChange: (page: number) => void;
   loading: boolean;
 }) {
-  // ... (Il tuo codice di paginazione è già ottimo e rimane invariato)
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const maxVisible = 5;
@@ -183,12 +170,11 @@ export function Pagination({
   };
 
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center justify-center gap-2 mt-4">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1 || loading}
-        className="p-2 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
-        title="Previous page"
+        className="p-2 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
       >
         <ChevronLeft size={20} />
       </button>
@@ -199,16 +185,16 @@ export function Pagination({
             key={idx}
             onClick={() => onPageChange(page)}
             disabled={loading}
-            className={`px-3 py-1 rounded border ${
+            className={`px-4 py-2 rounded border font-medium transition-all ${
               currentPage === page
-                ? "bg-blue-600 text-white border-blue-600"
-                : "border-gray-300 hover:bg-gray-100"
+                ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                : "bg-white border-gray-300 hover:bg-gray-50 text-gray-700"
             }`}
           >
             {page}
           </button>
         ) : (
-          <span key={idx} className="px-2">
+          <span key={idx} className="px-2 text-gray-400">
             ...
           </span>
         )
@@ -217,8 +203,7 @@ export function Pagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages || loading}
-        className="p-2 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50"
-        title="Next page"
+        className="p-2 rounded border border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
       >
         <ChevronRight size={20} />
       </button>

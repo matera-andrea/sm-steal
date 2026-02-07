@@ -1,39 +1,34 @@
-// /api/listings/route.ts
-
+import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
+import { z } from "zod";
 import prisma from "@/app/lib/prisma";
 import { createListingSchema } from "@/app/lib/validation/listing.schema";
-import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
+import { querySchema } from "@/app/lib/validation/query.schema";
 
-const querySchema = z.object({
-  page: z.coerce.number().min(1).default(1),
-  limit: z.coerce.number().min(1).max(100).default(20),
-  isActive: z.enum(["true", "false"]).optional(),
+// --- AGGIORNAMENTO SCHEMA VALIDAZIONE QUERY ---
+const listingQuerySchema = querySchema.extend({
   isFeatured: z.enum(["true", "false"]).optional(),
-  itemId: z.string().cuid().optional(),
+  itemId: z.string().optional(),
   condition: z
     .enum(["NEW", "LIKE_NEW", "VERY_GOOD", "GOOD", "ACCEPTABLE", "POOR"])
     .optional(),
   minPrice: z.coerce.number().min(0).optional(),
   maxPrice: z.coerce.number().positive().optional(),
-  sizingId: z.string().cuid().optional(), // Nuovo filtro per taglia
+  sizingId: z.string().optional(),
+  search: z.string().optional(),
+  brandId: z.string().optional(),
+  modelId: z.string().optional(),
 });
 
-//
-// GET ALL LISTINGS (con filtri e paginazione)
-//
 export async function GET(request: NextRequest) {
   try {
     const searchParams = Object.fromEntries(request.nextUrl.searchParams);
-    const validation = querySchema.safeParse(searchParams);
+    const validation = listingQuerySchema.safeParse(searchParams);
 
     if (!validation.success) {
       return NextResponse.json(
-        {
-          message: "Parametri di ricerca non validi",
-          errors: validation.error.issues,
-        },
-        { status: 400 }
+        { message: "Parametri non validi", errors: validation.error.issues },
+        { status: 400 },
       );
     }
 
@@ -47,29 +42,66 @@ export async function GET(request: NextRequest) {
       minPrice,
       maxPrice,
       sizingId,
+      search,
+      brandId,
+      modelId,
     } = validation.data;
 
     const skip = (page - 1) * limit;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: Record<string, any> = {};
+    // --- COSTRUZIONE QUERY DINAMICA ---
+    const where: Prisma.ListingWhereInput = {};
 
     if (isActive) where.isActive = isActive === "true";
     if (isFeatured) where.isFeatured = isFeatured === "true";
-    if (itemId) where.itemId = itemId;
-    if (condition) where.condition = condition;
 
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      where.price = {};
-      if (minPrice !== undefined) where.price.gte = minPrice;
-      if (maxPrice !== undefined) where.price.lte = maxPrice;
+    // --- FILTRI SULL'ITEM ---
+    const itemWhere: Prisma.ItemWhereInput = {};
+
+    if (itemId) itemWhere.id = itemId;
+    if (modelId) itemWhere.sneakerModelId = modelId;
+    if (brandId) {
+      itemWhere.sneakerModel = { brandId: brandId };
     }
 
-    // Filtro per taglia - usa la relazione many-to-many
-    if (sizingId) {
+    if (search) {
+      const searchFilter = {
+        contains: search,
+        mode: Prisma.QueryMode.insensitive,
+      };
+      itemWhere.OR = [
+        { name: searchFilter },
+        { sku: searchFilter },
+        { sneakerModel: { name: searchFilter } },
+        {
+          sneakerModel: {
+            Brand: {
+              name: searchFilter,
+            },
+          },
+        },
+      ];
+    }
+
+    if (Object.keys(itemWhere).length > 0) {
+      where.item = itemWhere;
+    }
+
+    // --- FILTRI VARIANTI (Prezzo e Condizione) ---
+    if (
+      condition ||
+      minPrice !== undefined ||
+      maxPrice !== undefined ||
+      sizingId
+    ) {
       where.sizings = {
         some: {
-          sizingId: sizingId,
+          ...(condition && { condition }),
+          ...(sizingId && { sizingId }),
+          price: {
+            ...(minPrice !== undefined && { gte: minPrice }),
+            ...(maxPrice !== undefined && { lte: maxPrice }),
+          },
         },
       };
     }
@@ -81,22 +113,20 @@ export async function GET(request: NextRequest) {
         take: limit,
         orderBy: { createdAt: "desc" },
         include: {
-          item: { select: { id: true, name: true, sku: true } },
-          sizings: {
+          item: {
             include: {
-              sizing: {
-                select: {
-                  id: true,
-                  size: true,
-                },
+              sneakerModel: {
+                include: { Brand: true },
               },
             },
           },
+          sizings: {
+            include: { sizing: true },
+            orderBy: { price: "asc" },
+          },
           photos: {
             orderBy: [{ isMain: "desc" }, { order: "asc" }],
-            select: {
-              url: true,
-            },
+            select: { url: true, isMain: true },
           },
         },
       }),
@@ -105,72 +135,140 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       data: listings,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
     console.error("[LISTINGS_GET] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} //
-// CREATE A NEW LISTING
-//
+}
+
+// --- POST: CREA O AGGIORNA (MERGE) LISTING ---
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+
     const validation = createListingSchema.safeParse(body);
+
     if (!validation.success) {
       return NextResponse.json(
         { message: "Dati non validi", errors: validation.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const { itemId, sizingIds, ...listingData } = validation.data;
+    // Estraniamo 'stock' per ignorarlo, visto che non esiste più sul Listing padre
+    const { itemId, variants, ...listingData } = validation.data;
 
-    // Controlla che l'item associato esista
+    // 2. Verifica esistenza Item
     const itemExists = await prisma.item.findUnique({ where: { id: itemId } });
     if (!itemExists) {
       return NextResponse.json(
-        { message: `L'articolo con ID '${itemId}' non esiste.` },
-        { status: 404 }
+        { message: "L'articolo selezionato non esiste." },
+        { status: 404 },
       );
     }
 
-    // Crea il listing, le sue associazioni con le taglie e aggiorna il contatore dell'item
-    const newListing = await prisma.$transaction(async (tx) => {
-      const createdListing = await tx.listing.create({
-        data: {
-          ...listingData,
-          itemId,
-        },
-      });
-
-      // Crea le righe nella tabella di join `ListingSizing`
-      await tx.listingSizing.createMany({
-        data: sizingIds.map((sizingId) => ({
-          listingId: createdListing.id,
-          sizingId: sizingId,
-        })),
-      });
-
-      // Aggiorna il contatore degli annunci sull'item
-      await tx.item.update({
-        where: { id: itemId },
-        data: { listingCount: { increment: 1 } },
-      });
-
-      return createdListing;
+    // 3. Verifica esistenza Listing "Padre"
+    const existingListing = await prisma.listing.findFirst({
+      where: { itemId: itemId },
     });
 
-    return NextResponse.json(newListing, { status: 201 });
+    // 4. Transazione Atomica
+    const result = await prisma.$transaction(async (tx) => {
+      // === SCENARIO A: LISTING ESISTENTE (MERGE/UPDATE) ===
+      if (existingListing) {
+        // A.1 Aggiorna dati generali
+        await tx.listing.update({
+          where: { id: existingListing.id },
+          data: {
+            ...listingData,
+            updatedAt: new Date(),
+            // RIMOSSO: stock
+          },
+        });
+
+        // A.2 Gestione Varianti
+        for (const variant of variants) {
+          await tx.listingSizing.upsert({
+            where: {
+              listingId_sizingId_condition: {
+                listingId: existingListing.id,
+                sizingId: variant.sizingId,
+                condition: variant.condition,
+              },
+            },
+            update: {
+              // IMPORTANTE: Conversione in Decimal per il DB
+              price: variant.price,
+              stock: variant.stock ?? 1,
+            },
+            create: {
+              listingId: existingListing.id,
+              sizingId: variant.sizingId,
+              condition: variant.condition,
+              price: variant.price,
+              stock: variant.stock ?? 1,
+            },
+          });
+        }
+
+        // RIMOSSO: Calcolo aggregato e update stock sul padre
+
+        // Ritorna l'oggetto aggiornato
+        const updatedListing = await tx.listing.findUnique({
+          where: { id: existingListing.id },
+          include: { sizings: true },
+        });
+
+        return { action: "updated", listing: updatedListing };
+      }
+
+      // === SCENARIO B: NUOVO LISTING (CREATE) ===
+      else {
+        // B.1 Creazione Listing (senza stock padre)
+        const createdListing = await tx.listing.create({
+          data: {
+            ...listingData,
+            itemId,
+            // RIMOSSO: stock
+            sizings: {
+              create: variants.map((v) => ({
+                sizingId: v.sizingId,
+                price: v.price,
+                condition: v.condition,
+                stock: v.stock ?? 1,
+              })),
+            },
+          },
+        });
+
+        // B.2 Aggiornamento contatore sull'Item
+        await tx.item.update({
+          where: { id: itemId },
+          data: { listingCount: { increment: 1 } },
+        });
+
+        return { action: "created", listing: createdListing };
+      }
+    });
+
+    return NextResponse.json(result.listing, {
+      status: result.action === "created" ? 201 : 200,
+    });
   } catch (error) {
     console.error("[LISTINGS_POST] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

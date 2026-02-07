@@ -1,45 +1,40 @@
 // app/api/listings/[listingId]/photos/route.ts
 
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
 import prisma from "@/app/lib/prisma";
 import { R2_BUCKET_NAME, R2_PUBLIC_URL, s3Client } from "@/app/lib/r2";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
+interface RouteParams {
+  params: Promise<{ listingId: string }>;
+}
 // Schema per la validazione dei parametri della rotta
 const paramsSchema = z.object({
   listingId: z.cuid({ message: "ID del listing non valido." }),
 });
 
-// Schema per i dati del form (che arrivano come stringhe)
 const createPhotoSchema = z.object({
   name: z.string().min(1, "Il nome è obbligatorio."),
   altText: z.string().optional(),
-  // Trasforma la stringa 'true'/'false' da FormData in booleano
   isMain: z
     .string()
     .transform((val) => val === "true")
     .default(false),
-  // Converte la stringa 'order' in numero
   order: z.coerce.number().int().default(0),
 });
 
-//
-// GET ALL PHOTOS FOR A LISTING (Invariato)
-//
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { listingId: string } }
-) {
+export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const paramsValidation = paramsSchema.safeParse(params);
+    const paramsValidation = paramsSchema.safeParse(await params);
     if (!paramsValidation.success) {
       return NextResponse.json(
         {
           message: "Parametri non validi",
           errors: paramsValidation.error.issues,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
     const { listingId } = paramsValidation.data;
@@ -52,7 +47,7 @@ export async function GET(
     if (!listingExists) {
       return NextResponse.json(
         { message: `Listing con ID '${listingId}' non trovato.` },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -66,19 +61,15 @@ export async function GET(
     console.error("[LISTING_PHOTOS_GET] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-//
-// CREATE A NEW PHOTO FOR A LISTING (Gestisce l'upload)
-//
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { listingId: string } }
-) {
+export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     // 1. Valida i parametri della rotta
     const paramsValidation = paramsSchema.safeParse(await params);
     if (!paramsValidation.success) {
@@ -87,7 +78,7 @@ export async function POST(
           message: "Parametri non validi",
           errors: paramsValidation.error.issues,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
     const { listingId } = paramsValidation.data;
@@ -99,7 +90,7 @@ export async function POST(
     if (!listingExists) {
       return NextResponse.json(
         { message: `Il listing con ID '${listingId}' non esiste.` },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -110,7 +101,7 @@ export async function POST(
     if (!file || !(file instanceof File)) {
       return NextResponse.json(
         { message: "File non valido o mancante." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -128,7 +119,7 @@ export async function POST(
     if (!bodyValidation.success) {
       return NextResponse.json(
         { message: "Dati non validi", errors: bodyValidation.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -172,7 +163,7 @@ export async function POST(
             Key: key,
             Body: buffer,
             ContentType: file.type,
-          })
+          }),
         );
       } catch (uploadError) {
         console.error("[R2_UPLOAD_ERROR]", uploadError);
@@ -192,7 +183,7 @@ export async function POST(
     }
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,38 +1,43 @@
-// /hooks/useSneakerModels.ts
-
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { SneakerModel, Brand } from "@prisma/client";
-import { useState, useEffect } from "react";
 
-// Definiamo un tipo semplice che ci serve per la dropdown
-type SimpleSneakerModel = Pick<SneakerModel, "id" | "name"> & {
-  Brand: Pick<Brand, "name"> | null;
+export type SimpleSneakerModel = Pick<
+  SneakerModel,
+  "id" | "name" | "brandId"
+> & {
+  Brand: Pick<Brand, "id" | "name"> | null;
 };
 
+interface ModelsApiResponse {
+  data: SimpleSneakerModel[];
+}
+
 export function useSneakerModels() {
-  const [models, setModels] = useState<SimpleSneakerModel[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["models-list"],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        page: "1",
+        limit: "200", // Limite un po' più alto per i modelli
+        isActive: "true",
+      });
 
-  useEffect(() => {
-    const fetchModels = async () => {
-      try {
-        setLoading(true);
-        // Usiamo un limite alto per prenderli tutti per la select
-        const response = await fetch("/api/sneakerModels");
-        if (!response.ok) throw new Error("Failed to fetch sneaker models");
+      const response = await fetch(`/api/sneakerModels?${params.toString()}`);
+      if (!response.ok) throw new Error("Failed to fetch models");
 
-        const data = await response.json();
-        setModels(data.data);
-      } catch (error) {
-        console.error("Error fetching sneaker models for dropdown:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const json: ModelsApiResponse = await response.json();
+      return json.data || [];
+    },
+    staleTime: 1000 * 60 * 5, // Cache per 5 minuti
+    refetchOnWindowFocus: false,
+  });
 
-    fetchModels();
-  }, []);
-
-  return { models, loading };
+  return {
+    models: data || [],
+    loading: isLoading,
+    isError,
+    refetch,
+  };
 }

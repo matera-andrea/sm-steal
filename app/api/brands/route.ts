@@ -1,54 +1,59 @@
+//api/brands/route.ts
 import prisma from "@/app/lib/prisma";
 import { brandSchema } from "@/app/lib/validation/brand.schema";
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { querySchema } from "@/app/lib/validation/query.schema";
 
-const querySchema = z.object({
-  page: z.coerce.number().min(1).default(1),
-  limit: z.coerce.number().min(1).max(100).default(10),
-  search: z.string().optional(),
-  isActive: z.enum(["true", "false"]).optional(),
+const brandQuerySchema = querySchema.extend({
   includeItems: z.enum(["true", "false"]).default("false"),
 });
 
 export async function GET(request: NextRequest) {
   try {
-    const rawParams = Object.fromEntries(
-      new URL(request.url).searchParams.entries()
-    );
-    const params = querySchema.parse(rawParams);
+    const searchParams = Object.fromEntries(request.nextUrl.searchParams);
+    const validation = brandQuerySchema.safeParse(searchParams);
 
-    const skip = (params.page - 1) * params.limit;
-    const where: Record<string, unknown> = {};
-
-    if (params.search) {
-      where.name = { contains: params.search, mode: "insensitive" };
-    }
-    if (params.isActive) {
-      where.isActive = params.isActive === "true";
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          message: "Bad request: parameters not valid.",
+          errors: validation.error.issues,
+        },
+        { status: 400 },
+      );
     }
 
-    const include =
-      params.includeItems === "true"
-        ? {
-            items: {
-              where: { isActive: true },
-              select: {
-                id: true,
-                name: true,
-                category: true,
-                gender: true,
-              },
-            },
-            _count: { select: { sneakerModels: true } },
-          }
-        : { _count: { select: { sneakerModels: true } } };
+    const { page, limit, search, isActive, includeItems } = validation.data;
+    const skip = (page - 1) * limit;
 
-    const [brands, total] = await Promise.all([
+    const where: Prisma.BrandWhereInput = {};
+
+    if (search) where.name = { contains: search, mode: "insensitive" };
+    if (isActive) where.isActive = isActive === "true";
+
+    const include: Prisma.BrandInclude = {
+      _count: {
+        select: { sneakerModels: true },
+      },
+    };
+
+    if (includeItems === "true") {
+      include.sneakerModels = {
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+        },
+      };
+    }
+
+    const [brands, total] = await prisma.$transaction([
       prisma.brand.findMany({
         where,
         skip,
-        take: params.limit,
+        take: limit,
         orderBy: { name: "asc" },
         include,
       }),
@@ -58,28 +63,34 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       data: brands,
       pagination: {
-        page: params.page,
-        limit: params.limit,
+        page,
+        limit,
         total,
-        pages: Math.ceil(total / params.limit),
+        totalPages: Math.ceil(total / limit),
       },
     });
-  } catch (error: unknown) {
-    console.error("Error fetching brands:", error);
+  } catch (error) {
+    console.error("[BRANDS_GET] Error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+      { message: "Internal server error" },
+      { status: 500 },
     );
   }
 }
 
-//
-// POST brand
-//
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const validatedData = brandSchema.parse(body);
+    const validation = brandSchema.safeParse(body);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        { message: "Dati non validi", errors: validation.error.issues },
+        { status: 400 },
+      );
+    }
+
+    const validatedData = validation.data;
 
     const existingBrand = await prisma.brand.findUnique({
       where: { name: validatedData.name },
@@ -87,8 +98,8 @@ export async function POST(request: NextRequest) {
 
     if (existingBrand) {
       return NextResponse.json(
-        { error: "Brand name already exists" },
-        { status: 400 }
+        { message: "Brand name already exists" },
+        { status: 400 },
       );
     }
 
@@ -97,19 +108,12 @@ export async function POST(request: NextRequest) {
       include: { _count: { select: { sneakerModels: true } } },
     });
 
-    return NextResponse.json({ data: brand }, { status: 201 });
+    return NextResponse.json(brand, { status: 201 });
   } catch (error: unknown) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Validation error", details: error.message },
-        { status: 400 }
-      );
-    }
-
-    console.error("Error creating brand:", error);
+    console.error("[BRANDS_POST] Error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+      { message: "Internal server error" },
+      { status: 500 },
     );
   }
 }

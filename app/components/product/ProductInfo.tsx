@@ -1,60 +1,103 @@
 "use client";
-import { ProductActions } from "@/app/components/cards/ProductActions";
+
+import { SizingVariant, ListingWithDetails } from "@/app/lib/types/type";
+import { Check } from "lucide-react";
 
 interface ProductInfoProps {
-  listing: any;
-  fullName: string;
+  listing: ListingWithDetails;
+  selectedVariantId?: string;
+  onVariantChange: (variant: SizingVariant) => void;
 }
 
-export function ProductInfo({ listing, fullName }: ProductInfoProps) {
-  const price = new Intl.NumberFormat("it-IT", {
-    style: "currency",
-    currency: "EUR",
-  }).format(listing.price);
+export function ProductInfo({
+  listing,
+  selectedVariantId,
+  onVariantChange,
+}: ProductInfoProps) {
+  // Ordiniamo le varianti: Prima per Taglia, poi per Prezzo
+  const sortedSizings = [...listing.sizings].sort((a, b) => {
+    // Logica semplificata di sort per taglia (potresti aver bisogno di una logica custom per US/UK/EU)
+    const sizeA = parseFloat(a.sizing.size) || 0;
+    const sizeB = parseFloat(b.sizing.size) || 0;
+    return sizeA - sizeB;
+  });
+  if (sortedSizings.length !== 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-end">
+          <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">
+            Select Size & Condition
+          </h3>
+          {/* <span className="text-[10px] font-bold underline cursor-pointer hover:text-amber-500">
+          Size Guide
+        </span> */}
+        </div>
 
-  const getConditionLabel = (condition: string) => {
-    const conditions: Record<string, string> = {
-      NEW: "Nuovo",
-      LIKE_NEW: "Come nuovo",
-      GOOD: "Usato - Buone condizioni",
-      USED: "Usato",
-    };
-    return conditions[condition] || condition;
-  };
+        {/* GRIGLIA VARIANTI */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {sortedSizings.map((variant) => {
+            const isSelected = selectedVariantId === variant.id;
 
-  return (
-    <div>
-      {/* Nome prodotto */}
-      <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl">
-        {fullName}
-      </h1>
+            return (
+              <button
+                key={variant.id}
+                onClick={() => onVariantChange(variant)}
+                className={`
+                relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all duration-200 group
+                ${
+                  isSelected
+                    ? "border-black bg-black text-white shadow-xl scale-[1.02]"
+                    : "border-gray-100 bg-white hover:border-black hover:shadow-md text-black"
+                }
+              `}
+              >
+                {/* Size */}
+                <span
+                  className={`text-sm font-black ${
+                    isSelected ? "text-amber-400" : "text-black"
+                  }`}
+                >
+                  {variant.sizing.size}{" "}
+                  <span className="text-[10px] font-medium opacity-70">
+                    {variant.sizing.type}
+                  </span>
+                </span>
 
-      {/* Prezzo */}
-      <div className="mt-4 sm:items-center sm:gap-4 sm:flex">
-        <p className="text-2xl font-extrabold text-gray-900 sm:text-3xl">
-          {price}
-        </p>
+                {/* Price */}
+                <span className="text-lg font-bold mt-1">€{variant.price}</span>
+
+                {/* Condition Badge (Piccolo) */}
+                <span
+                  className={`
+                mt-2 text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded
+                ${
+                  isSelected
+                    ? "bg-white/20 text-white"
+                    : "bg-gray-100 text-gray-500"
+                }
+              `}
+                >
+                  {variant.condition === "NEW"
+                    ? "Brand New"
+                    : variant.condition.replace("_", " ")}
+                </span>
+
+                {/* Checkmark icon on selection */}
+                {isSelected && (
+                  <div className="absolute -top-2 -right-2 bg-amber-400 text-black rounded-full p-1 shadow-sm">
+                    <Check size={12} strokeWidth={4} />
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
-
-      {/* Badge condizione e disponibilità */}
-      <div className="mt-4 flex flex-wrap gap-2">
-        <span className="inline-flex items-center rounded-md bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
-          {getConditionLabel(listing.condition)}
-        </span>
-
-        {listing.stock > 0 ? (
-          <span className="inline-flex items-center rounded-md bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-            Disponibile ({listing.stock} in stock)
-          </span>
-        ) : (
-          <span className="inline-flex items-center rounded-md bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20">
-            Esaurito
-          </span>
-        )}
+    );
+  } else
+    return (
+      <div className="p-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center">
+        <p className="text-sm font-bold text-gray-400">Out of Stock</p>
       </div>
-
-      {/* Azioni prodotto (taglie e bottoni) */}
-      <ProductActions listing={listing} />
-    </div>
-  );
+    );
 }

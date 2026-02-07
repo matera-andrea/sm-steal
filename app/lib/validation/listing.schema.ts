@@ -2,7 +2,6 @@
 
 import { z } from "zod";
 
-// Enum presi direttamente dallo schema Prisma per coerenza.
 const ListingConditionEnum = z.enum([
   "NEW",
   "LIKE_NEW",
@@ -12,24 +11,27 @@ const ListingConditionEnum = z.enum([
   "POOR",
 ]);
 
-export const createListingSchema = z.object({
-  description: z.string().optional(),
-  condition: ListingConditionEnum.default("NEW"),
-  stock: z.coerce.number().min(1, "Lo stock deve essere almeno 1.").default(1),
+const ListingVariantSchema = z.object({
+  sizingId: z.cuid("ID taglia non valido."),
   price: z.coerce
     .number({ error: "Il prezzo deve essere un numero." })
-    .positive("Il prezzo deve essere un valore positivo."),
+    .positive("Il prezzo deve essere positivo."),
+  condition: ListingConditionEnum.default("NEW"),
+  stock: z.coerce.number().min(0).default(1),
+});
+
+export const createListingSchema = z.object({
+  description: z.string().optional(),
   isActive: z.boolean().default(true),
   isFeatured: z.boolean().default(false),
-  endDate: z.date().optional(),
-  itemId: z.cuid("L'ID dell'articolo non è valido."),
+  endDate: z.coerce.date().optional(),
+  itemId: z.cuid("ID articolo non valido."),
 
-  sizingIds: z
-    .array(z.cuid("Uno o più ID di taglia non sono validi."))
-    .min(1, "È richiesta almeno una taglia."),
+  variants: z.array(ListingVariantSchema).min(0),
 });
 
 export const updateListingSchema = createListingSchema.partial();
 
 export type CreateListingDto = z.infer<typeof createListingSchema>;
 export type UpdateListingDto = z.infer<typeof updateListingSchema>;
+export type ListingVariantDto = z.infer<typeof ListingVariantSchema>;

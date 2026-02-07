@@ -208,7 +208,7 @@ export default function AdminNav() {
                 </span>
               </a>
               <a
-                className="flex flex-row items-center  justify-center lg:justify-start rounded-md h-12 focus:outline-none pr-3.5  lg:pr-6 font-semibold bg-primary-50 shadow-sm text-primary-400 font-bold "
+                className="flex flex-row items-center  justify-center lg:justify-start rounded-md h-12 focus:outline-none pr-3.5  lg:pr-6 font-semibold bg-primary-50 shadow-sm text-primary-400 "
                 href="/app/projects"
               >
                 <span className="inline-flex justify-center items-center ml-3.5">

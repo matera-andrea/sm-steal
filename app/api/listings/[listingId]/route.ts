@@ -1,17 +1,23 @@
 import prisma from "@/app/lib/prisma";
 import { updateListingSchema } from "@/app/lib/validation/listing.schema";
+import { ListingCondition } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 interface Params {
-  params: { listingId: string };
+  params: Promise<{ listingId: string }>;
 }
 
-//
-// GET A SINGLE LISTING BY ID
-//
+interface Variant {
+  sizingId: string;
+  price: number;
+  condition: ListingCondition;
+  stock?: number;
+}
+
+// GET: Recupera il listing con tutte le varianti di prezzo/taglia
 export async function GET(request: NextRequest, { params }: Params) {
   try {
-    const {listingId} = await params;
+    const { listingId } = await params;
     const listing = await prisma.listing.findUnique({
       where: { id: listingId },
       include: {
@@ -21,14 +27,18 @@ export async function GET(request: NextRequest, { params }: Params) {
           },
         },
         photos: { orderBy: { order: "asc" } },
-        sizings: { include: { sizing: true } },
+        // Fondamentale: includiamo price e condition che ora sono qui
+        sizings: {
+          include: { sizing: true },
+          orderBy: { sizing: { size: "asc" } }, // Ordiniamo per taglia
+        },
       },
     });
 
     if (!listing) {
       return NextResponse.json(
         { message: "Annuncio non trovato." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -37,58 +47,62 @@ export async function GET(request: NextRequest, { params }: Params) {
     console.error("[LISTING_GET_BY_ID] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-//
-// UPDATE A LISTING BY ID
-//
+// PATCH: Aggiorna il listing e le sue varianti specifiche
 export async function PATCH(request: NextRequest, { params }: Params) {
   try {
-    const { listingId } = params;
+    const { listingId } = await params;
     const body = await request.json();
+
+    // NOTA: Dovrai aggiornare lo schema Zod per accettare un array di oggetti:
+    // { sizingId: string, price: number, condition: Condition }
     const validation = updateListingSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
         { message: "Dati non validi", errors: validation.error.issues },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    // Controlla che il listing da aggiornare esista
     const existingListing = await prisma.listing.findUnique({
       where: { id: listingId },
     });
+
     if (!existingListing) {
       return NextResponse.json(
         { message: "Annuncio non trovato." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    const { sizingIds, ...listingData } = validation.data;
-
+    // Estraiamo le varianti dal body (es: variants: [{ sizingId: '...', price: 200, condition: 'NEW' }])
+    const { variants, ...listingData } = validation.data;
     const updatedListing = await prisma.$transaction(async (tx) => {
-      // 1. Aggiorna i dati principali del listing
       const listing = await tx.listing.update({
         where: { id: listingId },
         data: listingData,
       });
 
-      // 2. Se vengono passate nuove taglie, sostituisci le vecchie
-      if (sizingIds) {
-        // Elimina le associazioni esistenti
+      // 2. Se vengono passate varianti, resettiamo e ricreiamo
+      if (variants) {
+        // Rimuoviamo le vecchie associazioni taglia/prezzo
         await tx.listingSizing.deleteMany({
           where: { listingId: listingId },
         });
-        // Crea le nuove associazioni
+
+        // Creiamo le nuove associazioni con i relativi prezzi e condizioni
         await tx.listingSizing.createMany({
-          data: sizingIds.map((sizingId) => ({
+          data: variants.map((v: Variant) => ({
             listingId: listingId,
-            sizingId: sizingId,
+            sizingId: v.sizingId,
+            price: v.price,
+            condition: v.condition,
+            stock: v.stock ?? 1,
           })),
         });
       }
@@ -100,14 +114,12 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     console.error("[LISTING_PATCH] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
-//
-// DELETE A LISTING BY ID
-//
+// DELETE rimane sostanzialmente invariata perché Prisma gestisce il Cascade
 export async function DELETE(request: NextRequest, { params }: Params) {
   try {
     const { listingId } = await params;
@@ -119,29 +131,24 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     if (!listingToDelete) {
       return NextResponse.json(
         { message: "Annuncio non trovato." },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    // Prisma gestirà l'eliminazione a cascata di `Photo` e `ListingSizing`.
-    // Dobbiamo solo preoccuparci di aggiornare il contatore.
     await prisma.$transaction(async (tx) => {
-      await tx.listing.delete({
-        where: { id: listingId },
-      });
-
+      await tx.listing.delete({ where: { id: listingId } });
       await tx.item.update({
         where: { id: listingToDelete.itemId },
         data: { listingCount: { decrement: 1 } },
       });
     });
 
-    return new NextResponse(null, { status: 204 }); // No Content
+    return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error("[LISTING_DELETE] Error:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
