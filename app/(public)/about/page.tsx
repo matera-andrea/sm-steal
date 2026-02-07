@@ -95,7 +95,7 @@ export default function AboutPage() {
               <p>
                 Quello che è partito come un piccolo progetto di reselling tra
                 amici è diventato
-                <strong> SM.STEAL</strong>. Oggi gestiamo migliaia di paia, ma
+                <strong> Heat Lab</strong>. Oggi gestiamo migliaia di paia, ma
                 la filosofia rimane la stessa: trattiamo ogni cliente come se
                 fosse uno di noi.
               </p>
