@@ -1,7 +1,7 @@
 "use client";
 
 import { SignedIn, SignedOut, useClerk, UserButton } from "@clerk/nextjs";
-import { useState, useEffect, Suspense } from "react"; // Aggiunto Suspense
+import { useState, useEffect, Suspense } from "react";
 import {
   Disclosure,
   DisclosureButton,
@@ -20,7 +20,6 @@ const navigation = [
   { name: "About", href: "/about" },
 ];
 
-// 1. Rinominiamo il componente principale in "NavBarContent" (non esportato)
 function NavBarContent() {
   const pathname = usePathname();
   const router = useRouter();
@@ -61,7 +60,7 @@ function NavBarContent() {
   }, [lastScrollY]);
 
   const handleSearch = (
-    e: React.KeyboardEvent<HTMLInputElement> | React.FormEvent
+    e: React.KeyboardEvent<HTMLInputElement> | React.FormEvent,
   ) => {
     if ("key" in e && e.key !== "Enter") return;
     e.preventDefault();
@@ -83,8 +82,9 @@ function NavBarContent() {
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex h-20 items-center justify-between gap-4">
-              {/* Bottone Mobile */}
+            {/* MODIFICA ALTEZZA: h-24 per ospitare il logo grande */}
+            <div className="flex h-24 items-center justify-between gap-4">
+              {/* Bottone Mobile (a sinistra su mobile) */}
               <div className="flex items-center sm:hidden">
                 <DisclosureButton className="inline-flex items-center justify-center rounded-full p-2 text-black hover:bg-gray-100 focus:outline-none">
                   {open ? (
@@ -95,8 +95,23 @@ function NavBarContent() {
                 </DisclosureButton>
               </div>
 
-              {/* BARRA DI RICERCA */}
-              <div className="hidden sm:flex flex-1 max-w-xs">
+              {/* 1. LOGO (Posizionato PRIMA della search bar) */}
+              <div className="flex flex-shrink-0 items-center">
+                <Link href="/">
+                  <Image
+                    src="/logo.png"
+                    alt="Logo"
+                    // MODIFICA DIMENSIONI: Logo grande
+                    width={250}
+                    height={150}
+                    className="h-14 sm:h-20 w-auto object-contain"
+                    priority
+                  />
+                </Link>
+              </div>
+
+              {/* 2. BARRA DI RICERCA (Posizionata DOPO il logo) */}
+              <div className="hidden sm:flex flex-1 max-w-xs ml-4">
                 <div className="relative group w-full">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                     <Search className="h-4 w-4 text-gray-400 group-focus-within:text-black transition-colors" />
@@ -112,21 +127,7 @@ function NavBarContent() {
                 </div>
               </div>
 
-              {/* LOGO CENTRALE */}
-              <div className="flex flex-shrink-0 items-center">
-                <Link href="/">
-                  <Image
-                    src="/logo_black.png"
-                    alt="Logo"
-                    width={120}
-                    height={40}
-                    className="h-10 w-auto"
-                    priority
-                  />
-                </Link>
-              </div>
-
-              {/* ICONE DESTRA */}
+              {/* ICONE DESTRA (Mantenute alla fine) */}
               <div className="flex flex-1 items-center justify-end gap-2 md:gap-5">
                 <SignedIn>
                   <Link href={"/wishlist"}>
@@ -223,13 +224,12 @@ function NavBarContent() {
   );
 }
 
-// 2. Esportiamo il componente Wrapper con Suspense
 export default function NavBar() {
   return (
-    // Il fallback è un placeholder che evita che il layout "salti" mentre la navbar carica
     <Suspense
       fallback={
-        <div className="h-20 bg-white border-b border-gray-100 sticky top-0 z-50" />
+        // MODIFICA ALTEZZA FALLBACK: h-24
+        <div className="h-24 bg-white border-b border-gray-100 sticky top-0 z-50" />
       }
     >
       <NavBarContent />

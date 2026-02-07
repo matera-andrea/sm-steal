@@ -74,17 +74,16 @@ export default function WishlistPage() {
 
                 <div className="relative z-10 max-w-md space-y-4">
                   <h2 className="text-4xl font-black uppercase italic tracking-tight text-gray-900">
-                    Your rotation is empty.
+                    La tua rotation è vuota
                   </h2>
                   <p className="text-gray-500 font-medium">
-                    You haven&apos;t saved any items yet. Browse our catalog and
-                    save the kicks you want to cop later.
+                    Non hai ancora salvato nessun prodotto. Esplora il nostro catalogo e salva i kicks che desideri copiare in futuro.
                   </p>
                 </div>
 
                 <Link href="/shop" className="relative z-10">
                   <button className="group flex items-center gap-3 bg-black text-white px-10 py-5 rounded-full font-black uppercase tracking-widest text-xs hover:bg-red-500 hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl shadow-black/20">
-                    Start Shopping
+                    Vai allo Shop
                     <ArrowRight
                       size={16}
                       className="group-hover:translate-x-1 transition-transform"

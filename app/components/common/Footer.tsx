@@ -8,27 +8,31 @@ export default function Footer() {
   return (
     <footer className="bg-black text-white border-t z-50 border-white/10 relative">
       <div className="container mx-auto px-6 py-16">
-        {/* MODIFICA: Griglia passata da 5 a 4 colonne per bilanciare la rimozione dello shop */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Colonna Brand & Mission (Occupa 2 spazi su 4) */}
           <div className="lg:col-span-2 space-y-6">
-            <Link href="/" className="flex items-center gap-3">
+            {/* MODIFICA: Logo e Testo molto più grandi */}
+            <Link href="/" className="flex items-center gap-4">
               <Image
-                src="/logo_white.png"
+                src="/logo.png"
                 alt="Sm Steal Logo"
-                width={50}
-                height={50}
-                className="h-12 w-auto"
+                // Aumentata risoluzione
+                width={200}
+                height={200}
+                // Aumentata dimensione visuale: h-20 mobile, h-28 desktop
+                className="h-20 md:h-28 w-auto object-contain"
               />
-              <span className="text-2xl font-black uppercase italic tracking-tighter">
+              <span className="text-3xl md:text-4xl font-black uppercase italic tracking-tighter">
                 Sm steal<span className="text-amber-400">.</span>
               </span>
             </Link>
+
             <p className="text-gray-400 text-sm max-w-sm leading-relaxed font-medium">
               Il punto di riferimento per il resell autentico. Sneakers,
               collectibles e grails selezionati con cura per veri appassionati.
               No fake, just steals.
             </p>
+
             <div className="flex space-x-5">
               <a
                 href="https://instagram.com/sm.steal"
@@ -68,7 +72,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                {/* Aggiornato il link alla pagina corretta */}
                 <Link
                   href="/shipping-returns"
                   className="hover:text-white transition-colors"
@@ -118,7 +121,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                {/* Aggiornato il link alla pagina corretta */}
                 <Link
                   href="/cookie-policy"
                   className="hover:text-white transition-colors"
@@ -136,8 +138,7 @@ export default function Footer() {
           <div className="flex gap-6">
             <span>VAT: [INSERISCI P.IVA]</span>
 
-            {/* MODIFICA QUI: Rendi il testo un Link */}
-            <Link
+            {/* <Link
               href="/developer"
               className="hover:text-white transition-colors group"
             >
@@ -145,7 +146,7 @@ export default function Footer() {
               <span className="group-hover:text-amber-400 transition-colors underline decoration-amber-400 underline-offset-4">
                 Andrea Matera
               </span>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

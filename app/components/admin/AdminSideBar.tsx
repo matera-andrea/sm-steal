@@ -46,7 +46,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         <div className="p-8 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-3" onClick={onClose}>
             <Image
-              src="/logo_white.png" // Assicurati che il percorso sia valido
+              src="/logo.png" // Assicurati che il percorso sia valido
               alt="Logo"
               width={40}
               height={40}

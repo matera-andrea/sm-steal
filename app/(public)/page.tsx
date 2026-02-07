@@ -3,6 +3,7 @@
 import { useState, useEffect, memo } from "react"; // Aggiungi memo
 import { useQuery } from "@tanstack/react-query";
 import FeaturedGrid from "../components/product/FeaturedGrid";
+import Link from "next/link";
 
 // Tipo per le slide provenienti dall'API
 interface Slide {
@@ -95,7 +96,20 @@ export default function Home() {
       {/* --- SEZIONE FEATURED --- */}
       <section className="container mx-auto py-20 px-4">
         {/* ... Header New Arrivals ... */}
-
+        <div className="flex justify-between items-end mb-12">
+          <div>
+            <h2 className="text-4xl font-black uppercase italic tracking-tight">
+              New Arrivals
+            </h2>
+            <div className="h-1.5 w-20 bg-amber-400 mt-2" />
+          </div>
+          <Link
+            href="/shop"
+            className="text-sm font-bold uppercase tracking-widest hover:text-amber-500 transition-colors"
+          >
+            View All →
+          </Link>
+        </div>
         {/* 
             IMPORTANTE: Usa la versione Memoizzata.
             Se FeaturedGrid fa delle fetch al suo interno, il re-render continuo
