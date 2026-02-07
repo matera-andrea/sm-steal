@@ -9,12 +9,12 @@ const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
 });
 
-const ratelimit = new Ratelimit({
-  redis: redis,
-  limiter: Ratelimit.slidingWindow(100, "5 s"),
-  analytics: true,
-  prefix: "@upstash/ratelimit",
-});
+// const ratelimit = new Ratelimit({
+//   redis: redis,
+//   limiter: Ratelimit.slidingWindow(1000, "5 s"),
+//   analytics: true,
+//   prefix: "@upstash/ratelimit",
+// });
 
 // --- DEFINIZIONE ROTTE ---
 // Wishlist rimane protetta per utenti loggati (qualsiasi)
@@ -36,21 +36,21 @@ export default clerkMiddleware(async (auth, req) => {
 
   // ---------------------------------------------------------
   // 1. RATE LIMITING (Solo API)
-  // ---------------------------------------------------------
-  if (path.startsWith("/api")) {
-    const ip =
-      req.headers.get("x-forwarded-for") ??
-      req.headers.get("x-real-ip") ??
-      "127.0.0.1";
-    const { success, limit, reset, remaining } = await ratelimit.limit(ip);
+  // // ---------------------------------------------------------
+  // if (path.startsWith("/api")) {
+  //   const ip =
+  //     req.headers.get("x-forwarded-for") ??
+  //     req.headers.get("x-real-ip") ??
+  //     "127.0.0.1";
+  //   const { success, limit, reset, remaining } = await ratelimit.limit(ip);
 
-    if ((!success && !userId) || (userId !== adminId && userId !== devId)) {
-      return NextResponse.json(
-        { error: "Too Many Requests", message: "Rallenta! Troppe richieste." },
-        { status: 429, headers: { "X-RateLimit-Reset": reset.toString() } },
-      );
-    }
-  }
+  //   if ((!success && !userId) || (userId !== adminId && userId !== devId)) {
+  //     return NextResponse.json(
+  //       { error: "Too Many Requests", message: "Rallenta! Troppe richieste." },
+  //       { status: 429, headers: { "X-RateLimit-Reset": reset.toString() } },
+  //     );
+  //   }
+  // }
 
   // ---------------------------------------------------------
   // 2. PROTEZIONE AUTOMATICA METODI (La parte che hai chiesto)

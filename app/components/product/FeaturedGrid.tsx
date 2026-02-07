@@ -7,39 +7,54 @@ import ProductCard from "@/app/components/cards/ProductCard";
 import { ListingWithDetails } from "@/app/lib/types/type";
 
 interface FeaturedGridProps {
-  limit?: number; // Opzionale: se vuoi mostrarne solo 4 o 8 in homepage
-  showPagination?: boolean; // Opzionale: nascondi paginazione in home
+  limit?: number;
+  showPagination?: boolean;
 }
 
 export default function FeaturedGrid({
   limit = 8,
-  showPagination = false,
+  showPagination = false, // eslint-disable-line @typescript-eslint/no-unused-vars
 }: FeaturedGridProps) {
-  // Per la homepage spesso non serve paginazione, ma la predisponiamo
   const currentPage = 1;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["listings", "featured", limit],
+  const { data, isLoading, isError } = useQuery({
+    // Aggiungi currentPage alle chiavi se in futuro userai la paginazione
+    queryKey: ["listings", "featured", limit, currentPage],
+
     queryFn: async () => {
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: limit.toString(),
         isActive: "true",
         isFeatured: "true",
-        // Ordiniamo per data di creazione discendente (i più recenti in alto)
-        // Nota: Assicurati che il tuo backend supporti l'ordinamento,
-        // altrimenti prenderà quelli di default.
       });
 
       const response = await fetch(`/api/listings?${params.toString()}`);
-      if (!response.ok) throw new Error("Errore nel caricamento dei prodotti");
+
+      if (!response.ok) {
+        // Gestione specifica per il Rate Limit
+        if (response.status === 429) throw new Error("Rate limit exceeded");
+        throw new Error("Errore nel caricamento dei prodotti");
+      }
+
       return response.json();
+    },
+
+    // --- CONFIGURAZIONE ANTI-LOOP / ANTI-429 ---
+    staleTime: 1000 * 60 * 10, // 10 minuti: I prodotti in vetrina non cambiano ogni secondo.
+    gcTime: 1000 * 60 * 30, // 30 minuti: Mantieni in cache anche se cambi pagina.
+    refetchOnWindowFocus: false, // Fondamentale: non rifetchare se l'utente fa alt-tab.
+    refetchOnMount: false, // Se i dati sono in cache (e non stale), non rifetchare al mount.
+    retry: (failureCount, error) => {
+      // Se becchiamo un 429, smettiamo subito di martellare il server
+      if (error.message === "Rate limit exceeded") return false;
+      return failureCount < 2;
     },
   });
 
   const listings: ListingWithDetails[] = data?.data || [];
 
-  // --- LOADING SKELETON (Stesso stile del ProductGrid) ---
+  // --- LOADING SKELETON ---
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
@@ -50,6 +65,15 @@ export default function FeaturedGrid({
             <div className="h-6 bg-gray-100 rounded w-1/3" />
           </div>
         ))}
+      </div>
+    );
+  }
+
+  // --- ERROR STATE (Opzionale ma consigliato) ---
+  if (isError) {
+    return (
+      <div className="py-10 text-center text-red-500">
+        <p>Impossible to load featured products at the moment.</p>
       </div>
     );
   }
