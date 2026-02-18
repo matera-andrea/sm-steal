@@ -7,8 +7,7 @@ import {
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import { Heart, Search, User } from "lucide-react";
+import { Heart, Menu, Search, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -88,20 +87,19 @@ function NavBarContent() {
               <div className="flex items-center sm:hidden">
                 <DisclosureButton className="inline-flex items-center justify-center rounded-full p-2 text-black hover:bg-gray-100 focus:outline-none">
                   {open ? (
-                    <XMarkIcon className="h-6 w-6" />
+                    <X className="h-6 w-6" />
                   ) : (
-                    <Bars3Icon className="h-6 w-6" />
+                    <Menu className="h-6 w-6" />
                   )}
                 </DisclosureButton>
               </div>
 
               {/* 1. LOGO (Posizionato PRIMA della search bar) */}
-              <div className="flex flex-shrink-0 items-center">
+              <div className="flex shrink-0 items-center">
                 <Link href="/">
                   <Image
                     src="/logo.png"
                     alt="Logo"
-                    // MODIFICA DIMENSIONI: Logo grande
                     width={250}
                     height={150}
                     className="h-14 sm:h-20 w-auto object-contain"
@@ -143,7 +141,7 @@ function NavBarContent() {
                     </button>
                   </div>
                 </SignedOut>
-                <div className="h-6 w-[1px] bg-gray-200 hidden sm:block" />
+                <div className="h-6 w-px bg-gray-200 hidden sm:block" />
 
                 <SignedIn>
                   <UserButton />
@@ -178,7 +176,7 @@ function NavBarContent() {
                     >
                       {item.name}
                       <span
-                        className={`absolute bottom-0 left-0 h-[2px] bg-amber-400 transition-all duration-300 ${
+                        className={`absolute bottom-0 left-0 h-0.5 bg-amber-400 transition-all duration-300 ${
                           isActive ? "w-full" : "w-0 group-hover:w-full"
                         }`}
                       />

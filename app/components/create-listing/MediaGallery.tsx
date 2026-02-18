@@ -1,4 +1,3 @@
-// app/components/listing/MediaGallery.tsx
 import Image from "next/image";
 import { X, Image as ImageIcon } from "lucide-react";
 
@@ -24,7 +23,7 @@ export default function MediaGallery({
             key={i}
             className="relative aspect-square rounded-2xl overflow-hidden border-2 border-gray-100 group shadow-sm"
           >
-            <Image src={url} alt="Preview" fill className="object-cover" />
+            <Image src={url} alt="Preview" fill sizes="33vw" className="object-cover" />
             <button
               type="button"
               onClick={() => onRemove(i)}

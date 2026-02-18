@@ -7,19 +7,17 @@ import { useSizings } from "@/hooks/useSizings";
 import { useBrands } from "@/hooks/useBrands"; // Serve per il refetch se necessario
 import { useSneakerModels } from "@/hooks/useSneakerModels"; // Serve per il refetch
 
-import {
-  KicksProductResponse,
-  ListingVariantState,
-} from "@/app/lib/types/type";
+import { KicksProductResponse } from "@/app/lib/types/type";
 import InventoryManager from "../create-listing/InventoryManager";
 import {
   TempProductData,
   ListingFormData,
+  ListingVariantState,
   mapStockXGender,
 } from "../create-listing/listingShared";
 import MediaGallery from "../create-listing/MediaGallery";
 import ProductSyncPreview from "../create-listing/ProductSyncPreview";
-import StockXImporter from "../create-listing/stockXImporter";
+import StockXImporter from "../create-listing/StockXImporter";
 
 export default function ListingForm() {
   const router = useRouter();
@@ -230,7 +228,6 @@ export default function ListingForm() {
       } else if (formData.itemId) {
         const selectedItem = items.find((i) => i.id === formData.itemId);
         if (!selectedItem) throw new Error("Item selezionato non valido");
-        console.log("Selected Item for Listing:", selectedItem);
 
         // Per sicurezza, passiamo lo SKU e i nomi. Se l'item esiste, l'API userà quello.
         payloadData = {

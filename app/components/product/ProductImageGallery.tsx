@@ -38,6 +38,7 @@ export function ProductImageGallery({
               src={photo.url}
               alt="Thumbnail"
               fill
+              sizes="96px"
               className="object-contain p-2"
             />
           </button>
@@ -53,6 +54,7 @@ export function ProductImageGallery({
           src={activePhoto}
           alt={productName}
           fill
+          sizes="(max-width: 1024px) 100vw, 58vw"
           className="object-contain p-8 w-full h-full mix-blend-multiply transition-opacity duration-500"
           priority
         />

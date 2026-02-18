@@ -1,5 +1,3 @@
-// app/lib/r2-client.ts
-
 import { S3Client } from "@aws-sdk/client-s3";
 
 const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID;

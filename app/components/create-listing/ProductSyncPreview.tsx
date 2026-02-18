@@ -1,4 +1,3 @@
-// app/components/listing/ProductSyncPreview.tsx
 import Image from "next/image";
 import { Edit3, Loader2, CheckCircle2 } from "lucide-react";
 import {
@@ -46,6 +45,7 @@ export default function ProductSyncPreview({
                 src={previewUrl}
                 alt="StockX"
                 fill
+                sizes="80px"
                 className="object-cover"
               />
             </div>

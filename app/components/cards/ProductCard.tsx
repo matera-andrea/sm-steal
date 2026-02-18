@@ -1,5 +1,3 @@
-// /app/components/cards/ProductCard.tsx
-
 import { ListingWithDetails } from "@/app/lib/types/type";
 import Link from "next/link";
 import Image from "next/image";
@@ -34,7 +32,7 @@ export default function ProductCard({ listing }: ProductCardProps) {
 
   return (
     <Link href={`/shop/${listing.id}`}>
-      <div className="group flex flex-col h-full realtive">
+      <div className="group flex flex-col h-full relative">
         {" "}
         {/* h-full per allineare le card */}
         {/* IMAGE CONTAINER */}
@@ -43,6 +41,7 @@ export default function ProductCard({ listing }: ProductCardProps) {
             src={photoUrl}
             alt={displayTitle}
             fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
             className="object-contain p-4 w-full h-full group-hover:scale-105 transition-transform duration-300"
           />
         </div>

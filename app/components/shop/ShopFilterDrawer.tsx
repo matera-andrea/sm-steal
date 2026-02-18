@@ -1,10 +1,11 @@
 "use client";
 import { useMemo } from "react";
-import { Condition, ShopFilters } from "@/app/lib/types/shop"; // O importa dal file dove li hai definiti
+import { ShopFilters } from "@/app/lib/types/shop";
+import type { ListingCondition } from "@prisma/client";
 import { SimpleBrand } from "@/hooks/useBrands";
 import { SimpleSneakerModel } from "@/hooks/useSneakerModels";
 
-const conditionLabels: Record<Condition, string> = {
+const conditionLabels: Record<ListingCondition, string> = {
   NEW: "Nuovo",
   LIKE_NEW: "Come Nuovo",
   VERY_GOOD: "Ottimo",
@@ -108,7 +109,7 @@ export default function ShopFilterDrawer({
           onChange={(e) =>
             setTempFilters({
               ...tempFilters,
-              condition: (e.target.value as Condition) || undefined,
+              condition: (e.target.value as ListingCondition) || undefined,
             })
           }
           className="w-full bg-transparent border-b-2 border-gray-300 py-2 font-bold focus:border-black outline-none transition-all cursor-pointer text-black"

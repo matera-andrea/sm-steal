@@ -1,6 +1,4 @@
-// /app/admin/sneaker-models/page.tsx
-
-import SneakerModelTableClient from "./smTableClient";
+import SneakerModelTableClient from "./SmTableClient";
 
 export default function SneakerModelsPage() {
   return (

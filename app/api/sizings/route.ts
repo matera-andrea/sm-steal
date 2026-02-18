@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   } catch (error: unknown) {
-    console.log("Error fetching sizings: ", error);
+    console.error("Error fetching sizings: ", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

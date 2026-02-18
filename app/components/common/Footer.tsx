@@ -1,6 +1,4 @@
-// components/layout/Footer.tsx
-
-import { FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
+import { Instagram, Linkedin, Twitter } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -40,19 +38,19 @@ export default function Footer() {
                 rel="noreferrer"
                 className="text-gray-400 hover:text-amber-400 transition-colors"
               >
-                <FaInstagram size={22} />
+                <Instagram size={22} />
               </a>
               <a
                 href="#"
                 className="text-gray-400 hover:text-amber-400 transition-colors"
               >
-                <FaLinkedin size={22} />
+                <Linkedin size={22} />
               </a>
               <a
                 href="#"
                 className="text-gray-400 hover:text-amber-400 transition-colors"
               >
-                <FaTwitter size={22} />
+                <Twitter size={22} />
               </a>
             </div>
           </div>

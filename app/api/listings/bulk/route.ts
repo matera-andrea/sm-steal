@@ -8,20 +8,14 @@ import { CategoryItem, Gender, ListingCondition } from "@prisma/client";
 import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
 // --- SCHEMA DI VALIDAZIONE ---
-export const bulkListingSchema = z.object({
+const bulkListingSchema = z.object({
   brandName: z.string().min(1),
   modelName: z.string().min(1),
   itemName: z.string().min(1),
   sku: z.string().min(1),
 
-  category: z
-    .enum(Object.values(CategoryItem) as [string, ...string[]])
-    .optional()
-    .default(CategoryItem.SNEAKER),
-  gender: z
-    .enum(Object.values(Gender) as [string, ...string[]])
-    .optional()
-    .default(Gender.MEN),
+  category: z.nativeEnum(CategoryItem).optional().default(CategoryItem.SNEAKER),
+  gender: z.nativeEnum(Gender).optional().default(Gender.MEN),
 
   description: z.string(),
   isActive: z.boolean().default(true),
@@ -31,7 +25,7 @@ export const bulkListingSchema = z.object({
     z.object({
       sizingId: z.string(),
       price: z.number().min(0),
-      condition: z.enum(Object.values(ListingCondition) as [string, ...string[]]).default(ListingCondition.NEW),
+      condition: z.nativeEnum(ListingCondition).default(ListingCondition.NEW),
       stock: z.number().int().min(1).default(1),
     }),
   ),
@@ -269,12 +263,10 @@ export async function POST(request: NextRequest) {
       { message: "Listing creato/aggiornato con successo", listing },
       { status: 200 },
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[BULK_LISTING_POST] Error:", error);
-    // Prisma error code handling opzionale
-    return NextResponse.json(
-      { message: error.message || "Internal server error" },
-      { status: 500 },
-    );
+    const message =
+      error instanceof Error ? error.message : "Internal server error";
+    return NextResponse.json({ message }, { status: 500 });
   }
 }

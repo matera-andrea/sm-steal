@@ -36,7 +36,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     const data: KicksProductResponse = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    console.log("Error in getting stockx data:", error);
+    console.error("Error in getting stockx data:", error);
     return NextResponse.json(
       { error: "Failed to fetch StockX data" },
       { status: 500 },

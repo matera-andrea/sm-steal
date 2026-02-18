@@ -1,4 +1,3 @@
-// app/components/listing/listing-shared.ts
 import { ListingCondition, Gender, CategoryItem } from "@/app/lib/types/type";
 
 export const CONDITION_OPTIONS: { value: ListingCondition; label: string }[] = [

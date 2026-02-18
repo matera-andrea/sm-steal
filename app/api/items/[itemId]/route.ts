@@ -1,5 +1,3 @@
-// /api/items/[id]/route.ts
-
 import prisma from "@/app/lib/prisma";
 import { updateItemSchema } from "@/app/lib/validation/item.schema";
 import { NextRequest, NextResponse } from "next/server";
@@ -60,7 +58,6 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     const validation = updateItemSchema.safeParse(body);
 
     if (!validation.success) {
-      console.log("Validation errors:", validation.error.issues);
       return NextResponse.json(
         { message: "Dati non validi", errors: validation.error.issues },
         { status: 400 },

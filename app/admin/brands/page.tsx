@@ -1,5 +1,4 @@
-// /app/admin/brands/page.tsx
-import BrandTableClient from "./brandTableClient";
+import BrandTableClient from "./BrandTableClient";
 
 export default function BrandsPage() {
   return (

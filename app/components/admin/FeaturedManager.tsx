@@ -200,6 +200,7 @@ export default function FeaturedManagerClient() {
                   src={photoUrl}
                   alt="shoe"
                   fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1280px) 25vw, 20vw"
                   className={`object-contain p-2 mix-blend-multiply transition-opacity ${
                     isFeatured
                       ? "opacity-100"

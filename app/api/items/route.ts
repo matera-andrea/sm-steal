@@ -1,4 +1,3 @@
-//api/items/route.ts
 import prisma from "@/app/lib/prisma";
 import { createItemSchema } from "@/app/lib/validation/item.schema";
 import { querySchema } from "@/app/lib/validation/query.schema";
@@ -121,7 +120,7 @@ export async function POST(request: NextRequest) {
     const validation = createItemSchema.safeParse(body);
 
     if (!validation.success) {
-      console.log(validation.error);
+
       return NextResponse.json(
         { message: "Dati non validi", errors: validation.error.issues },
         { status: 400 },

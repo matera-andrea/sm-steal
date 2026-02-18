@@ -1,14 +1,7 @@
-// lib/types/shop.ts (o dentro il file stesso se preferisci)
-export type Condition =
-  | "NEW"
-  | "LIKE_NEW"
-  | "VERY_GOOD"
-  | "GOOD"
-  | "ACCEPTABLE"
-  | "POOR";
+import type { ListingCondition } from "@prisma/client";
 
 export interface ShopFilters {
-  condition?: Condition;
+  condition?: ListingCondition;
   minPrice?: number;
   maxPrice?: number;
   isFeatured?: boolean;

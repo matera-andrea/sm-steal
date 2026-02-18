@@ -1,5 +1,3 @@
-// app/api/listings/[listingId]/photos/route.ts
-
 import { checkAdmin } from "@/app/lib/apiAdminCheck";
 import prisma from "@/app/lib/prisma";
 import { R2_BUCKET_NAME, R2_PUBLIC_URL, s3Client } from "@/app/lib/r2";
@@ -21,8 +19,8 @@ const createPhotoSchema = z.object({
   altText: z.string().optional(),
   isMain: z
     .string()
-    .transform((val) => val === "true")
-    .default(false),
+    .default("false")
+    .transform((val) => val === "true"),
   order: z.coerce.number().int().default(0),
 });
 
@@ -119,7 +117,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       order: formData.get("order"),
     };
 
-    console.log(formValues);
     const bodyValidation = createPhotoSchema.safeParse(formValues);
 
     if (!bodyValidation.success) {

@@ -1,4 +1,3 @@
-// /types/listings.ts
 import {
   Listing,
   Item,
@@ -9,12 +8,18 @@ import {
   Brand,
 } from "@prisma/client";
 
-// Il cuore della modifica: la variante specifica taglia/prezzo
+// Re-export Prisma enums for frontend usage
+export type {
+  Gender,
+  CategoryItem,
+  ListingCondition,
+  SizingType,
+} from "@prisma/client";
+
 export type SizingVariant = ListingSizing & {
   sizing: Sizing;
 };
 
-// Il listing completo che riceviamo dalle API
 export type ListingWithDetails = Listing & {
   item: Item & {
     sneakerModel: SneakerModel & {
@@ -25,25 +30,6 @@ export type ListingWithDetails = Listing & {
   sizings: SizingVariant[];
 };
 
-// Copia esatta degli Enum del tuo Schema Prisma per il frontend
-export type Gender = "MEN" | "WOMEN" | "UNISEX" | "KIDS";
-export type CategoryItem =
-  | "SNEAKER"
-  | "SHOE"
-  | "COLLECTIBLE"
-  | "CLOTHING"
-  | "ACCESSORY"
-  | "OTHER";
-export type ListingCondition =
-  | "NEW"
-  | "LIKE_NEW"
-  | "VERY_GOOD"
-  | "GOOD"
-  | "ACCEPTABLE"
-  | "POOR";
-export type SizingType = "UK" | "US" | "IT" | "OFA" | "OTHER";
-
-// Risposta API Kicks (StockX)
 export interface KicksProductResponse {
   data: {
     id: string;
@@ -54,15 +40,7 @@ export interface KicksProductResponse {
     description: string;
     image: string;
     slug: string;
-    gender: string; // StockX restituisce stringhe tipo 'men', 'child'
-    product_type: string; // StockX restituisce 'sneakers', etc.
+    gender: string;
+    product_type: string;
   };
-}
-
-// Struttura variante per il form (corrisponde a ListingSizing)
-export interface ListingVariantState {
-  sizingId: string;
-  price: number;
-  condition: ListingCondition;
-  stock: number; // Aggiunto come da tuo schema ListingSizing
 }
