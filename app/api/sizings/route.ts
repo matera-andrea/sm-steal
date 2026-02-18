@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { sizingSchema } from "@/app/lib/validation/sizing.schema";
 import z from "zod";
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,6 +29,8 @@ export async function GET(request: NextRequest) {
 }
 export async function POST(request: NextRequest) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     const body = await request.json();
     const validatedData = sizingSchema.parse(body);
 

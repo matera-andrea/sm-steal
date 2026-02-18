@@ -5,6 +5,7 @@ import { createSneakerModelSchema } from "@/app/lib/validation/sneakerModel.sche
 import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
 const sneakerModelsQuerySchema = querySchema.extend({
   brandId: z.cuid("ID del brand non valido.").optional(),
@@ -66,6 +67,8 @@ export async function GET(request: NextRequest) {
 // CREATE SNEAKER MODEL
 export async function POST(request: NextRequest) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     const body = await request.json();
     const validation = createSneakerModelSchema.safeParse(body);
 

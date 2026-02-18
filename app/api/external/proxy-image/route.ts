@@ -1,6 +1,13 @@
 import { checkAdmin } from "@/app/lib/apiAdminCheck";
 import { NextRequest, NextResponse } from "next/server";
 
+const ALLOWED_IMAGE_HOSTS = [
+  "images.stockx.com",
+  "stockx-assets.imgix.net",
+  "cdn.kicks.dev",
+  "pub-764b2f9992e44491998ffd3f90e860c7.r2.dev",
+];
+
 export async function GET(request: NextRequest) {
   const authError = await checkAdmin();
   if (authError) return authError;
@@ -9,6 +16,21 @@ export async function GET(request: NextRequest) {
 
   if (!imageUrl) {
     return NextResponse.json({ error: "URL missing" }, { status: 400 });
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(imageUrl);
+  } catch {
+    return NextResponse.json({ error: "Invalid URL" }, { status: 400 });
+  }
+
+  if (!["https:", "http:"].includes(parsed.protocol)) {
+    return NextResponse.json({ error: "Invalid protocol" }, { status: 400 });
+  }
+
+  if (!ALLOWED_IMAGE_HOSTS.includes(parsed.hostname)) {
+    return NextResponse.json({ error: "Host not allowed" }, { status: 403 });
   }
 
   try {

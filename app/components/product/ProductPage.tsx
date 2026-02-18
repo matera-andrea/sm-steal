@@ -2,17 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
 import { ShieldCheck, Truck, ArrowLeft, Share2, Heart } from "lucide-react";
 
-// 1. IMPORT CLERK
 import { useAuth, useClerk } from "@clerk/nextjs";
 
 import { ProductImageGallery } from "@/app/components/product/ProductImageGallery";
 import { ProductInfo } from "@/app/components/product/ProductInfo";
 import { ProductDetails } from "@/app/components/product/ProductDetails";
-import { ListingWithDetails, SizingVariant } from "@/app/lib/types/type";
+import type { ListingWithDetails, SizingVariant } from "@/app/lib/types/type";
 import { useWishlist } from "@/hooks/useWishlist";
 
 const PHONE_NUMBER = "393511579485";
@@ -31,13 +28,13 @@ function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
-export default function ProductPage() {
-  const params = useParams();
-  const listingId = Array.isArray(params.listingId)
-    ? params.listingId[0]
-    : params.listingId;
+export default function ProductPage({
+  listing,
+}: {
+  listing: ListingWithDetails;
+}) {
+  const listingId = listing.id;
 
-  // 2. INIT CLERK HOOKS
   const { isSignedIn } = useAuth();
   const { openSignIn } = useClerk();
 
@@ -46,25 +43,7 @@ export default function ProductPage() {
   );
 
   const { isInWishlist, handleToggle } = useWishlist();
-  const isWishlisted = listingId ? isInWishlist(listingId) : false;
-
-  const {
-    data: listing,
-    isLoading,
-    error,
-  } = useQuery<ListingWithDetails>({
-    queryKey: ["listing", listingId],
-    queryFn: async () => {
-      if (!listingId) throw new Error("ID mancante");
-      const res = await fetch(`/api/listings/${listingId}`);
-      if (!res.ok) throw new Error("Prodotto non trovato");
-      return res.json();
-    },
-    enabled: !!listingId,
-  });
-
-  if (isLoading) return <ProductSkeleton />;
-  if (error || !listing) return <ProductNotFound />;
+  const isWishlisted = isInWishlist(listingId);
 
   const brandName = listing.item?.sneakerModel?.Brand?.name || "";
   const modelName = listing.item?.sneakerModel?.name || "Unknown Model";

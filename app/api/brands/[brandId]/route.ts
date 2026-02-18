@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/lib/prisma";
 import { ZodError } from "zod";
 import { brandSchema } from "@/app/lib/validation/brand.schema";
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
 type RouteParams = { params: Promise<{ brandId: string }> };
 
@@ -28,6 +29,8 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     const body = await request.json();
     const parsed = brandSchema.parse(body);
     const { brandId } = await params;
@@ -55,6 +58,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     const body = await request.json();
     const { brandId } = await params;
 
@@ -83,6 +88,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     const { brandId } = await params;
 
     await prisma.brand.delete({

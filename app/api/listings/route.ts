@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import prisma from "@/app/lib/prisma";
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
 import { createListingSchema } from "@/app/lib/validation/listing.schema";
 import { querySchema } from "@/app/lib/validation/query.schema";
 
@@ -154,6 +155,9 @@ export async function GET(request: NextRequest) {
 // --- POST: CREA O AGGIORNA (MERGE) LISTING ---
 export async function POST(request: NextRequest) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
+
     const body = await request.json();
 
     const validation = createListingSchema.safeParse(body);

@@ -3,6 +3,7 @@
 import prisma from "@/app/lib/prisma";
 import { updateSneakerModelSchema } from "@/app/lib/validation/sneakerModel.schema";
 import { NextRequest, NextResponse } from "next/server";
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
 interface Params {
   params: Promise<{ sneakerModelId: string }>;
@@ -47,6 +48,8 @@ export async function GET(request: NextRequest, { params }: Params) {
 //
 export async function PATCH(request: NextRequest, { params }: Params) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     const body = await request.json();
     const validation = updateSneakerModelSchema.safeParse(body);
 
@@ -88,6 +91,8 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 //
 export async function DELETE(request: NextRequest, { params }: Params) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     // Controlla che il modello esista per ottenere il brandId associato
     const modelToDelete = await prisma.sneakerModel.findUnique({
       where: { id: (await params).sneakerModelId },

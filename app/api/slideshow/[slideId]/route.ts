@@ -2,12 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import prisma from "@/app/lib/prisma";
 import { R2_PUBLIC_URL, s3Client, R2_BUCKET_NAME } from "@/app/lib/r2";
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
 interface RouteParams {
   params: Promise<{ slideId: string }>;
 }
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     const { slideId } = await params;
 
     const slide = await prisma.heroSlide.findUnique({ where: { id: slideId } });

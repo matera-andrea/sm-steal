@@ -1,9 +1,11 @@
 import prisma from "@/app/lib/prisma";
 import { R2_BUCKET_NAME, R2_PUBLIC_URL, s3Client } from "@/app/lib/r2";
+import { validateImageFile } from "@/app/lib/validateUpload";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { CategoryItem, Gender, ListingCondition } from "@prisma/client";
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
 // --- SCHEMA DI VALIDAZIONE ---
 export const bulkListingSchema = z.object({
@@ -13,11 +15,11 @@ export const bulkListingSchema = z.object({
   sku: z.string().min(1),
 
   category: z
-    .enum(CategoryItem as any)
+    .enum(Object.values(CategoryItem) as [string, ...string[]])
     .optional()
     .default(CategoryItem.SNEAKER),
   gender: z
-    .enum(Gender as any)
+    .enum(Object.values(Gender) as [string, ...string[]])
     .optional()
     .default(Gender.MEN),
 
@@ -29,7 +31,7 @@ export const bulkListingSchema = z.object({
     z.object({
       sizingId: z.string(),
       price: z.number().min(0),
-      condition: z.enum(ListingCondition as any).default(ListingCondition.NEW),
+      condition: z.enum(Object.values(ListingCondition) as [string, ...string[]]).default(ListingCondition.NEW),
       stock: z.number().int().min(1).default(1),
     }),
   ),
@@ -37,6 +39,8 @@ export const bulkListingSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     const formData = await request.formData();
     const jsonData = formData.get("data");
     const files = formData.getAll("photos");

@@ -1,4 +1,5 @@
 import prisma from "@/app/lib/prisma";
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
 import { updateListingSchema } from "@/app/lib/validation/listing.schema";
 import { ListingCondition } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
@@ -55,6 +56,9 @@ export async function GET(request: NextRequest, { params }: Params) {
 // PATCH: Aggiorna il listing e le sue varianti specifiche
 export async function PATCH(request: NextRequest, { params }: Params) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
+
     const { listingId } = await params;
     const body = await request.json();
 
@@ -122,6 +126,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 // DELETE rimane sostanzialmente invariata perché Prisma gestisce il Cascade
 export async function DELETE(request: NextRequest, { params }: Params) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
+
     const { listingId } = await params;
     const listingToDelete = await prisma.listing.findFirst({
       where: { id: listingId },

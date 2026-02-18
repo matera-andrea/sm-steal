@@ -3,6 +3,7 @@
 import prisma from "@/app/lib/prisma";
 import { updateItemSchema } from "@/app/lib/validation/item.schema";
 import { NextRequest, NextResponse } from "next/server";
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
 interface Params {
   params: Promise<{ itemId: string }>;
@@ -52,6 +53,8 @@ export async function GET(request: NextRequest, { params }: Params) {
 //
 export async function PATCH(request: NextRequest, { params }: Params) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     const { itemId } = await params;
     const body = await request.json();
     const validation = updateItemSchema.safeParse(body);
@@ -95,6 +98,8 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 //
 export async function DELETE(request: NextRequest, { params }: Params) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     // Controlla che l'item da eliminare esista per ottenere l'ID del modello
     const { itemId } = await params;
     const itemToDelete = await prisma.item.findUnique({

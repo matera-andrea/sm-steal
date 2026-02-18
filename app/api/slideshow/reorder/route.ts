@@ -1,14 +1,34 @@
 import prisma from "@/app/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
+
+const reorderSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        id: z.string().cuid(),
+        order: z.number().int().min(0).max(1000),
+      }),
+    )
+    .max(100),
+});
 
 export async function PUT(req: NextRequest) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     const body = await req.json();
-    const { items } = body as { items: { id: string; order: number }[] };
+    const validation = reorderSchema.safeParse(body);
 
-    if (!items || !Array.isArray(items)) {
-      return NextResponse.json({ message: "Invalid data" }, { status: 400 });
+    if (!validation.success) {
+      return NextResponse.json(
+        { message: "Invalid data", errors: validation.error.issues },
+        { status: 400 },
+      );
     }
+
+    const { items } = validation.data;
 
     // Eseguiamo tutti gli aggiornamenti in una singola transazione database
     await prisma.$transaction(

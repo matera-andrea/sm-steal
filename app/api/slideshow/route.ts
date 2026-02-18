@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import prisma from "@/app/lib/prisma";
 import { R2_PUBLIC_URL, s3Client, R2_BUCKET_NAME } from "@/app/lib/r2";
+import { validateImageFile } from "@/app/lib/validateUpload";
+import { z } from "zod";
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
+
+const slideshowSchema = z.object({
+  title: z.string().max(200).default(""),
+  subtitle: z.string().max(500).default(""),
+});
 
 // GET: Recupera le slide dal DB
 export async function GET() {
@@ -22,10 +30,10 @@ export async function GET() {
 // POST: Carica nuova slide
 export async function POST(request: NextRequest) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     const formData = await request.formData();
     const file = formData.get("file");
-    const title = formData.get("title") as string;
-    const subtitle = formData.get("subtitle") as string;
 
     if (!file || !(file instanceof File)) {
       return NextResponse.json(
@@ -33,6 +41,23 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
+
+    const fileError = validateImageFile(file);
+    if (fileError) {
+      return NextResponse.json({ message: fileError }, { status: 400 });
+    }
+
+    const validation = slideshowSchema.safeParse({
+      title: formData.get("title"),
+      subtitle: formData.get("subtitle"),
+    });
+    if (!validation.success) {
+      return NextResponse.json(
+        { message: "Invalid data", errors: validation.error.issues },
+        { status: 400 },
+      );
+    }
+    const { title, subtitle } = validation.data;
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const fileExtension = file.name.split(".").pop();

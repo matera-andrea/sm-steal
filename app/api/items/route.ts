@@ -5,6 +5,7 @@ import { querySchema } from "@/app/lib/validation/query.schema";
 import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
 const itemsQuerySchema = querySchema.extend({
   brandId: z.cuid().optional(),
@@ -114,6 +115,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const authError = await checkAdmin();
+    if (authError) return authError;
     const body = await request.json();
     const validation = createItemSchema.safeParse(body);
 

@@ -1,3 +1,4 @@
+"use client";
 import { useMemo } from "react";
 import { Condition, ShopFilters } from "@/app/lib/types/shop"; // O importa dal file dove li hai definiti
 import { SimpleBrand } from "@/hooks/useBrands";

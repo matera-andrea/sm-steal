@@ -3,6 +3,7 @@
 import { checkAdmin } from "@/app/lib/apiAdminCheck";
 import prisma from "@/app/lib/prisma";
 import { R2_BUCKET_NAME, R2_PUBLIC_URL, s3Client } from "@/app/lib/r2";
+import { validateImageFile } from "@/app/lib/validateUpload";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -103,6 +104,11 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         { message: "File non valido o mancante." },
         { status: 400 },
       );
+    }
+
+    const fileError = validateImageFile(file);
+    if (fileError) {
+      return NextResponse.json({ message: fileError }, { status: 400 });
     }
 
     // 4. Valida i metadati dal form
