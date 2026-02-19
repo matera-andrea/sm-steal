@@ -10,7 +10,7 @@ import { CategoryItem, Gender } from "@/app/lib/types/type";
 interface ProductSyncPreviewProps {
   data: TempProductData;
   setData: (data: TempProductData) => void;
-  previewUrl: string | null;
+  previewUrls: string[];
   isDownloadingImage: boolean;
   onSync: () => void;
   isSyncing: boolean;
@@ -19,7 +19,7 @@ interface ProductSyncPreviewProps {
 export default function ProductSyncPreview({
   data,
   setData,
-  previewUrl,
+  previewUrls,
   isDownloadingImage,
   onSync,
   isSyncing,
@@ -36,18 +36,25 @@ export default function ProductSyncPreview({
 
         {isDownloadingImage ? (
           <div className="flex items-center gap-2 text-amber-600 text-xs font-bold animate-pulse">
-            <Loader2 size={14} className="animate-spin" /> Downloading Image...
+            <Loader2 size={14} className="animate-spin" /> Downloading Images...
           </div>
         ) : (
-          previewUrl && (
-            <div className="relative w-20 h-20 rounded-xl overflow-hidden border-2 border-white shadow-sm bg-white">
-              <Image
-                src={previewUrl}
-                alt="StockX"
-                fill
-                sizes="80px"
-                className="object-cover"
-              />
+          previewUrls[0] && (
+            <div className="relative">
+              <div className="relative w-20 h-20 rounded-xl overflow-hidden border-2 border-white shadow-sm bg-white">
+                <Image
+                  src={previewUrls[0]}
+                  alt="StockX"
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                />
+              </div>
+              {previewUrls.length > 1 && (
+                <span className="absolute -bottom-1 -right-1 bg-amber-400 text-[8px] font-black px-1.5 py-0.5 rounded-full text-black leading-none">
+                  +{previewUrls.length - 1}
+                </span>
+              )}
             </div>
           )
         )}

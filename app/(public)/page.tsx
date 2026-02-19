@@ -17,7 +17,7 @@ export default async function Home() {
         <div className="flex justify-between items-end mb-12">
           <div>
             <h2 className="text-4xl font-black uppercase italic tracking-tight">
-              New Arrivals
+              Nuovi Arrivi
             </h2>
             <div className="h-1.5 w-20 bg-amber-400 mt-2" />
           </div>
@@ -25,7 +25,7 @@ export default async function Home() {
             href="/shop"
             className="text-sm font-bold uppercase tracking-widest hover:text-amber-500 transition-colors"
           >
-            View All →
+            Vedi Tutto →
           </Link>
         </div>
         <Suspense

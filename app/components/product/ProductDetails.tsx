@@ -19,7 +19,7 @@ export function ProductDetails({
         className="w-full flex items-center justify-between group"
       >
         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-900 group-hover:text-amber-500 transition-colors">
-          Description & Details
+          Descrizione e Dettagli
         </h3>
         <ChevronDown
           size={16}

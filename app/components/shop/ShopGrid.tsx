@@ -29,10 +29,10 @@ export default function ShopGrid({ isLoading, listings }: ShopGridProps) {
           <SearchX size={48} className="text-gray-300" />
         </div>
         <h2 className="text-2xl font-black uppercase italic text-black">
-          No items found
+          Nessun articolo trovato
         </h2>
         <p className="text-gray-400 mt-2">
-          Try adjusting your filters to find what you&apos;re looking for.
+          Prova a modificare i filtri per trovare quello che cerchi.
         </p>
       </div>
     );

@@ -58,7 +58,7 @@ export default function Footer() {
           {/* Colonna Support */}
           <div className="space-y-4">
             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-amber-400">
-              Support
+              Supporto
             </h3>
             <ul className="space-y-3 text-sm font-bold uppercase tracking-tight text-gray-400">
               <li>
@@ -66,7 +66,7 @@ export default function Footer() {
                   href="/how-it-works"
                   className="hover:text-white transition-colors"
                 >
-                  How it works
+                  Come funziona
                 </Link>
               </li>
               <li>
@@ -74,7 +74,7 @@ export default function Footer() {
                   href="/shipping-returns"
                   className="hover:text-white transition-colors"
                 >
-                  Shipping & Returns
+                  Spedizioni e Resi
                 </Link>
               </li>
               <li>
@@ -90,7 +90,7 @@ export default function Footer() {
                   href="/contact-us"
                   className="hover:text-white transition-colors"
                 >
-                  Contact Us
+                  Contattaci
                 </Link>
               </li>
             </ul>
@@ -99,7 +99,7 @@ export default function Footer() {
           {/* Colonna Legal */}
           <div className="space-y-4">
             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-amber-400">
-              Legal
+              Legale
             </h3>
             <ul className="space-y-3 text-sm font-bold uppercase tracking-tight text-gray-400">
               <li>
@@ -115,7 +115,7 @@ export default function Footer() {
                   href="/terms"
                   className="hover:text-white transition-colors"
                 >
-                  Terms of Service
+                  Termini di Servizio
                 </Link>
               </li>
               <li>
@@ -132,9 +132,9 @@ export default function Footer() {
 
         {/* Barra inferiore */}
         <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">
-          <div>© {new Date().getFullYear()} Heat Lab — All Rights Reserved</div>
+          <div>© {new Date().getFullYear()} Heat Lab — Tutti i diritti riservati</div>
           <div className="flex gap-6">
-            <span>VAT: [INSERISCI P.IVA]</span>
+            <span>P.IVA: [INSERISCI P.IVA]</span>
 
             {/* <Link
               href="/developer"

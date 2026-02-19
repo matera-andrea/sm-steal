@@ -30,13 +30,13 @@ export default function WishlistPage() {
                     size={24}
                   />
                   <span className="font-bold text-xs uppercase tracking-[0.2em]">
-                    Saved Items
+                    Elementi Salvati
                   </span>
                 </div>
                 <h1 className="text-6xl md:text-8xl font-black uppercase italic tracking-tighter text-black leading-[0.85]">
-                  Your <br className="hidden md:block" />
+                  I Tuoi <br className="hidden md:block" />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-amber-500">
-                    Grails.
+                    Grail.
                   </span>
                 </h1>
               </div>
@@ -48,7 +48,7 @@ export default function WishlistPage() {
                     {wishlistListings.length}
                   </span>
                   <span className="text-xs uppercase font-bold text-gray-400 tracking-wider">
-                    Products
+                    Prodotti
                   </span>
                 </div>
               )}
@@ -59,7 +59,7 @@ export default function WishlistPage() {
               <div className="flex flex-col items-center justify-center py-32 space-y-4">
                 <Loader2 className="animate-spin text-black" size={48} />
                 <p className="text-xs font-bold uppercase tracking-widest text-gray-400 animate-pulse">
-                  Loading your heat...
+                  Caricamento...
                 </p>
               </div>
             ) : wishlistListings.length === 0 ? (

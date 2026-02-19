@@ -9,6 +9,7 @@ import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
 const sneakerModelsQuerySchema = querySchema.extend({
   brandId: z.cuid("ID del brand non valido.").optional(),
+  slug: z.string().optional(),
 });
 
 // GET ALL SNEAKER MODELS
@@ -24,13 +25,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { page, limit, search, isActive, brandId } = validation.data;
+    const { page, limit, search, isActive, brandId, slug } = validation.data;
     const skip = (page - 1) * limit;
 
     const where: Prisma.SneakerModelWhereInput = {};
     if (search) where.name = { contains: search, mode: "insensitive" };
     if (isActive) where.isActive = isActive === "true";
     if (brandId) where.brandId = brandId;
+    if (slug) where.slug = slug;
 
     const [sneakerModels, total] = await prisma.$transaction([
       prisma.sneakerModel.findMany({

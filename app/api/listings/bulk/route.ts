@@ -12,10 +12,10 @@ const bulkListingSchema = z.object({
   brandName: z.string().min(1),
   modelName: z.string().min(1),
   itemName: z.string().min(1),
-  sku: z.string().min(1),
+  sku: z.string().nullable(),
 
-  category: z.nativeEnum(CategoryItem).optional().default(CategoryItem.SNEAKER),
-  gender: z.nativeEnum(Gender).optional().default(Gender.MEN),
+  category: z.enum(CategoryItem).optional().default(CategoryItem.SNEAKER),
+  gender: z.enum(Gender).optional().default(Gender.MEN),
 
   description: z.string(),
   isActive: z.boolean().default(true),
@@ -25,7 +25,7 @@ const bulkListingSchema = z.object({
     z.object({
       sizingId: z.string(),
       price: z.number().min(0),
-      condition: z.nativeEnum(ListingCondition).default(ListingCondition.NEW),
+      condition: z.enum(ListingCondition).default(ListingCondition.NEW),
       stock: z.number().int().min(1).default(1),
     }),
   ),
@@ -50,6 +50,7 @@ export async function POST(request: NextRequest) {
     const validation = bulkListingSchema.safeParse(rawData);
 
     if (!validation.success) {
+      console.error(validation.error.issues);
       return NextResponse.json(
         { message: "Dati non validi", errors: validation.error.issues },
         { status: 400 },
@@ -69,6 +70,32 @@ export async function POST(request: NextRequest) {
       variants,
     } = validation.data;
 
+    // --- VERIFICA SIZINGS ---
+    // Prima di iniziare la transazione, verifichiamo che tutti i sizingId esistano
+    const uniqueSizingIds = Array.from(new Set(variants.map(v => v.sizingId)));
+    const existingSizings = await prisma.sizing.findMany({
+      where: { id: { in: uniqueSizingIds } },
+      select: { id: true }
+    });
+
+    if (existingSizings.length !== uniqueSizingIds.length) {
+      const foundIds = existingSizings.map(s => s.id);
+      const missingIds = uniqueSizingIds.filter(id => !foundIds.includes(id));
+      return NextResponse.json(
+        { message: `Alcune taglie non sono valide o non esistono nel sistema: ${missingIds.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    // Estraiamo lo slug se possibile dal primo file (formato: slug-index.jpg)
+    let extractedSlug: string | null = null;
+    if (files.length > 0 && files[0] instanceof File) {
+       const firstFileName = files[0].name;
+       if (firstFileName.includes("-main.jpg") || firstFileName.includes("-0.jpg")) {
+          extractedSlug = firstFileName.split("-").slice(0, -1).join("-");
+       }
+    }
+
     // --- FASE 1: TRANSAZIONE DATABASE (Solo dati testuali) ---
     // Rimuoviamo l'upload da qui per evitare timeout
     const listing = await prisma.$transaction(
@@ -87,8 +114,10 @@ export async function POST(request: NextRequest) {
         // B. SNEAKER MODEL
         let model = await tx.sneakerModel.findFirst({
           where: {
-            name: { equals: modelName, mode: "insensitive" },
-            brandId: brand.id,
+            OR: [
+              { name: { equals: modelName, mode: "insensitive" }, brandId: brand.id },
+              ...(extractedSlug ? [{ slug: extractedSlug }] : [])
+            ]
           },
         });
 
@@ -97,12 +126,19 @@ export async function POST(request: NextRequest) {
             data: {
               name: modelName,
               brandId: brand.id,
+              slug: extractedSlug
             },
           });
           await tx.brand.update({
             where: { id: brand.id },
             data: { itemsCount: { increment: 1 } },
           });
+        } else if (extractedSlug && !model.slug) {
+           // Se il modello esiste ma non ha lo slug, lo aggiorniamo
+           model = await tx.sneakerModel.update({
+              where: { id: model.id },
+              data: { slug: extractedSlug }
+           });
         }
 
         // C. ITEM
@@ -206,6 +242,7 @@ export async function POST(request: NextRequest) {
 
         for (const fileEntry of files) {
           if (fileEntry instanceof File) {
+            const currentOrder = orderCounter++;
             // Prepariamo l'upload
             const buffer = Buffer.from(await fileEntry.arrayBuffer());
             const ext = fileEntry.name.split(".").pop() || "jpg";
@@ -228,24 +265,19 @@ export async function POST(request: NextRequest) {
               )
               .then(async () => {
                 // Dopo l'upload su R2 riuscito, salviamo su DB
-                // Usiamo una piccola operazione DB atomica per ogni foto
                 return prisma.photo.create({
                   data: {
                     url: publicUrl,
                     name: uniqueFileName,
                     altText: itemName,
-                    isMain: orderCounter === 0, // Nota: logica semplificata per isMain
-                    order: orderCounter++, // Incrementiamo per la prossima iterazione locale
+                    isMain: currentOrder === 0,
+                    order: currentOrder,
                     listingId: listing.id,
                   },
                 });
               });
 
             uploadPromises.push(uploadTask);
-            // Incrementiamo counter locale per preservare ordine logico
-            // (Nota: in promise parallele l'ordine esatto di fine non è garantito,
-            // ma l'assegnazione 'order' qui è sequenziale nel loop)
-            orderCounter++;
           }
         }
 

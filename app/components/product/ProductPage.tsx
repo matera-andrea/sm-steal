@@ -12,7 +12,7 @@ import { ProductDetails } from "@/app/components/product/ProductDetails";
 import type { ListingWithDetails, SizingVariant } from "@/app/lib/types/type";
 import { useWishlist } from "@/hooks/useWishlist";
 
-const PHONE_NUMBER = "393511579485";
+const PHONE_NUMBER = "393471700483";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -46,8 +46,8 @@ export default function ProductPage({
   const isWishlisted = isInWishlist(listingId);
 
   const brandName = listing.item?.sneakerModel?.Brand?.name || "";
-  const modelName = listing.item?.sneakerModel?.name || "Unknown Model";
-  const itemName = listing.item?.name || "Unknown Item";
+  const modelName = listing.item?.sneakerModel?.name || "Modello Sconosciuto";
+  const itemName = listing.item?.name || "Articolo Sconosciuto";
 
   let extraName = "";
   if (itemName.startsWith(modelName)) {
@@ -102,7 +102,7 @@ Sono ancora disponibili? Grazie!`;
             size={12}
             className="group-hover:-translate-x-1 transition-transform"
           />
-          Back to Shop
+          Torna allo Shop
         </Link>
         <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
           <Share2 size={18} />
@@ -127,7 +127,7 @@ Sono ancora disponibili? Grazie!`;
                   </span>
                   {listing.isFeatured && (
                     <span className="bg-amber-400 text-black text-[10px] font-black uppercase px-2 py-1 rounded">
-                      Featured
+                      In Evidenza
                     </span>
                   )}
                 </div>
@@ -151,7 +151,7 @@ Sono ancora disponibili? Grazie!`;
                 {!soldOut && (
                   <div className="pt-2">
                     <p className="text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-1">
-                      {selectedVariant ? "Selected Price" : "Starting from"}
+                      {selectedVariant ? "Prezzo Selezionato" : "A partire da"}
                     </p>
                     <div className="flex items-baseline gap-2">
                       <span className="text-5xl font-black tracking-tight">
@@ -183,7 +183,7 @@ Sono ancora disponibili? Grazie!`;
                     <WhatsAppIcon className="w-5 h-5" />
                     {selectedVariant
                       ? "Acquista su WhatsApp"
-                      : "Select Size to Buy"}
+                      : "Seleziona Taglia"}
                   </button>
                 )}
 
@@ -201,7 +201,7 @@ Sono ancora disponibili? Grazie!`;
                       isWishlisted ? "fill-red-500" : "fill-transparent"
                     }`}
                   />
-                  {isWishlisted ? "Saved to Wishlist" : "Add to Wishlist"}
+                  {isWishlisted ? "Salvato nei Preferiti" : "Aggiungi ai Preferiti"}
                 </button>
               </div>
 
@@ -209,19 +209,19 @@ Sono ancora disponibili? Grazie!`;
                 <div className="flex flex-col gap-1">
                   <ShieldCheck className="text-amber-500 mb-1" size={20} />
                   <span className="text-[10px] font-black uppercase tracking-widest">
-                    100% Verified
+                    100% Verificato
                   </span>
                   <span className="text-[10px] text-gray-400 font-medium leading-tight">
-                    Every item is manually checked by experts.
+                    Ogni articolo è controllato manualmente da esperti.
                   </span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <Truck className="text-amber-500 mb-1" size={20} />
                   <span className="text-[10px] font-black uppercase tracking-widest">
-                    Express Ship
+                    Spedizione Express
                   </span>
                   <span className="text-[10px] text-gray-400 font-medium leading-tight">
-                    Fast worldwide delivery with tracking.
+                    Consegna veloce e tracciata in tutta Italia.
                   </span>
                 </div>
               </div>

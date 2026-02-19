@@ -35,10 +35,10 @@ export default async function FeaturedGrid({ limit = 8 }: FeaturedGridProps) {
           <Sparkles size={32} className="text-amber-500" />
         </div>
         <h2 className="text-xl font-black uppercase italic text-gray-900">
-          No Featured Drops
+          Nessun Drop in Evidenza
         </h2>
         <p className="text-gray-400 mt-2 text-sm max-w-xs mx-auto">
-          We are curating the next drop. Check back soon for exclusive items.
+          Stiamo preparando il prossimo drop. Torna presto per scoprire articoli esclusivi.
         </p>
       </div>
     );

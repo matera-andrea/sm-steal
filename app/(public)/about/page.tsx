@@ -64,8 +64,8 @@ export default function AboutPage() {
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto space-y-6">
           <h1 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter text-white leading-[0.9]">
-            More Than <br />
-            <span className="text-amber-400">Just Hype.</span>
+            Più di un <br />
+            <span className="text-amber-400">semplice Hype.</span>
           </h1>
           <p className="text-gray-300 text-lg md:text-xl font-medium max-w-2xl mx-auto">
             Siamo nati dalla passione per la cultura sneaker. La nostra missione
@@ -104,7 +104,7 @@ export default function AboutPage() {
             <div className="pt-4">
               <Image
                 src="/signature.png" // Facoltativo: firma del founder
-                alt="Founder Signature"
+                alt="Firma del Fondatore"
                 width={150}
                 height={50}
                 className="opacity-50"
@@ -115,7 +115,7 @@ export default function AboutPage() {
           <div className="relative aspect-square lg:aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-gray-100">
             <Image
               src="/team-working.jpg" // Sostituisci con foto del team
-              alt="Our Team"
+              alt="Il Nostro Team"
               fill
               className="object-cover"
             />
@@ -155,7 +155,7 @@ export default function AboutPage() {
                 <PackageCheck size={32} />
               </div>
               <h4 className="text-xl font-black uppercase italic tracking-tight">
-                Deadstock Condition.
+                Condizioni Deadstock.
               </h4>
               <p className="text-gray-500 text-sm leading-relaxed">
                 Garantiamo che ogni prodotto venduto come &quot;Nuovo&quot; sia intonso,
@@ -189,7 +189,7 @@ export default function AboutPage() {
             Community
           </h2>
           <h3 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter">
-            Join the Movement.
+            Unisciti al Movimento.
           </h3>
           <p className="text-gray-500 max-w-xl mx-auto">
             Seguici per drop esclusivi, restock a sorpresa e contenuti
@@ -215,7 +215,7 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="w-full py-3 rounded-full border border-gray-200 group-hover:border-white/20 text-xs font-black uppercase tracking-widest mt-auto">
-              Follow Us
+              Seguici
             </div>
           </a>
 
@@ -232,11 +232,11 @@ export default function AboutPage() {
             <div>
               <p className="font-black uppercase text-xl italic">X / Twitter</p>
               <p className="text-xs font-bold uppercase tracking-widest opacity-60 mt-1">
-                Updates & Leaks
+                Aggiornamenti & Leak
               </p>
             </div>
             <div className="w-full py-3 rounded-full border border-gray-200 group-hover:border-white/20 text-xs font-black uppercase tracking-widest mt-auto">
-              Follow Us
+              Seguici
             </div>
           </a>
 
@@ -253,11 +253,11 @@ export default function AboutPage() {
             <div>
               <p className="font-black uppercase text-xl italic">YouTube</p>
               <p className="text-xs font-bold uppercase tracking-widest opacity-60 mt-1">
-                Reviews & Unboxing
+                Review & Unboxing
               </p>
             </div>
             <div className="w-full py-3 rounded-full border border-gray-200 group-hover:border-white/20 text-xs font-black uppercase tracking-widest mt-auto">
-              Subscribe
+              Iscriviti
             </div>
           </a>
         </div>

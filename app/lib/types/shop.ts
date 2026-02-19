@@ -8,4 +8,13 @@ export interface ShopFilters {
   search?: string;
   brandId?: string;
   modelId?: string;
+  sizingIds?: string[];
+}
+
+/** Partial photo shape returned by the listings list endpoint (select projection). */
+export interface ListingPhotoSummary {
+  id: string;
+  url: string;
+  isMain: boolean;
+  order: number;
 }

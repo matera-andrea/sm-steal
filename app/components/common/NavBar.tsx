@@ -15,8 +15,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 const navigation = [
   { name: "Home", href: "/" },
   { name: "Shop", href: "/shop" },
-  { name: "How it works", href: "/how-it-works" },
-  { name: "About", href: "/about" },
+  { name: "Come funziona", href: "/how-it-works" },
+  { name: "Chi siamo", href: "/about" },
 ];
 
 function NavBarContent() {
@@ -82,7 +82,7 @@ function NavBarContent() {
         <>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {/* MODIFICA ALTEZZA: h-24 per ospitare il logo grande */}
-            <div className="flex h-24 items-center justify-between gap-4">
+            <div className="relative flex h-24 items-center justify-between gap-4">
               {/* Bottone Mobile (a sinistra su mobile) */}
               <div className="flex items-center sm:hidden">
                 <DisclosureButton className="inline-flex items-center justify-center rounded-full p-2 text-black hover:bg-gray-100 focus:outline-none">
@@ -94,15 +94,15 @@ function NavBarContent() {
                 </DisclosureButton>
               </div>
 
-              {/* 1. LOGO (Posizionato PRIMA della search bar) */}
-              <div className="flex shrink-0 items-center">
+              {/* 1. LOGO — absolute center on mobile, static on desktop */}
+              <div className="absolute left-1/2 -translate-x-1/2 sm:static sm:translate-x-0 flex shrink-0 items-center">
                 <Link href="/">
                   <Image
                     src="/logo.png"
                     alt="Logo"
                     width={250}
                     height={150}
-                    className="h-14 sm:h-20 w-auto object-contain"
+                    className="h-20 sm:h-20 w-auto object-contain"
                     priority
                   />
                 </Link>
@@ -116,7 +116,7 @@ function NavBarContent() {
                   </div>
                   <input
                     type="search"
-                    placeholder="Search drops..."
+                    placeholder="Cerca drops..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyDown={handleSearch}
@@ -194,7 +194,7 @@ function NavBarContent() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
                   type="search"
-                  placeholder="Search..."
+                  placeholder="Cerca..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={handleSearch}

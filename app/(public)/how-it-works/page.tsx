@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import Link from "next/link";
@@ -86,7 +85,7 @@ export default function HowItWorksPage() {
 
         <div className="max-w-5xl mx-auto text-center relative z-10">
           <h1 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.9]">
-            How It <span className="text-amber-400">Works.</span>
+            Come <span className="text-amber-400">Funziona.</span>
           </h1>
           <p className="text-gray-300 text-lg font-medium max-w-xl mx-auto mt-6">
             Niente carrelli complicati o checkout infiniti. Abbiamo reso
@@ -130,7 +129,7 @@ export default function HowItWorksPage() {
                   <MapPin size={24} />
                 </div>
                 <span className="text-xs font-black uppercase tracking-widest text-amber-600">
-                  Local Pickup
+                  Ritiro a Mano
                 </span>
               </div>
 

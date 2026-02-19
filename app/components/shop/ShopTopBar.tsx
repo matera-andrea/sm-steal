@@ -32,7 +32,7 @@ export default function ShopTopBar({
             {isLoading ? "..." : totalItems}
           </span>
           <span className="text-sm font-bold uppercase tracking-widest text-gray-400">
-            Items
+            Articoli
           </span>
         </div>
 
@@ -42,7 +42,7 @@ export default function ShopTopBar({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && onSearch()}
-            placeholder="Search sneakers, sku..."
+            placeholder="Cerca sneakers, sku..."
             className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full text-sm font-bold outline-none focus:border-black focus:ring-1 focus:ring-black transition-all text-black"
           />
           <Search
@@ -72,7 +72,7 @@ export default function ShopTopBar({
               onClick={onResetFilters}
               className="text-xs font-bold uppercase underline decoration-2 underline-offset-4 hover:text-amber-500 transition-colors whitespace-nowrap"
             >
-              Clear All
+              Pulisci Tutto
             </button>
           )}
           <button
@@ -84,7 +84,7 @@ export default function ShopTopBar({
             }`}
           >
             <SlidersHorizontal size={14} />
-            {showFilters ? "Close" : "Filters"}
+            {showFilters ? "Chiudi" : "Filtri"}
             {activeFilterCount > 0 && (
               <span className="ml-1 bg-amber-400 text-black px-1.5 rounded-sm">
                 {activeFilterCount}

@@ -15,7 +15,7 @@ const listingQuerySchema = querySchema.extend({
     .optional(),
   minPrice: z.coerce.number().min(0).optional(),
   maxPrice: z.coerce.number().positive().optional(),
-  sizingId: z.string().optional(),
+  sizingIds: z.string().optional(), // comma-separated IDs
   search: z.string().optional(),
   brandId: z.string().optional(),
   modelId: z.string().optional(),
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       condition,
       minPrice,
       maxPrice,
-      sizingId,
+      sizingIds,
       search,
       brandId,
       modelId,
@@ -89,16 +89,18 @@ export async function GET(request: NextRequest) {
     }
 
     // --- FILTRI VARIANTI (Prezzo e Condizione) ---
+    const sizingIdList = sizingIds?.split(",").filter(Boolean) ?? [];
+
     if (
       condition ||
       minPrice !== undefined ||
       maxPrice !== undefined ||
-      sizingId
+      sizingIdList.length > 0
     ) {
       where.sizings = {
         some: {
           ...(condition && { condition }),
-          ...(sizingId && { sizingId }),
+          ...(sizingIdList.length > 0 && { sizingId: { in: sizingIdList } }),
           price: {
             ...(minPrice !== undefined && { gte: minPrice }),
             ...(maxPrice !== undefined && { lte: maxPrice }),
@@ -127,7 +129,7 @@ export async function GET(request: NextRequest) {
           },
           photos: {
             orderBy: [{ isMain: "desc" }, { order: "asc" }],
-            select: { url: true, isMain: true },
+            select: { id: true, url: true, isMain: true, order: true },
           },
         },
       }),

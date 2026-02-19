@@ -26,7 +26,7 @@ export default function ShopPagination({
           size={18}
           className="group-hover:-translate-x-1 transition-transform"
         />{" "}
-        Prev
+        Prec
       </button>
 
       <span className="text-sm font-bold font-mono">
@@ -38,7 +38,7 @@ export default function ShopPagination({
         disabled={currentPage === totalPages || isLoading}
         className="group flex items-center gap-2 font-black text-xs uppercase tracking-widest disabled:opacity-30 disabled:cursor-not-allowed"
       >
-        Next{" "}
+        Succ{" "}
         <ChevronRight
           size={18}
           className="group-hover:translate-x-1 transition-transform"

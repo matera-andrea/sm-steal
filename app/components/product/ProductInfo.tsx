@@ -26,7 +26,7 @@ export function ProductInfo({
       <div className="space-y-6">
         <div className="flex justify-between items-end">
           <h3 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">
-            Select Size & Condition
+            Seleziona Taglia e Condizione
           </h3>
           {/* <span className="text-[10px] font-bold underline cursor-pointer hover:text-amber-500">
           Size Guide
@@ -78,7 +78,7 @@ export function ProductInfo({
               `}
                 >
                   {variant.condition === "NEW"
-                    ? "Brand New"
+                    ? "Nuovo"
                     : variant.condition.replace("_", " ")}
                 </span>
 
@@ -97,7 +97,7 @@ export function ProductInfo({
   } else
     return (
       <div className="p-6 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center">
-        <p className="text-sm font-bold text-gray-400">Out of Stock</p>
+        <p className="text-sm font-bold text-gray-400">Esaurito</p>
       </div>
     );
 }

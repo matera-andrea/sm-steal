@@ -31,7 +31,7 @@ export default function ProductCard({ listing }: ProductCardProps) {
   const displayTitle = `${brandName} ${modelName}`;
 
   return (
-    <Link href={`/shop/${listing.id}`}>
+    <Link href={`/shop/${item.sneakerModel.slug ?? listing.id}`}>
       <div className="group flex flex-col h-full relative">
         {" "}
         {/* h-full per allineare le card */}
@@ -61,7 +61,7 @@ export default function ProductCard({ listing }: ProductCardProps) {
 
           {/* Prezzo */}
           <p className="text-lg font-black mt-1">
-            {startingPrice > 0 ? `Da €${startingPrice}` : "Sold Out"}
+            {startingPrice > 0 ? `Da €${startingPrice}` : "Esaurito"}
           </p>
         </div>
       </div>

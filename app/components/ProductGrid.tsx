@@ -7,10 +7,11 @@ import { useSearchParams } from "next/navigation";
 // Hooks
 import { useBrands } from "@/hooks/useBrands";
 import { useSneakerModels } from "@/hooks/useSneakerModels";
+import { useSizings } from "@/hooks/useSizings";
 
 // Types
 import { ListingWithDetails } from "../lib/types/type";
-import { ShopFilters } from "@/app/lib/types/shop"; // Assicurati di aver creato questo tipo o copialo qui
+import { ShopFilters } from "@/app/lib/types/shop";
 
 // Sub-Components
 import ShopTopBar from "./shop/ShopTopBar";
@@ -30,6 +31,7 @@ export default function ProductGrid() {
   // --- HOOKS ---
   const { brands, loading: brandsLoading } = useBrands();
   const { models, loading: modelsLoading } = useSneakerModels();
+  const { sizings, loading: sizingsLoading } = useSizings();
   const searchParams = useSearchParams();
 
   // --- EFFECTS ---
@@ -69,6 +71,8 @@ export default function ProductGrid() {
       if (filters.search) params.append("search", filters.search);
       if (filters.brandId) params.append("brandId", filters.brandId);
       if (filters.modelId) params.append("modelId", filters.modelId);
+      if (filters.sizingIds?.length)
+        params.append("sizingIds", filters.sizingIds.join(","));
 
       const response = await fetch(`/api/listings?${params.toString()}`);
       if (!response.ok)
@@ -103,14 +107,12 @@ export default function ProductGrid() {
     setFilters({});
     setSearchTerm("");
     setCurrentPage(1);
-    // Pulizia visiva se c'era search dalla X
     if (filters.search) {
       setFilters((prev) => ({ ...prev, search: undefined }));
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Wrapper per gestire lo scroll al cambio pagina
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -136,8 +138,10 @@ export default function ProductGrid() {
         setTempFilters={setTempFilters}
         brands={brands}
         models={models}
+        sizings={sizings}
         brandsLoading={brandsLoading}
         modelsLoading={modelsLoading}
+        sizingsLoading={sizingsLoading}
         onApply={applyFilters}
       />
 

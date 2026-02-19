@@ -65,3 +65,26 @@ export interface TempProductData {
   gender: Gender;
   category: CategoryItem;
 }
+
+/**
+ * Extended product data shape returned by the KicksDB/StockX proxy API.
+ * `images` holds all available 360° photos when the external API provides them.
+ */
+export interface KicksProductData {
+  id: string;
+  title: string;
+  brand: string;
+  model: string;
+  sku: string;
+  description: string;
+  image: string;
+  gallery?: string[];
+  gallery_360?: string[];
+  slug: string;
+  gender: string;
+  product_type: string;
+}
+
+export interface KicksMultiImageResponse {
+  data: KicksProductData;
+}

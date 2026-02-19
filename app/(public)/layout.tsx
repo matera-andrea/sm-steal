@@ -3,7 +3,7 @@ import NavBar from "../components/common/NavBar";
 import Footer from "../components/common/Footer";
 
 export const metadata: Metadata = {
-  title: "DEV | sm.steal",
+  title: "Heat Lab | sm.steal",
   description: "",
 };
 
