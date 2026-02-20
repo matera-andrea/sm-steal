@@ -1,4 +1,11 @@
 import { Search, X, SlidersHorizontal } from "lucide-react";
+import { SortBy } from "@/app/lib/types/shop";
+
+const SORT_OPTIONS: { value: SortBy; label: string }[] = [
+  { value: "alphabetical", label: "A → Z" },
+  { value: "price_asc", label: "Prezzo ↑" },
+  { value: "price_desc", label: "Prezzo ↓" },
+];
 
 interface ShopTopBarProps {
   totalItems: number;
@@ -10,6 +17,8 @@ interface ShopTopBarProps {
   showFilters: boolean;
   setShowFilters: (show: boolean) => void;
   onResetFilters: () => void;
+  sortBy: SortBy;
+  onSortChange: (sort: SortBy) => void;
 }
 
 export default function ShopTopBar({
@@ -22,6 +31,8 @@ export default function ShopTopBar({
   showFilters,
   setShowFilters,
   onResetFilters,
+  sortBy,
+  onSortChange,
 }: ShopTopBarProps) {
   return (
     <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 py-6 mb-8 transition-all">
@@ -54,19 +65,26 @@ export default function ShopTopBar({
             <X
               size={14}
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer hover:text-black"
-              onClick={() => {
-                setSearchTerm("");
-                // Nota: La logica di reset dello stato padre viene gestita nel padre tramite useEffect o callback dedicata,
-                // qui ci limitiamo a pulire l'input visivo se necessario, ma idealmente il padre resetta tutto.
-                // Per semplicità qui chiamiamo setSearchTerm.
-                // Il reset vero avviene nel componente padre.
-              }}
+              onClick={() => setSearchTerm("")}
             />
           )}
         </div>
 
-        {/* 3. Filtri Btn */}
+        {/* 3. Sort + Filtri */}
         <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+          {/* Sort selector */}
+          <select
+            value={sortBy}
+            onChange={(e) => onSortChange(e.target.value as SortBy)}
+            className="h-10.5 px-4 border-2 border-gray-200 rounded-full text-xs font-black uppercase tracking-widest bg-white cursor-pointer hover:border-black transition-all outline-none appearance-none text-black"
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+
           {activeFilterCount > 0 && (
             <button
               onClick={onResetFilters}

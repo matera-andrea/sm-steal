@@ -5,11 +5,18 @@ import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2 } from "lucide-react";
 import Image from "next/image";
 
+const TARGET_LABELS: Record<string, string> = {
+  all: "Tutti",
+  desktop: "Desktop",
+  mobile: "Mobile",
+};
+
 interface Slide {
   id: string;
   url: string;
   title?: string;
   subtitle?: string;
+  target?: string;
 }
 
 interface Props {
@@ -50,15 +57,22 @@ export function SortableSlideItem({ slide, onDelete }: Props) {
       </button>
 
       {/* Thumbnail */}
-      <div className="relative w-24 h-16 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 select-none">
+      <div className="relative w-24 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0 select-none">
         <Image src={slide.url} alt="slide" fill className="object-cover" />
       </div>
 
       {/* Info */}
       <div className="flex-1 min-w-0 select-none">
-        <h3 className="font-bold text-sm truncate">
-          {slide.title || "No Title"}
-        </h3>
+        <div className="flex items-center gap-2 mb-0.5">
+          <h3 className="font-bold text-sm truncate">
+            {slide.title || "No Title"}
+          </h3>
+          {slide.target && slide.target !== "all" && (
+            <span className="shrink-0 text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-amber-400 text-black">
+              {TARGET_LABELS[slide.target] ?? slide.target}
+            </span>
+          )}
+        </div>
         <p className="text-xs text-gray-500 truncate">
           {slide.subtitle || "No Subtitle"}
         </p>

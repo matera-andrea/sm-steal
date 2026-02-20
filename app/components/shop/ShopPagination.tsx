@@ -13,8 +13,6 @@ export default function ShopPagination({
   onPageChange,
   isLoading,
 }: ShopPaginationProps) {
-  if (totalPages <= 1) return null;
-
   return (
     <div className="mt-24 flex justify-center items-center gap-8 border-t border-gray-100 pt-12 text-black">
       <button

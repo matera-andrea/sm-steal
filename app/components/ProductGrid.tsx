@@ -11,7 +11,7 @@ import { useSizings } from "@/hooks/useSizings";
 
 // Types
 import { ListingWithDetails } from "../lib/types/type";
-import { ShopFilters } from "@/app/lib/types/shop";
+import { ShopFilters, SortBy } from "@/app/lib/types/shop";
 
 // Sub-Components
 import ShopTopBar from "./shop/ShopTopBar";
@@ -27,6 +27,7 @@ export default function ProductGrid() {
   const [filters, setFilters] = useState<ShopFilters>({});
   const [tempFilters, setTempFilters] = useState<ShopFilters>({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<SortBy>("alphabetical");
 
   // --- HOOKS ---
   const { brands, loading: brandsLoading } = useBrands();
@@ -54,12 +55,13 @@ export default function ProductGrid() {
 
   // --- DATA FETCHING ---
   const { data, isLoading } = useQuery({
-    queryKey: ["listings", currentPage, filters],
+    queryKey: ["listings", currentPage, filters, sortBy],
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append("page", currentPage.toString());
-      params.append("limit", "50");
+      params.append("limit", "12");
       params.append("isActive", "true");
+      params.append("sortBy", sortBy);
 
       if (filters.condition) params.append("condition", filters.condition);
       if (filters.minPrice)
@@ -118,6 +120,11 @@ export default function ProductGrid() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleSortChange = (sort: SortBy) => {
+    setSortBy(sort);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-0">
       <ShopTopBar
@@ -130,6 +137,8 @@ export default function ProductGrid() {
         showFilters={showFilters}
         setShowFilters={setShowFilters}
         onResetFilters={resetFilters}
+        sortBy={sortBy}
+        onSortChange={handleSortChange}
       />
 
       <ShopFilterDrawer

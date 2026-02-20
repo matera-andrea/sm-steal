@@ -23,13 +23,22 @@ import {
 } from "@dnd-kit/sortable";
 import { SortableSlideItem } from "@/app/components/admin/SortableSlideItem";
 
+type SlideTarget = "all" | "desktop" | "mobile";
+
 interface Slide {
   id: string;
   url: string;
   title?: string;
   subtitle?: string;
   order: number;
+  target: SlideTarget;
 }
+
+const TARGET_OPTIONS: { value: SlideTarget; label: string }[] = [
+  { value: "all", label: "Tutti i Dispositivi" },
+  { value: "desktop", label: "Solo Desktop" },
+  { value: "mobile", label: "Solo Mobile" },
+];
 
 export default function SlideshowManager() {
   const queryClient = useQueryClient();
@@ -43,6 +52,7 @@ export default function SlideshowManager() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
+  const [target, setTarget] = useState<SlideTarget>("all");
 
   // Sensori per DnD (Pointer per mouse/touch, Keyboard per accessibilità)
   const sensors = useSensors(
@@ -114,6 +124,7 @@ export default function SlideshowManager() {
       formData.append("file", file);
       formData.append("title", title);
       formData.append("subtitle", subtitle);
+      formData.append("target", target);
       await fetch("/api/slideshow", { method: "POST", body: formData });
 
       // Reset e Refetch
@@ -121,6 +132,7 @@ export default function SlideshowManager() {
       setPreviewUrl(null);
       setTitle("");
       setSubtitle("");
+      setTarget("all");
       queryClient.invalidateQueries({ queryKey: ["admin-slides"] });
     } catch (e) {
       console.error("Errore caricamento slide", e);
@@ -231,6 +243,30 @@ export default function SlideshowManager() {
                   className="w-full p-4 bg-white rounded-xl text-sm font-medium outline-none"
                 />
               </div>
+
+              {/* Target Device */}
+              <div className="space-y-2">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+                  Dispositivo
+                </p>
+                <div className="flex gap-2">
+                  {TARGET_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setTarget(opt.value)}
+                      className={`flex-1 py-2.5 px-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border-2 ${
+                        target === opt.value
+                          ? "bg-black text-white border-black"
+                          : "bg-white text-gray-400 border-gray-100 hover:border-black hover:text-black"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <button
                 type="submit"
                 disabled={!file || isSubmitting}

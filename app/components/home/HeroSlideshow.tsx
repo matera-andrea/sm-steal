@@ -8,20 +8,28 @@ interface Slide {
   url: string;
   title?: string | null;
   subtitle?: string | null;
+  target?: string | null;
 }
 
-export default function HeroSlideshow({ slides }: { slides: Slide[] }) {
+function HeroPlaceholder() {
+  return (
+    <section className="relative h-[85vh] w-full bg-black flex flex-col items-center justify-center text-white select-none">
+      <h1 className="text-5xl md:text-8xl font-black uppercase tracking-tighter italic">
+        Heat Lab<span className="text-amber-400">.</span>
+      </h1>
+    </section>
+  );
+}
+
+function SlideshowPlayer({ slides }: { slides: Slide[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    if (slides.length === 0) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(interval);
   }, [slides.length]);
-
-  if (slides.length === 0) return null;
 
   return (
     <section className="relative h-[85vh] w-full overflow-hidden bg-black">
@@ -50,5 +58,36 @@ export default function HeroSlideshow({ slides }: { slides: Slide[] }) {
         </h1>
       </div>
     </section>
+  );
+}
+
+export default function HeroSlideshow({ slides }: { slides: Slide[] }) {
+  const desktopSlides = slides.filter(
+    (s) => !s.target || s.target === "all" || s.target === "desktop",
+  );
+  const mobileSlides = slides.filter(
+    (s) => !s.target || s.target === "all" || s.target === "mobile",
+  );
+
+  return (
+    <>
+      {/* Desktop (md e superiori) */}
+      <div className="hidden md:block">
+        {desktopSlides.length > 0 ? (
+          <SlideshowPlayer slides={desktopSlides} />
+        ) : (
+          <HeroPlaceholder />
+        )}
+      </div>
+
+      {/* Mobile (sotto md) */}
+      <div className="block md:hidden">
+        {mobileSlides.length > 0 ? (
+          <SlideshowPlayer slides={mobileSlides} />
+        ) : (
+          <HeroPlaceholder />
+        )}
+      </div>
+    </>
   );
 }

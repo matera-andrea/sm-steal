@@ -9,6 +9,7 @@ import { checkAdmin } from "@/app/lib/apiAdminCheck";
 const slideshowSchema = z.object({
   title: z.string().max(200).default(""),
   subtitle: z.string().max(500).default(""),
+  target: z.enum(["all", "desktop", "mobile"]).default("all"),
 });
 
 // GET: Recupera le slide dal DB
@@ -50,6 +51,7 @@ export async function POST(request: NextRequest) {
     const validation = slideshowSchema.safeParse({
       title: formData.get("title"),
       subtitle: formData.get("subtitle"),
+      target: formData.get("target"),
     });
     if (!validation.success) {
       return NextResponse.json(
@@ -57,7 +59,7 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    const { title, subtitle } = validation.data;
+    const { title, subtitle, target } = validation.data;
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const fileExtension = file.name.split(".").pop();
@@ -75,7 +77,8 @@ export async function POST(request: NextRequest) {
           url: publicUrl,
           title: title || "",
           subtitle: subtitle || "",
-          order: 0, // Implementare logica di ordine se necessario
+          target,
+          order: 0,
         },
       });
 

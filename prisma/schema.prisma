@@ -224,6 +224,8 @@ model HeroSlide {
   title     String?
   subtitle  String?
   order     Int      @default(0)
+  /// "all" | "desktop" | "mobile"
+  target    String   @default("all")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

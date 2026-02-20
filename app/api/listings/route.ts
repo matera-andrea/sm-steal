@@ -16,10 +16,14 @@ const listingQuerySchema = querySchema.extend({
   condition: z.preprocess((val) => (val === "" ? undefined : val), z.enum(["NEW", "LIKE_NEW", "VERY_GOOD", "GOOD", "ACCEPTABLE", "POOR"]).optional()),
   minPrice: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(0).optional()),
   maxPrice: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().positive().optional()),
-  sizingIds: emptyToUndefined, // comma-separated IDs
+  sizingIds: emptyToUndefined,
   search: emptyToUndefined,
   brandId: emptyToUndefined,
   modelId: emptyToUndefined,
+  sortBy: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.enum(["alphabetical", "price_asc", "price_desc"]).default("alphabetical"),
+  ),
 });
 
 export async function GET(request: NextRequest) {
@@ -47,6 +51,7 @@ export async function GET(request: NextRequest) {
       search,
       brandId,
       modelId,
+      sortBy,
     } = validation.data;
 
     const skip = (page - 1) * limit;
@@ -110,32 +115,74 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    const [listings, total] = await prisma.$transaction([
-      prisma.listing.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: "desc" },
+    const listingInclude = {
+      item: {
         include: {
-          item: {
-            include: {
-              sneakerModel: {
-                include: { Brand: true },
-              },
-            },
-          },
-          sizings: {
-            include: { sizing: true },
-            orderBy: { price: "asc" },
-          },
-          photos: {
-            orderBy: [{ isMain: "desc" }, { order: "asc" }],
-            select: { id: true, url: true, isMain: true, order: true },
+          sneakerModel: {
+            include: { Brand: true },
           },
         },
-      }),
-      prisma.listing.count({ where }),
-    ]);
+      },
+      sizings: {
+        include: { sizing: true },
+        orderBy: { price: "asc" as const },
+      },
+      photos: {
+        orderBy: [{ isMain: "desc" as const }, { order: "asc" as const }],
+        select: { id: true, url: true, isMain: true, order: true },
+      },
+    };
+
+    type ListingResult = Prisma.ListingGetPayload<{ include: typeof listingInclude }>;
+    let listings: ListingResult[];
+    let total: number;
+
+    if (sortBy === "alphabetical") {
+      [listings, total] = await prisma.$transaction([
+        prisma.listing.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: { item: { sneakerModel: { name: "asc" } } },
+          include: listingInclude,
+        }),
+        prisma.listing.count({ where }),
+      ]);
+    } else {
+      // Price sort: aggregate min price per listing in JS, then paginate
+      const allSizings = await prisma.listingSizing.findMany({
+        where: { listing: where },
+        select: { listingId: true, price: true },
+      });
+
+      const priceMap = new Map<string, number>();
+      for (const s of allSizings) {
+        const price = Number(s.price);
+        const existing = priceMap.get(s.listingId);
+        if (
+          existing === undefined ||
+          (sortBy === "price_asc" ? price < existing : price > existing)
+        ) {
+          priceMap.set(s.listingId, price);
+        }
+      }
+
+      const sortedIds = [...priceMap.entries()]
+        .sort(([, a], [, b]) => (sortBy === "price_asc" ? a - b : b - a))
+        .map(([id]) => id);
+
+      total = sortedIds.length;
+      const pageIds = sortedIds.slice(skip, skip + limit);
+
+      const unordered = await prisma.listing.findMany({
+        where: { id: { in: pageIds } },
+        include: listingInclude,
+      });
+
+      listings = pageIds
+        .map((id) => unordered.find((l) => l.id === id))
+        .filter((l): l is NonNullable<typeof l> => l !== undefined);
+    }
 
     return NextResponse.json({
       data: listings,
