@@ -13,7 +13,7 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-4">
               <Image
                 src="/logo.png"
-                alt="HeatLab Logo"
+                alt="sm.steal Logo"
                 // Aumentata risoluzione
                 width={200}
                 height={200}
@@ -21,7 +21,7 @@ export default function Footer() {
                 className="h-20 md:h-28 w-auto object-contain"
               />
               {/* <span className="text-3xl md:text-4xl font-black uppercase italic tracking-tighter">
-                Heat<span className="text-amber-400">Lab</span>
+                sm<span className="text-amber-400">.steal</span>
               </span> */}
             </Link>
 
@@ -132,7 +132,7 @@ export default function Footer() {
 
         {/* Barra inferiore */}
         <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">
-          <div>© {new Date().getFullYear()} Heat Lab — Tutti i diritti riservati</div>
+          <div>© {new Date().getFullYear()} SM.STEAL — Tutti i diritti riservati</div>
           <div className="flex gap-6">
             <span>P.IVA: [INSERISCI P.IVA]</span>
 

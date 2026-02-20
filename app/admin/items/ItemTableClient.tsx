@@ -3,6 +3,7 @@
 import DataTable, { ColumnDef } from "@/app/components/admin/DataTable";
 import ListingManagerModal from "@/app/components/ListingManagerModal";
 import { useSneakerModels } from "@/hooks/useSneakerModels";
+import { useBrands } from "@/hooks/useBrands";
 import { Item, SneakerModel, Brand, CategoryItem } from "@prisma/client";
 import { useCallback, useMemo, useState } from "react";
 
@@ -198,6 +199,7 @@ const getItemColumns = (
 
 export default function ItemTableClient() {
   const { models, loading: modelsLoading } = useSneakerModels();
+  const { brands } = useBrands();
   const [managingItem, setManagingItem] = useState<ItemWithRelations | null>(
     null,
   );
@@ -224,10 +226,86 @@ export default function ItemTableClient() {
   return (
     <>
       <DataTable<ItemWithRelations>
-        modelName="Catalog Item"
+        modelName="Product"
         apiEndpoint="/api/items"
         columns={columns}
         initialEmptyRow={emptyItem}
+        renderFilters={(filters, setFilters) => (
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              type="text"
+              placeholder="Search Products..."
+              value={(filters as any).search || ""}
+              onChange={(e) =>
+                setFilters({ ...filters, search: e.target.value })
+              }
+              className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black w-48"
+            />
+            <select
+              value={(filters as any).brandId || ""}
+              onChange={(e) =>
+                setFilters({
+                  ...filters,
+                  brandId: e.target.value,
+                  sneakerModelId: "",
+                })
+              }
+              className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black"
+            >
+              <option value="">All Brands</option>
+              {brands.map((brand) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.name}
+                </option>
+              ))}
+            </select>
+            <select
+              value={(filters as any).sneakerModelId || ""}
+              onChange={(e) =>
+                setFilters({ ...filters, sneakerModelId: e.target.value })
+              }
+              className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black"
+            >
+              <option value="">All Models</option>
+              {models
+                .filter(
+                  (m) =>
+                    !(filters as any).brandId ||
+                    m.brandId === (filters as any).brandId,
+                )
+                .map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.name}
+                  </option>
+                ))}
+            </select>
+            <select
+              value={(filters as any).category || ""}
+              onChange={(e) =>
+                setFilters({ ...filters, category: e.target.value })
+              }
+              className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black"
+            >
+              <option value="">All Categories</option>
+              {categoryOptions.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+            <select
+              value={(filters as any).isActive || ""}
+              onChange={(e) =>
+                setFilters({ ...filters, isActive: e.target.value })
+              }
+              className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black"
+            >
+              <option value="">All Status</option>
+              <option value="true">Public</option>
+              <option value="false">Hidden</option>
+            </select>
+          </div>
+        )}
       />
       {managingItem && (
         <ListingManagerModal

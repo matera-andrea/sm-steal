@@ -6,13 +6,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
+const emptyToUndefined = z.preprocess((val) => (val === "" ? undefined : val), z.string().optional());
+
 const itemsQuerySchema = querySchema.extend({
-  brandId: z.cuid().optional(),
-  sneakerModelId: z.string().optional(),
-  category: z
-    .enum(["SNEAKER", "SHOE", "COLLECTIBLE", "CLOTHING", "ACCESSORY", "OTHER"])
-    .optional(),
-  gender: z.enum(["MEN", "WOMEN", "UNISEX", "KIDS"]).optional(),
+  isActive: z.preprocess((val) => (val === "" ? undefined : val), z.enum(["true", "false"]).optional()),
+  search: emptyToUndefined,
+  brandId: emptyToUndefined,
+  sneakerModelId: emptyToUndefined,
+  category: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.enum(["SNEAKER", "SHOE", "COLLECTIBLE", "CLOTHING", "ACCESSORY", "OTHER"]).optional()
+  ),
+  gender: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.enum(["MEN", "WOMEN", "UNISEX", "KIDS"]).optional()
+  ),
 });
 
 export async function GET(request: NextRequest) {

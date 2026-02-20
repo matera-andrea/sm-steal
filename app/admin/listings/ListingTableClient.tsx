@@ -314,7 +314,9 @@ const getListingColumns = (
 
 interface ListingFilters {
   brandId?: string;
-  sneakerModelId?: string;
+  modelId?: string;
+  search?: string;
+  isActive?: string;
 }
 
 export default function ListingTableClient() {
@@ -330,20 +332,27 @@ export default function ListingTableClient() {
 
   return (
     <DataTable<ListingWithRelations, ListingFilters>
-      modelName="Listing"
+      modelName="Drop"
       apiEndpoint="/api/listings"
       columns={columns}
       initialEmptyRow={{ itemId: "", isActive: true, variants: [] }}
-      initialFilters={{ brandId: "", sneakerModelId: "" }}
+      initialFilters={{ brandId: "", modelId: "", search: "", isActive: "" }}
       renderFilters={(filters, setFilters) => (
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <input
+            type="text"
+            placeholder="Search Drops..."
+            value={filters.search || ""}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black w-48"
+          />
           <select
             value={filters.brandId || ""}
             onChange={(e) =>
               setFilters({
                 ...filters,
                 brandId: e.target.value,
-                sneakerModelId: "",
+                modelId: "",
               })
             }
             className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black"
@@ -357,17 +366,15 @@ export default function ListingTableClient() {
           </select>
 
           <select
-            value={filters.sneakerModelId || ""}
+            value={filters.modelId || ""}
             onChange={(e) =>
-              setFilters({ ...filters, sneakerModelId: e.target.value })
+              setFilters({ ...filters, modelId: e.target.value })
             }
             className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black"
           >
             <option value="">All Models</option>
             {models
-              ?.filter(
-                (m) => !filters.brandId || m.Brand?.name === filters.brandId,
-              )
+              ?.filter((m) => !filters.brandId || m.brandId === filters.brandId)
               .map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.name}
@@ -375,9 +382,31 @@ export default function ListingTableClient() {
               ))}
           </select>
 
-          {(filters.brandId || filters.sneakerModelId) && (
+          <select
+            value={filters.isActive || ""}
+            onChange={(e) =>
+              setFilters({ ...filters, isActive: e.target.value })
+            }
+            className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black"
+          >
+            <option value="">All Status</option>
+            <option value="true">Online</option>
+            <option value="false">Offline</option>
+          </select>
+
+          {(filters.brandId ||
+            filters.modelId ||
+            filters.search ||
+            filters.isActive) && (
             <button
-              onClick={() => setFilters({ brandId: "", sneakerModelId: "" })}
+              onClick={() =>
+                setFilters({
+                  brandId: "",
+                  modelId: "",
+                  search: "",
+                  isActive: "",
+                })
+              }
               className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400 hover:text-black"
             >
               <X size={14} />

@@ -61,7 +61,7 @@ export default function ContactPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* 1. WHATSAPP (Main CTA) */}
           <a
-            href={`https://wa.me/${CONTACT_INFO.whatsapp}?text=Ciao SM.STEAL, ho bisogno di informazioni su...`}
+            href={`https://wa.me/${CONTACT_INFO.whatsapp}?text=Ciao! Ho bisogno di informazioni su...`}
             target="_blank"
             rel="noreferrer"
             className="group bg-white p-8 rounded-[2rem] border-2 border-transparent hover:border-black shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center gap-4 relative overflow-hidden"

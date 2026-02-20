@@ -7,18 +7,19 @@ import { createListingSchema } from "@/app/lib/validation/listing.schema";
 import { querySchema } from "@/app/lib/validation/query.schema";
 
 // --- AGGIORNAMENTO SCHEMA VALIDAZIONE QUERY ---
+const emptyToUndefined = z.preprocess((val) => (val === "" ? undefined : val), z.string().optional());
+
 const listingQuerySchema = querySchema.extend({
-  isFeatured: z.enum(["true", "false"]).optional(),
-  itemId: z.string().optional(),
-  condition: z
-    .enum(["NEW", "LIKE_NEW", "VERY_GOOD", "GOOD", "ACCEPTABLE", "POOR"])
-    .optional(),
-  minPrice: z.coerce.number().min(0).optional(),
-  maxPrice: z.coerce.number().positive().optional(),
-  sizingIds: z.string().optional(), // comma-separated IDs
-  search: z.string().optional(),
-  brandId: z.string().optional(),
-  modelId: z.string().optional(),
+  isActive: z.preprocess((val) => (val === "" ? undefined : val), z.enum(["true", "false"]).optional()),
+  isFeatured: z.preprocess((val) => (val === "" ? undefined : val), z.enum(["true", "false"]).optional()),
+  itemId: emptyToUndefined,
+  condition: z.preprocess((val) => (val === "" ? undefined : val), z.enum(["NEW", "LIKE_NEW", "VERY_GOOD", "GOOD", "ACCEPTABLE", "POOR"]).optional()),
+  minPrice: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(0).optional()),
+  maxPrice: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().positive().optional()),
+  sizingIds: emptyToUndefined, // comma-separated IDs
+  search: emptyToUndefined,
+  brandId: emptyToUndefined,
+  modelId: emptyToUndefined,
 });
 
 export async function GET(request: NextRequest) {

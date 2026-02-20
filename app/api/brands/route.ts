@@ -8,6 +8,8 @@ import { querySchema } from "@/app/lib/validation/query.schema";
 import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
 const brandQuerySchema = querySchema.extend({
+  isActive: z.preprocess((val) => (val === "" ? undefined : val), z.enum(["true", "false"]).optional()),
+  search: z.preprocess((val) => (val === "" ? undefined : val), z.string().optional()),
   includeItems: z.enum(["true", "false"]).default("false"),
 });
 

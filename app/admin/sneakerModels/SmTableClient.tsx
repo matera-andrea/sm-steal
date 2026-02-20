@@ -1,5 +1,3 @@
-// /app/admin/sneaker-models/SneakerModelTableClient.tsx
-
 "use client";
 
 import DataTable, { ColumnDef } from "@/app/components/admin/DataTable";
@@ -143,10 +141,44 @@ export default function SneakerModelTableClient() {
 
   return (
     <DataTable<SneakerModelWithRelations>
-      modelName="Sneaker Model"
+      modelName="Model"
       apiEndpoint="/api/sneakerModels"
       columns={columns}
       initialEmptyRow={emptySneakerModel}
+      renderFilters={(filters, setFilters) => (
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Search Models..."
+            value={(filters as any).search || ""}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black w-48"
+          />
+          <select
+            value={(filters as any).brandId || ""}
+            onChange={(e) => setFilters({ ...filters, brandId: e.target.value })}
+            className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black"
+          >
+            <option value="">All Brands</option>
+            {brands.map((brand) => (
+              <option key={brand.id} value={brand.id}>
+                {brand.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={(filters as any).isActive || ""}
+            onChange={(e) =>
+              setFilters({ ...filters, isActive: e.target.value })
+            }
+            className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black"
+          >
+            <option value="">All Status</option>
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+      )}
     />
   );
 }

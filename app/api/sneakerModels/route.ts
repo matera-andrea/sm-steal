@@ -7,9 +7,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
+const emptyToUndefined = z.preprocess((val) => (val === "" ? undefined : val), z.string().optional());
+
 const sneakerModelsQuerySchema = querySchema.extend({
-  brandId: z.cuid("ID del brand non valido.").optional(),
-  slug: z.string().optional(),
+  isActive: z.preprocess((val) => (val === "" ? undefined : val), z.enum(["true", "false"]).optional()),
+  search: emptyToUndefined,
+  brandId: z.preprocess((val) => (val === "" ? undefined : val), z.string().optional()),
+  slug: emptyToUndefined,
 });
 
 // GET ALL SNEAKER MODELS

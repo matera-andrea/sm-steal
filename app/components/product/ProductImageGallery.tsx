@@ -78,7 +78,7 @@ export function ProductImageGallery({
     <div className="sticky top-28 space-y-6 select-none">
       {/* 360 VIEWER CONTAINER */}
       <div
-        className="relative aspect-square bg-gray-50 rounded-[2.5rem] overflow-hidden border border-gray-100 cursor-grab active:cursor-grabbing group"
+        className="relative aspect-square bg-white rounded-[2.5rem] overflow-hidden border border-gray-200 shadow-sm cursor-grab active:cursor-grabbing group"
         onMouseDown={(e) => handleStart(e.clientX)}
         onMouseMove={(e) => handleMove(e.clientX)}
         onMouseLeave={handleEnd}
@@ -90,7 +90,7 @@ export function ProductImageGallery({
         {safePhotos.map((photo, index) => (
           <div
             key={photo.id || index}
-            className={`absolute inset-0 transition-opacity duration-75 ${
+            className={`absolute inset-0 ${
               index === activeIndex ? "opacity-100 z-10" : "opacity-0 z-0"
             }`}
           >
@@ -106,11 +106,11 @@ export function ProductImageGallery({
         ))}
 
         {/* TOP BADGES */}
-        <div className="absolute top-6 left-6 flex gap-2 z-20 pointer-events-none">
+        {/* <div className="absolute top-6 left-6 flex gap-2 z-20 pointer-events-none">
           <div className="bg-white/80 backdrop-blur-md px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/50 shadow-sm">
             Autentico Verificato
           </div>
-        </div>
+        </div> */}
 
         {/* INTERACTION HINT (Visible on hover if 360 is available) */}
         {safePhotos.length > 1 && (

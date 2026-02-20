@@ -42,7 +42,7 @@ export async function generateMetadata({
   const listing = await getListing(slug);
 
   if (!listing) {
-    return { title: "Prodotto non trovato | sm.steal" };
+    return { title: "Prodotto non trovato" };
   }
 
   const brandName = listing.item?.sneakerModel?.Brand?.name || "";
