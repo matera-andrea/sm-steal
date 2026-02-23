@@ -8,11 +8,13 @@ import { Toaster } from "sonner";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "block",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "block",
 });
 
 export const metadata: Metadata = {
@@ -28,10 +30,8 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <QueryProvider>
-        <html lang="en">
-          <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}
-          >
+        <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+          <body className="antialiased font-sans">
             {children}
             <Toaster position="bottom-right" />
           </body>

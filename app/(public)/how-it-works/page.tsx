@@ -144,7 +144,7 @@ export default function HowItWorksPage() {
 
               <p className="text-gray-500 text-sm leading-relaxed mb-6">
                 Se ti trovi in queste zone, offriamo il servizio di consegna a
-                mano o ritiro in sede. Specificalo in chat per annullare i costi
+                mano o ritiro in sede. Specificalo in chat per ridurre. i costi
                 di spedizione.
               </p>
 

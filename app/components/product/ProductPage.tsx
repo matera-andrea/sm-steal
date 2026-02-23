@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import Link from "next/link";
 import { ShieldCheck, Truck, ArrowLeft, Share2, Heart } from "lucide-react";
 
@@ -91,6 +92,23 @@ Sono ancora disponibili? Grazie!`;
     window.open(url, "_blank");
   };
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    const title = `${brandName} ${modelName}`;
+    const text = `Guarda queste sneakers su HeatLab: ${title}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text, url });
+      } catch {
+        // L'utente ha annullato — nessun feedback necessario
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copiato negli appunti");
+    }
+  };
+
   return (
     <div className="bg-white min-h-screen pb-20 text-black">
       <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
@@ -104,7 +122,11 @@ Sono ancora disponibili? Grazie!`;
           />
           Torna allo Shop
         </Link>
-        <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+        <button
+          onClick={handleShare}
+          aria-label="Condividi prodotto"
+          className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+        >
           <Share2 size={18} />
         </button>
       </div>
@@ -133,8 +155,8 @@ Sono ancora disponibili? Grazie!`;
                 </div>
 
                 <div>
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-[0.9]">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-800 to-black">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-[0.9] pr-4">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-800 to-black pr-4">
                       {modelName}
                     </span>
                   </h1>
@@ -201,7 +223,9 @@ Sono ancora disponibili? Grazie!`;
                       isWishlisted ? "fill-red-500" : "fill-transparent"
                     }`}
                   />
-                  {isWishlisted ? "Salvato nei Preferiti" : "Aggiungi ai Preferiti"}
+                  {isWishlisted
+                    ? "Salvato nei Preferiti"
+                    : "Aggiungi ai Preferiti"}
                 </button>
               </div>
 

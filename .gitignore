@@ -40,5 +40,5 @@ next-env.d.ts
 
 /app/generated/prisma
 
-CLAUDE.md
 GEMINI.md
+CLAUDE.md
