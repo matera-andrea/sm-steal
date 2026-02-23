@@ -11,6 +11,7 @@ const emptyToUndefined = z.preprocess((val) => (val === "" ? undefined : val), z
 const itemsQuerySchema = querySchema.extend({
   isActive: z.preprocess((val) => (val === "" ? undefined : val), z.enum(["true", "false"]).optional()),
   search: emptyToUndefined,
+  slug: emptyToUndefined,
   brandId: emptyToUndefined,
   sneakerModelId: emptyToUndefined,
   category: z.preprocess(
@@ -43,6 +44,7 @@ export async function GET(request: NextRequest) {
       limit,
       search,
       isActive,
+      slug,
       brandId,
       sneakerModelId,
       category,
@@ -53,6 +55,7 @@ export async function GET(request: NextRequest) {
     const where: Prisma.ItemWhereInput = {};
     if (search) where.name = { contains: search, mode: "insensitive" };
     if (isActive) where.isActive = isActive === "true";
+    if (slug) where.slug = slug;
     if (category) where.category = category;
     if (gender) where.gender = gender;
     if (sneakerModelId) where.sneakerModelId = sneakerModelId;
@@ -92,6 +95,7 @@ export async function GET(request: NextRequest) {
       return {
         id: item.id,
         name: item.name,
+        slug: item.slug,
         sku: item.sku,
         category: item.category,
         gender: item.gender,

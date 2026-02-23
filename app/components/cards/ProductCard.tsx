@@ -31,7 +31,7 @@ export default function ProductCard({ listing }: ProductCardProps) {
   const displayTitle = `${brandName} ${modelName}`;
 
   return (
-    <Link href={`/shop/${item.sneakerModel.slug ?? listing.id}`}>
+    <Link href={`/shop/${item.slug || listing.id}`}>
       <div className="group flex flex-col h-full relative">
         {" "}
         {/* h-full per allineare le card */}

@@ -17,6 +17,7 @@ export const createItemSchema = z.object({
   name: z
     .string({ message: "Il nome è obbligatorio." })
     .min(3, "Il nome deve contenere almeno 3 caratteri."),
+  slug: z.string().optional().default(""),
   category: CategoryItemEnum,
   sku: z.string().optional(),
   gender: GenderEnum.default("UNISEX"),

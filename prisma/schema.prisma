@@ -72,27 +72,26 @@ model Brand {
 model SneakerModel{
   id          String   @id @default(cuid())
   name        String   @unique
-  slug        String?  @unique
   description String?
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   itemsCount  Int      @default(0)
-  
+
   brandId     String
-  
+
   items Item[]
   Brand Brand @relation(fields: [brandId], references: [id])
-  
+
   @@index([name])
   @@index([isActive])
-  @@index([slug])
   @@map("sneaker_models")
 }
 
 model Item {
   id                 String       @id @default(cuid())
   name               String       @unique
+  slug               String       @default("")
   category           CategoryItem
   sku                String?
   gender             Gender       @default(MEN)
@@ -100,8 +99,8 @@ model Item {
   createdAt          DateTime     @default(now())
   updatedAt          DateTime     @updatedAt
   // Questi contatori sono gestiti dal database tramite transazioni, non dall'input dell'utente
-  listingCount       Int          @default(0) 
-  
+  listingCount       Int          @default(0)
+
   sneakerModelId String
 
   sneakerModel SneakerModel @relation(fields: [sneakerModelId], references: [id], onDelete: Cascade)
@@ -111,6 +110,7 @@ model Item {
   @@index([gender])
   @@index([isActive])
   @@index([name])
+  @@index([slug])
   @@index([category, gender])
   @@map("items")
 }

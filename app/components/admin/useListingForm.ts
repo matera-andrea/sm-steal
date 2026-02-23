@@ -92,13 +92,13 @@ export function useListingForm() {
 
     try {
       // Controllo se lo slug esiste già nel database locale
-      const checkRes = await fetch(`/api/sneakerModels?slug=${slug}`);
+      const checkRes = await fetch(`/api/items?slug=${slug}`);
       const checkJson = await checkRes.json();
-      
+
       if (checkJson.data && checkJson.data.length > 0) {
-         setStatus({ type: "error", msg: "modello gia' presente, modifica nella sezione dedicata" });
-         setIsImporting(false);
-         return;
+        setStatus({ type: "error", msg: "articolo gia' presente, modifica nella sezione dedicata" });
+        setIsImporting(false);
+        return;
       }
 
       const res = await fetch(`/api/external/stockx/${slug}`);

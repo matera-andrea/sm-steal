@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
           imageUrl: user?.imageUrl || "",
         },
         product: {
-          id: wishItem.listing.item.sneakerModel.slug ?? wishItem.listing.id,
+          id: wishItem.listing.item.slug || wishItem.listing.id,
           name: displayName,
           sku: wishItem.listing.item.sku,
           imageUrl: wishItem.listing.photos[0]?.url || "/placeholder.png",

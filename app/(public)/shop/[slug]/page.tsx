@@ -21,9 +21,9 @@ const INCLUDE = {
 } as const;
 
 async function getListing(slug: string) {
-  // Primary lookup: by sneakerModel slug
+  // Primary lookup: by item slug
   const bySlug = await prisma.listing.findFirst({
-    where: { item: { sneakerModel: { slug } } },
+    where: { item: { slug } },
     include: INCLUDE,
   });
   if (bySlug) return bySlug;

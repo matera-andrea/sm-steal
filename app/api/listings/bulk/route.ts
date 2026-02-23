@@ -113,12 +113,7 @@ export async function POST(request: NextRequest) {
 
         // B. SNEAKER MODEL
         let model = await tx.sneakerModel.findFirst({
-          where: {
-            OR: [
-              { name: { equals: modelName, mode: "insensitive" }, brandId: brand.id },
-              ...(extractedSlug ? [{ slug: extractedSlug }] : [])
-            ]
-          },
+          where: { name: { equals: modelName, mode: "insensitive" }, brandId: brand.id },
         });
 
         if (!model) {
@@ -126,19 +121,12 @@ export async function POST(request: NextRequest) {
             data: {
               name: modelName,
               brandId: brand.id,
-              slug: extractedSlug
             },
           });
           await tx.brand.update({
             where: { id: brand.id },
             data: { itemsCount: { increment: 1 } },
           });
-        } else if (extractedSlug && !model.slug) {
-           // Se il modello esiste ma non ha lo slug, lo aggiorniamo
-           model = await tx.sneakerModel.update({
-              where: { id: model.id },
-              data: { slug: extractedSlug }
-           });
         }
 
         // C. ITEM
@@ -151,6 +139,7 @@ export async function POST(request: NextRequest) {
             data: {
               name: itemName,
               sku: sku,
+              slug: extractedSlug ?? "",
               sneakerModelId: model.id,
               category: category,
               gender: gender,
@@ -159,6 +148,12 @@ export async function POST(request: NextRequest) {
           await tx.sneakerModel.update({
             where: { id: model.id },
             data: { itemsCount: { increment: 1 } },
+          });
+        } else if (extractedSlug && !item.slug) {
+          // Se l'item esiste ma non ha lo slug, lo aggiorniamo
+          item = await tx.item.update({
+            where: { id: item.id },
+            data: { slug: extractedSlug },
           });
         }
 

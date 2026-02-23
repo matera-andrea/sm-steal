@@ -13,7 +13,6 @@ const sneakerModelsQuerySchema = querySchema.extend({
   isActive: z.preprocess((val) => (val === "" ? undefined : val), z.enum(["true", "false"]).optional()),
   search: emptyToUndefined,
   brandId: z.preprocess((val) => (val === "" ? undefined : val), z.string().optional()),
-  slug: emptyToUndefined,
 });
 
 // GET ALL SNEAKER MODELS
@@ -29,14 +28,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { page, limit, search, isActive, brandId, slug } = validation.data;
+    const { page, limit, search, isActive, brandId } = validation.data;
     const skip = (page - 1) * limit;
 
     const where: Prisma.SneakerModelWhereInput = {};
     if (search) where.name = { contains: search, mode: "insensitive" };
     if (isActive) where.isActive = isActive === "true";
     if (brandId) where.brandId = brandId;
-    if (slug) where.slug = slug;
 
     const [sneakerModels, total] = await prisma.$transaction([
       prisma.sneakerModel.findMany({

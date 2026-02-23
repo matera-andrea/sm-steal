@@ -40,8 +40,5 @@ next-env.d.ts
 
 /app/generated/prisma
 
-## AI
 CLAUDE.md
 GEMINI.md
-/_ai
-OLD_GEMINI.md
