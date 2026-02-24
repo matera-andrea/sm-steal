@@ -4,6 +4,7 @@ import "@/app/globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import QueryProvider from "./providers/QueryProvider";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <QueryProvider>
+        <Analytics />
         <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
           <body className="antialiased font-sans">
             {children}

@@ -4,6 +4,8 @@ import prisma from "@/app/lib/prisma";
 import HeroSlideshow from "../components/home/HeroSlideshow";
 import FeaturedGrid from "../components/product/FeaturedGrid";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const slides = await prisma.heroSlide.findMany({
     orderBy: { order: "asc" },
