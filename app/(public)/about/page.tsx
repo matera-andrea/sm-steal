@@ -129,12 +129,11 @@ export default function AboutPage() {
                 <CheckCircle2 size={32} />
               </div>
               <h4 className="text-xl font-black uppercase italic tracking-tight">
-                100% Legit Check.
+                Qualità garantita.
               </h4>
               <p className="text-gray-500 text-sm leading-relaxed">
                 Niente fake, niente repliche. Ogni singolo paio passa attraverso
-                un rigoroso processo di autenticazione a mano da parte del
-                nostro team di esperti.
+                un rigoroso processo di autenticazione a mano.
               </p>
             </div>
 
@@ -148,8 +147,8 @@ export default function AboutPage() {
               </h4>
               <p className="text-gray-500 text-sm leading-relaxed">
                 Garantiamo che ogni prodotto venduto come &quot;Nuovo&quot; sia
-                intonso, mai indossato e completo di box originale e accessori.
-                La perfezione è il nostro standard.
+                mai utilizzato, completo di scatola originale e accessori. La
+                perfezione è il nostro standard.
               </p>
             </div>
 
@@ -162,9 +161,9 @@ export default function AboutPage() {
                 Spedizioni Flash.
               </h4>
               <p className="text-gray-500 text-sm leading-relaxed">
-                Odiamo aspettare quanto te. Il 90% dei nostri ordini viene evaso
-                entro 24 ore lavorative con spedizione tracciata express in
-                tutta Europa.
+                Odiamo aspettare quanto te. I nostri ordini vengono evasi entro
+                24 ore lavorative con spedizione tracciata express in tutta
+                Europa.
               </p>
             </div>
           </div>
@@ -181,8 +180,8 @@ export default function AboutPage() {
             Unisciti al Movimento.
           </h3>
           <p className="text-gray-500 max-w-xl mx-auto">
-            Seguici per drop esclusivi, restock a sorpresa e contenuti
-            behind-the-scenes. Siamo più attivi su Instagram che via mail.
+            Seguici per offerte esclusive, restock a sorpresa e contenuti
+            behind-the-scenes.
           </p>
         </div>
 
@@ -254,7 +253,7 @@ export default function AboutPage() {
 
       {/* --- CTA FINALE --- */}
       <section className="bg-amber-400 py-20 overflow-hidden relative">
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-10 pointer-events-none"></div>
+        <div className="absolute inset-0 opacity-10 pointer-events-none"></div>
         <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
           <h2 className="text-4xl md:text-6xl font-black uppercase italic tracking-tighter text-black mb-8">
             Pronto a coppare?
