@@ -10,7 +10,7 @@ export default function Shop() {
             Shop<span className="text-amber-400">.</span>
           </h1>
           <p className="mt-4 text-gray-500 font-medium max-w-xl text-lg uppercase tracking-tight">
-            Selezione curata dei grail più ricercati sul mercato.
+            Selezione curata delle sneakers più ricercate sul mercato.
           </p>
         </div>
       </header>

@@ -18,7 +18,8 @@ export function useWishlist() {
     queryFn: async () => {
       const res = await fetch("/api/wishlist");
       if (!res.ok) return [];
-      return res.json();
+      const data = await res.json();
+      return Array.isArray(data) ? data : [];
     },
     enabled: isSignedIn, // Esegui solo se loggato
     staleTime: 1000 * 60 * 5, // Cache per 5 minuti

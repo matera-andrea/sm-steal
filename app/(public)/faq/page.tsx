@@ -141,7 +141,7 @@ export default function FaqPage() {
       {/* --- HERO SECTION --- */}
       <section className="bg-black text-white pt-32 pb-24 px-6 rounded-b-[3rem] shadow-2xl relative overflow-hidden">
         {/* Background noise/texture opzionale */}
-        <div className="absolute inset-0 opacity-10 bg-[url('/noise.png')] pointer-events-none"></div>
+        <div className="absolute inset-0 opacity-10 pointer-events-none"></div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h1 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter leading-[0.9]">

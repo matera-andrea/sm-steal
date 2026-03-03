@@ -19,7 +19,7 @@ export default function ShippingReturnsPage() {
     <main className="bg-gray-50 min-h-screen text-black pb-20 font-sans">
       {/* --- HERO HEADER --- */}
       <section className="bg-black text-white pt-32 pb-32 px-6 rounded-b-[3rem] shadow-2xl relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[url('/noise.png')] pointer-events-none"></div>
+        <div className="absolute inset-0 opacity-10 pointer-events-none"></div>
 
         <div className="max-w-4xl mx-auto relative z-10">
           <Link
@@ -230,7 +230,7 @@ export default function ShippingReturnsPage() {
 
         {/* CTA */}
         <div className="bg-amber-400 p-8 md:p-12 rounded-[2rem] shadow-lg text-center relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10 bg-[url('/noise.png')] pointer-events-none"></div>
+          <div className="absolute inset-0 opacity-10 pointer-events-none"></div>
           <div className="relative z-10 flex flex-col items-center gap-6">
             <HelpCircle size={40} className="text-black" />
             <div>

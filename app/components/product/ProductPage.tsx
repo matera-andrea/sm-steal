@@ -245,7 +245,7 @@ Sono ancora disponibili? Grazie!`;
                     Spedizione Express
                   </span>
                   <span className="text-[10px] text-gray-400 font-medium leading-tight">
-                    Consegna veloce e tracciata in tutta Italia.
+                    Consegna veloce e tracciata in tutta Italia ed Europa.
                   </span>
                 </div>
               </div>

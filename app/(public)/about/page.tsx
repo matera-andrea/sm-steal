@@ -54,12 +54,6 @@ export default function AboutPage() {
         {/* Immagine di sfondo scura/sfumata */}
         <div className="absolute inset-0 opacity-40">
           {/* Placeholder img */}
-          <Image
-            src="/about-hero.jpg"
-            alt="Sneaker Wall"
-            fill
-            className="object-cover grayscale"
-          />
         </div>
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto space-y-6">
@@ -68,8 +62,9 @@ export default function AboutPage() {
             <span className="text-amber-400">semplice Hype.</span>
           </h1>
           <p className="text-gray-300 text-lg md:text-xl font-medium max-w-2xl mx-auto">
-            Siamo nati dalla passione per la cultura sneaker. La nostra missione
-            è portare i grail più esclusivi ai piedi di chi li apprezza davvero.
+            Siamo nati dalla passione per la cultura delle sneakers. La nostra
+            missione è portare i modelli più esclusivi ai piedi di chi li
+            apprezza davvero.
           </p>
         </div>
       </section>
@@ -82,46 +77,40 @@ export default function AboutPage() {
               La Nostra Storia
             </h2>
             <h3 className="text-4xl md:text-5xl font-black uppercase italic tracking-tighter">
-              Dal garage al <br />
-              mondo intero.
+              Prezzi da Fornitore,
+              <br />
+              Autenticità Garantita
             </h3>
             <div className="space-y-4 text-gray-600 font-medium leading-relaxed">
               <p>
-                Tutto è iniziato nel 2018. Eravamo stanchi di vedere marketplace
-                impersonali, costi nascosti e dubbi sull&apos;autenticità. Volevamo
-                creare un posto dove comprare sneakers fosse sicuro, veloce ed
-                emozionante.
+                Il nostro percorso inizia nel 2020, quando la passione per le
+                sneakers si trasforma in un progetto concreto. Nel corso degli
+                anni, abbiamo sviluppato una rete di collaborazioni con negozi
+                di resell italiani ed europei, rifornendoli con continuità e
+                offrendo sneakers con autenticità garantita a prezzi altamente
+                competitivi.
               </p>
               <p>
-                Quello che è partito come un piccolo progetto di reselling tra
-                amici è diventato
-                <strong> Heat Lab</strong>. Oggi gestiamo migliaia di paia, ma
-                la filosofia rimane la stessa: trattiamo ogni cliente come se
-                fosse uno di noi.
+                Nel 2026 nasce il nostro ecommerce. Lo stesso approccio
+                riservato ai negozi riforniti viene portato direttamente al
+                pubblico, con una selezione curata e un servizio sicuro e
+                affidabile. Oggi il nostro obiettivo è chiaro: offrire prodotti
+                di qualità con un’esperienza d’acquisto trasparente, garantendo
+                prezzi accessibili senza compromessi.
               </p>
-            </div>
-
-            <div className="pt-4">
-              <Image
-                src="/signature.png" // Facoltativo: firma del founder
-                alt="Firma del Fondatore"
-                width={150}
-                height={50}
-                className="opacity-50"
-              />
             </div>
           </div>
 
-          <div className="relative aspect-square lg:aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-gray-100">
+          <div className="relative aspect-[9/16] rounded-[2.5rem] overflow-hidden bg-gray-100">
             <Image
-              src="/team-working.jpg" // Sostituisci con foto del team
-              alt="Il Nostro Team"
+              src="/cover.jpeg" // Sostituisci con foto del team
+              alt=""
               fill
-              className="object-cover"
+              className="object-cover object-top"
             />
             {/* Badge flottante */}
             <div className="absolute bottom-8 left-8 bg-white p-6 rounded-3xl shadow-2xl max-w-xs">
-              <p className="text-4xl font-black text-amber-500">10k+</p>
+              <p className="text-4xl font-black text-amber-500">3k+</p>
               <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mt-1">
                 Paia vendute in tutto il mondo
               </p>
@@ -158,9 +147,9 @@ export default function AboutPage() {
                 Condizioni Deadstock.
               </h4>
               <p className="text-gray-500 text-sm leading-relaxed">
-                Garantiamo che ogni prodotto venduto come &quot;Nuovo&quot; sia intonso,
-                mai indossato e completo di box originale e accessori. La
-                perfezione è il nostro standard.
+                Garantiamo che ogni prodotto venduto come &quot;Nuovo&quot; sia
+                intonso, mai indossato e completo di box originale e accessori.
+                La perfezione è il nostro standard.
               </p>
             </div>
 

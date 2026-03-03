@@ -14,7 +14,7 @@ export async function GET() {
     const { userId } = await auth();
 
     if (!userId) {
-      return NextResponse.json({ data: [] }, { status: 200 }); // Ritorna array vuoto se non loggato
+      return NextResponse.json([], { status: 200 });
     }
 
     const wishlist = await prisma.wishlistItem.findMany({

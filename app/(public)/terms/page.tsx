@@ -22,7 +22,7 @@ export default function TermsPage() {
     <main className="bg-gray-50 min-h-screen text-black pb-20 font-sans">
       {/* --- HERO HEADER --- */}
       <section className="bg-black text-white pt-32 pb-32 px-6 rounded-b-[3rem] shadow-2xl relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[url('/noise.png')] pointer-events-none"></div>
+        <div className="absolute inset-0 opacity-10 pointer-events-none"></div>
 
         <div className="max-w-4xl mx-auto relative z-10">
           <Link

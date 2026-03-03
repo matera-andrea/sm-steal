@@ -26,18 +26,17 @@ function NavBarContent() {
 
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
 
   const { openSignIn } = useClerk();
 
-  useEffect(() => {
-    const query = searchParams.get("search");
-    if (query) {
-      setSearchTerm(query);
-    } else {
-      setSearchTerm("");
-    }
-  }, [searchParams]);
+  const queryFromUrl = searchParams.get("search") ?? "";
+  const [prevQueryFromUrl, setPrevQueryFromUrl] = useState(queryFromUrl);
+  const [searchTerm, setSearchTerm] = useState(queryFromUrl);
+
+  if (prevQueryFromUrl !== queryFromUrl) {
+    setPrevQueryFromUrl(queryFromUrl);
+    setSearchTerm(queryFromUrl);
+  }
 
   const handleLoginClick = () => {
     openSignIn();
@@ -116,7 +115,7 @@ function NavBarContent() {
                   </div>
                   <input
                     type="search"
-                    placeholder="Cerca drops..."
+                    placeholder="Cerca..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     onKeyDown={handleSearch}

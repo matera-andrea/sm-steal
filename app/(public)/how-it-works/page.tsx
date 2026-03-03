@@ -30,7 +30,7 @@ export default function HowItWorksPage() {
     {
       num: "01",
       title: "Scegli il Grail.",
-      desc: "Naviga nel nostro catalogo. Seleziona il modello, la tua taglia e la condizione (Nuovo o Usato).",
+      desc: "Naviga nel nostro catalogo. Seleziona il modello, la taglia e la condizione.",
       icon: <Search className="w-8 h-8 text-black" />,
     },
     {
@@ -39,7 +39,7 @@ export default function HowItWorksPage() {
       // MODIFICA QUI: Convertito in JSX per includere il Link
       desc: (
         <>
-          Clicca su 'Acquista su WhatsApp'. Verrai reindirizzato direttamente in
+          Clicca su &apos;Acquista su WhatsApp&apos;. Verrai reindirizzato direttamente in
           chat con il founder.
           <br className="mb-2" />
           <span className="text-xs text-gray-400 font-bold">
@@ -65,13 +65,13 @@ export default function HowItWorksPage() {
     {
       num: "04",
       title: "Pagamento Sicuro.",
-      desc: "Completa l'acquisto tramite Bonifico Bancario istantaneo o PayPal (Beni e Servizi per la tua tutela).",
+      desc: "Completa l'acquisto tramite Bonifico Bancario, Revolut o PayPal.",
       icon: <CreditCard className="w-8 h-8 text-black" />,
     },
     {
       num: "05",
       title: "Relax & Unbox.",
-      desc: "Riceverai il tracking number entro poche ore. Mettiti comodo, le tue nuove sneakers stanno arrivando.",
+      desc: "Riceverai il tracking entro poche ore. Mettiti comodo, le tue nuove sneakers stanno arrivando.",
       icon: <PackageCheck className="w-8 h-8 text-black" />,
     },
   ];
@@ -89,7 +89,7 @@ export default function HowItWorksPage() {
           </h1>
           <p className="text-gray-300 text-lg font-medium max-w-xl mx-auto mt-6">
             Niente carrelli complicati o checkout infiniti. Abbiamo reso
-            l'acquisto di sneakers semplice, diretto e umano.
+            l&apos;acquisto di sneakers semplice, diretto e umano.
           </p>
         </div>
       </section>
@@ -144,7 +144,7 @@ export default function HowItWorksPage() {
 
               <p className="text-gray-500 text-sm leading-relaxed mb-6">
                 Se ti trovi in queste zone, offriamo il servizio di consegna a
-                mano o ritiro in sede. Specificalo in chat per ridurre. i costi
+                mano o ritiro in sede. Specificalo in chat per evitare i costi
                 di spedizione.
               </p>
 
