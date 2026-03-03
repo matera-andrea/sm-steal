@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
 
     if (sortBy === "featured") {
       // Compound index: (isActive, isFeatured, hasStock, createdAt) — zero sort step
-      [listings, total] = await prisma.$transaction([
+      [listings, total] = (await prisma.$transaction([
         prisma.listing.findMany({
           where,
           skip,
@@ -152,9 +152,9 @@ export async function GET(request: NextRequest) {
           include: listingInclude,
         }),
         prisma.listing.count({ where }),
-      ]);
+      ])) as [ListingResult[], number];
     } else if (sortBy === "alphabetical") {
-      [listings, total] = await prisma.$transaction([
+      [listings, total] = (await prisma.$transaction([
         prisma.listing.findMany({
           where,
           skip,
@@ -163,11 +163,12 @@ export async function GET(request: NextRequest) {
           include: listingInclude,
         }),
         prisma.listing.count({ where }),
-      ]);
+      ])) as [ListingResult[], number];
     } else {
       // Price sort: use groupBy to find the min/max price per listing in the DB
-      const grouped = await prisma.listingSizing.groupBy({
-        by: ["listingId"],
+      type GroupedRow = { listingId: string; _min: { price: number | null }; _max: { price: number | null } };
+      const grouped = (await prisma.listingSizing.groupBy({
+        by: ["listingId"] as const,
         where: { listing: where },
         _min: { price: true },
         _max: { price: true },
@@ -175,7 +176,7 @@ export async function GET(request: NextRequest) {
           sortBy === "price_asc"
             ? { _min: { price: "asc" } }
             : { _max: { price: "desc" } },
-      });
+      })) as GroupedRow[];
 
       total = grouped.length;
       const pageIds = grouped.slice(skip, skip + limit).map((g) => g.listingId);
