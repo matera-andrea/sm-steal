@@ -92,12 +92,6 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/shipping-returns"
-                  className="hover:text-white transition-colors"
-                >
-                  Spedizioni e Resi
-                </Link>
               </li>
               <li>
                 <Link
