@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 
@@ -24,9 +24,6 @@ export default function ProductGrid() {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const [filters, setFilters] = useState<ShopFilters>({});
-  const [tempFilters, setTempFilters] = useState<ShopFilters>({});
-  const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<SortBy>("alphabetical");
 
   // --- HOOKS ---
@@ -35,23 +32,31 @@ export default function ProductGrid() {
   const { sizings, loading: sizingsLoading } = useSizings();
   const searchParams = useSearchParams();
 
-  // --- EFFECTS ---
+  // --- URL SYNC (derived state during render) ---
+  const querySearch = searchParams.get("search") ?? "";
+  const [prevQuerySearch, setPrevQuerySearch] = useState(querySearch);
+  const [filters, setFilters] = useState<ShopFilters>(
+    querySearch ? { search: querySearch } : {},
+  );
+  const [tempFilters, setTempFilters] = useState<ShopFilters>(
+    querySearch ? { search: querySearch } : {},
+  );
+  const [searchTerm, setSearchTerm] = useState(querySearch);
 
-  // 1. URL Sync
-  useEffect(() => {
-    const querySearch = searchParams.get("search");
-    if (querySearch && querySearch !== filters.search) {
-      setFilters((prev) => ({ ...prev, search: querySearch }));
-      setSearchTerm(querySearch);
-    }
-  }, [searchParams, filters.search]);
+  if (prevQuerySearch !== querySearch) {
+    setPrevQuerySearch(querySearch);
+    setFilters((prev) => ({ ...prev, search: querySearch || undefined }));
+    setSearchTerm(querySearch);
+  }
 
-  // 2. Drawer Sync
-  useEffect(() => {
-    if (showFilters) {
-      setTempFilters(filters);
-    }
-  }, [showFilters, filters]);
+  // Drawer Sync: keep tempFilters in sync when drawer opens
+  const [prevShowFilters, setPrevShowFilters] = useState(showFilters);
+  if (!prevShowFilters && showFilters) {
+    setPrevShowFilters(true);
+    setTempFilters(filters);
+  } else if (prevShowFilters && !showFilters) {
+    setPrevShowFilters(false);
+  }
 
   // --- DATA FETCHING ---
   const { data, isLoading } = useQuery({

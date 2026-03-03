@@ -150,12 +150,12 @@ export default function SneakerModelTableClient() {
           <input
             type="text"
             placeholder="Search Models..."
-            value={(filters as any).search || ""}
+            value={(filters as Record<string, string>).search || ""}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
             className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black w-48"
           />
           <select
-            value={(filters as any).brandId || ""}
+            value={(filters as Record<string, string>).brandId || ""}
             onChange={(e) => setFilters({ ...filters, brandId: e.target.value })}
             className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black"
           >
@@ -167,7 +167,7 @@ export default function SneakerModelTableClient() {
             ))}
           </select>
           <select
-            value={(filters as any).isActive || ""}
+            value={(filters as Record<string, string>).isActive || ""}
             onChange={(e) =>
               setFilters({ ...filters, isActive: e.target.value })
             }

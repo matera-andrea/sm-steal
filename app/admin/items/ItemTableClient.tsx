@@ -235,14 +235,14 @@ export default function ItemTableClient() {
             <input
               type="text"
               placeholder="Search Products..."
-              value={(filters as any).search || ""}
+              value={(filters as Record<string, string>).search || ""}
               onChange={(e) =>
                 setFilters({ ...filters, search: e.target.value })
               }
               className="bg-gray-50 border-none rounded-full px-4 py-2 text-[10px] font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-black w-48"
             />
             <select
-              value={(filters as any).brandId || ""}
+              value={(filters as Record<string, string>).brandId || ""}
               onChange={(e) =>
                 setFilters({
                   ...filters,
@@ -260,7 +260,7 @@ export default function ItemTableClient() {
               ))}
             </select>
             <select
-              value={(filters as any).sneakerModelId || ""}
+              value={(filters as Record<string, string>).sneakerModelId || ""}
               onChange={(e) =>
                 setFilters({ ...filters, sneakerModelId: e.target.value })
               }
@@ -270,8 +270,8 @@ export default function ItemTableClient() {
               {models
                 .filter(
                   (m) =>
-                    !(filters as any).brandId ||
-                    m.brandId === (filters as any).brandId,
+                    !(filters as Record<string, string>).brandId ||
+                    m.brandId === (filters as Record<string, string>).brandId,
                 )
                 .map((model) => (
                   <option key={model.id} value={model.id}>
@@ -280,7 +280,7 @@ export default function ItemTableClient() {
                 ))}
             </select>
             <select
-              value={(filters as any).category || ""}
+              value={(filters as Record<string, string>).category || ""}
               onChange={(e) =>
                 setFilters({ ...filters, category: e.target.value })
               }
@@ -294,7 +294,7 @@ export default function ItemTableClient() {
               ))}
             </select>
             <select
-              value={(filters as any).isActive || ""}
+              value={(filters as Record<string, string>).isActive || ""}
               onChange={(e) =>
                 setFilters({ ...filters, isActive: e.target.value })
               }

@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import { clerkClient } from "@clerk/nextjs/server";
 import prisma from "@/app/lib/prisma";
 import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const authError = await checkAdmin();
     if (authError) return authError;

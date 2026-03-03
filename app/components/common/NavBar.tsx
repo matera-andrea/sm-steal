@@ -58,7 +58,7 @@ function NavBarContent() {
   }, [lastScrollY]);
 
   const handleSearch = (
-    e: React.KeyboardEvent<HTMLInputElement> | React.FormEvent,
+    e: React.KeyboardEvent<HTMLInputElement> | React.BaseSyntheticEvent,
   ) => {
     if ("key" in e && e.key !== "Enter") return;
     e.preventDefault();

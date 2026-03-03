@@ -4,7 +4,8 @@ import { sizingSchema } from "@/app/lib/validation/sizing.schema";
 import z from "zod";
 import { checkAdmin } from "@/app/lib/apiAdminCheck";
 
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(_request: NextRequest) {
   try {
     const [sizes, total] = await Promise.all([
       prisma.sizing.findMany({ orderBy: { size: "asc" } }),

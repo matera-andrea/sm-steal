@@ -1,7 +1,6 @@
 import { ListingWithDetails } from "@/app/lib/types/type";
 import Link from "next/link";
 import Image from "next/image";
-import WishlistButton from "../product/WishlistButton";
 
 interface ProductCardProps {
   listing: ListingWithDetails;

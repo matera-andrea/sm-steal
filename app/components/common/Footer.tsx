@@ -60,19 +60,19 @@ export default function Footer() {
                 rel="noreferrer"
                 className="text-gray-400 hover:text-amber-400 transition-colors"
               >
-                <InstagramIcon className="w-[22px] h-[22px]" />
+                <InstagramIcon className="w-5.5 h-5.5" />
               </a>
               <a
                 href="#"
                 className="text-gray-400 hover:text-amber-400 transition-colors"
               >
-                <LinkedinIcon className="w-[22px] h-[22px]" />
+                <LinkedinIcon className="w-5.5 h-5.5" />
               </a>
               <a
                 href="#"
                 className="text-gray-400 hover:text-amber-400 transition-colors"
               >
-                <XIcon className="w-[22px] h-[22px]" />
+                <XIcon className="w-5.5 h-5.5" />
               </a>
             </div>
           </div>

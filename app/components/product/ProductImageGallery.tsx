@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  useState,
-  useRef,
-  useEffect,
-  MouseEvent as ReactMouseEvent,
-  TouchEvent as ReactTouchEvent,
-} from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Photo } from "@prisma/client";
 import { Rotate3d } from "lucide-react";
@@ -71,8 +65,6 @@ export function ProductImageGallery({
     window.addEventListener("mouseup", handleWindowMouseUp);
     return () => window.removeEventListener("mouseup", handleWindowMouseUp);
   }, []);
-
-  const activePhoto = safePhotos[activeIndex];
 
   return (
     <div className="sticky top-28 space-y-6 select-none">

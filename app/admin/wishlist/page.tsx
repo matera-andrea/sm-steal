@@ -7,7 +7,6 @@ import {
   Loader2,
   Calendar,
   User,
-  ShoppingBag,
   ExternalLink,
 } from "lucide-react";
 
