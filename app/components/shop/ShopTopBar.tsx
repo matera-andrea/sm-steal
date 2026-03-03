@@ -2,9 +2,10 @@ import { Search, X, SlidersHorizontal } from "lucide-react";
 import { SortBy } from "@/app/lib/types/shop";
 
 const SORT_OPTIONS: { value: SortBy; label: string }[] = [
+  { value: "featured",     label: "In primo piano" },
   { value: "alphabetical", label: "A → Z" },
-  { value: "price_asc", label: "Prezzo ↑" },
-  { value: "price_desc", label: "Prezzo ↓" },
+  { value: "price_asc",    label: "Prezzo ↑" },
+  { value: "price_desc",   label: "Prezzo ↓" },
 ];
 
 interface ShopTopBarProps {

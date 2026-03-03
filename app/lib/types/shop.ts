@@ -1,6 +1,6 @@
 import type { ListingCondition } from "@prisma/client";
 
-export type SortBy = "alphabetical" | "price_asc" | "price_desc";
+export type SortBy = "featured" | "alphabetical" | "price_asc" | "price_desc";
 
 export interface ShopFilters {
   condition?: ListingCondition;

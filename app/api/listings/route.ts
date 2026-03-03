@@ -22,7 +22,7 @@ const listingQuerySchema = querySchema.extend({
   modelId: emptyToUndefined,
   sortBy: z.preprocess(
     (val) => (val === "" ? undefined : val),
-    z.enum(["alphabetical", "price_asc", "price_desc"]).default("alphabetical"),
+    z.enum(["featured", "alphabetical", "price_asc", "price_desc"]).default("featured"),
   ),
 });
 
@@ -137,7 +137,23 @@ export async function GET(request: NextRequest) {
     let listings: ListingResult[];
     let total: number;
 
-    if (sortBy === "alphabetical") {
+    if (sortBy === "featured") {
+      // Compound index: (isActive, isFeatured, hasStock, createdAt) — zero sort step
+      [listings, total] = await prisma.$transaction([
+        prisma.listing.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: [
+            { isFeatured: "desc" },
+            { hasStock: "desc" },
+            { createdAt: "desc" },
+          ],
+          include: listingInclude,
+        }),
+        prisma.listing.count({ where }),
+      ]);
+    } else if (sortBy === "alphabetical") {
       [listings, total] = await prisma.$transaction([
         prisma.listing.findMany({
           where,
@@ -149,36 +165,27 @@ export async function GET(request: NextRequest) {
         prisma.listing.count({ where }),
       ]);
     } else {
-      // Price sort: aggregate min price per listing in JS, then paginate
-      const allSizings = await prisma.listingSizing.findMany({
+      // Price sort: use groupBy to find the min/max price per listing in the DB
+      const grouped = await prisma.listingSizing.groupBy({
+        by: ["listingId"],
         where: { listing: where },
-        select: { listingId: true, price: true },
+        _min: { price: true },
+        _max: { price: true },
+        orderBy:
+          sortBy === "price_asc"
+            ? { _min: { price: "asc" } }
+            : { _max: { price: "desc" } },
       });
 
-      const priceMap = new Map<string, number>();
-      for (const s of allSizings) {
-        const price = Number(s.price);
-        const existing = priceMap.get(s.listingId);
-        if (
-          existing === undefined ||
-          (sortBy === "price_asc" ? price < existing : price > existing)
-        ) {
-          priceMap.set(s.listingId, price);
-        }
-      }
-
-      const sortedIds = [...priceMap.entries()]
-        .sort(([, a], [, b]) => (sortBy === "price_asc" ? a - b : b - a))
-        .map(([id]) => id);
-
-      total = sortedIds.length;
-      const pageIds = sortedIds.slice(skip, skip + limit);
+      total = grouped.length;
+      const pageIds = grouped.slice(skip, skip + limit).map((g) => g.listingId);
 
       const unordered = await prisma.listing.findMany({
         where: { id: { in: pageIds } },
         include: listingInclude,
       });
 
+      // Restore the DB-sorted order after findMany
       listings = pageIds
         .map((id) => unordered.find((l) => l.id === id))
         .filter((l): l is NonNullable<typeof l> => l !== undefined);
@@ -276,6 +283,16 @@ export async function POST(request: NextRequest) {
         }
 
         // RIMOSSO: Calcolo aggregato e update stock sul padre
+
+        // Sync hasStock: true if any sizing still has stock > 0
+        const stockAgg = await tx.listingSizing.aggregate({
+          where: { listingId: existingListing.id },
+          _sum: { stock: true },
+        });
+        await tx.listing.update({
+          where: { id: existingListing.id },
+          data: { hasStock: (stockAgg._sum.stock ?? 0) > 0 },
+        });
 
         // Ritorna l'oggetto aggiornato
         const updatedListing = await tx.listing.findUnique({

@@ -24,7 +24,7 @@ export default function ProductGrid() {
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const [sortBy, setSortBy] = useState<SortBy>("alphabetical");
+  const [sortBy, setSortBy] = useState<SortBy>("featured");
 
   // --- HOOKS ---
   const { brands, loading: brandsLoading } = useBrands();

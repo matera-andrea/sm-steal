@@ -151,24 +151,25 @@ model Listing {
   description String?
   isActive    Boolean          @default(true)
   isFeatured  Boolean          @default(false)
-  
-  
+  hasStock    Boolean          @default(true)
+
   startDate   DateTime        @default(now())
   endDate     DateTime?
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
-  
+
   itemId String
-  
+
   item          Item            @relation(fields: [itemId], references: [id], onDelete: Cascade)
   photos        Photo[]
   sizings       ListingSizing[]
   wishlistItems WishlistItem[]
-  
+
   @@index([itemId])
   @@index([isActive])
   @@index([isFeatured])
   @@index([itemId, isActive])
+  @@index([isActive, isFeatured, hasStock, createdAt])
   @@map("listings")
 }
 
