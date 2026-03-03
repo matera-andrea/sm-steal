@@ -188,7 +188,7 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Instagram Card */}
           <a
-            href="https://instagram.com/sm.steal"
+            href="https://instagram.com/heat.lab_"
             target="_blank"
             rel="noreferrer"
             className="group p-8 rounded-[2rem] border-2 border-gray-100 hover:border-black transition-all hover:bg-black hover:text-white flex flex-col items-center gap-6"
@@ -199,7 +199,7 @@ export default function AboutPage() {
             <div>
               <p className="font-black uppercase text-xl italic">Instagram</p>
               <p className="text-xs font-bold uppercase tracking-widest opacity-60 mt-1">
-                @sm.steal
+                @heat.lab_
               </p>
             </div>
             <div className="w-full py-3 rounded-full border border-gray-200 group-hover:border-white/20 text-xs font-black uppercase tracking-widest mt-auto">
