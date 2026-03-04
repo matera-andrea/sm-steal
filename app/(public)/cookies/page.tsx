@@ -9,6 +9,7 @@ import {
   XCircle,
   Settings,
   Info,
+  FileText,
   Heart, // Aggiunta icona Heart
 } from "lucide-react";
 
@@ -54,13 +55,21 @@ export default function CookiePolicyPage() {
               Cosa sono i Cookie?
             </h2>
           </div>
-          <p className="text-gray-700 leading-relaxed font-medium">
+          <p className="text-gray-700 leading-relaxed font-medium mb-8">
             I cookie sono piccoli file di testo che i siti visitati inviano al
             tuo terminale (computer, tablet, smartphone), dove vengono
             memorizzati per essere poi ritrasmessi agli stessi siti alla visita
             successiva. Servono per autenticarti, ricordare le tue preferenze
             (come la <strong>Wishlist</strong>) e monitorare le sessioni.
           </p>
+          <a
+            href="https://app.legalblink.it/api/documents/69a736ff3499c800239e01ad/cookie-policy-it"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 bg-amber-400 text-black px-8 py-4 rounded-full text-sm font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-xl"
+          >
+            Leggi la Versione Ufficiale su LegalBlink <FileText size={18} />
+          </a>
         </div>
 
         {/* CATEGORIE DI COOKIE */}
@@ -219,11 +228,15 @@ export default function CookiePolicyPage() {
             Per maggiori informazioni sul trattamento dei dati personali,
             consulta la nostra:
           </p>
-          <Link href="/privacy">
+          <a
+            href="https://app.legalblink.it/api/documents/69a736ff3499c800239e01ad/privacy-policy-per-siti-web-o-e-commerce-it"
+            target="_blank"
+            rel="noreferrer"
+          >
             <button className="inline-flex items-center gap-2 bg-black text-white px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest hover:bg-amber-400 hover:text-black transition-all">
               Privacy Policy <Info size={14} />
             </button>
-          </Link>
+          </a>
         </div>
       </div>
     </main>

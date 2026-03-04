@@ -53,12 +53,20 @@ export default function PrivacyPolicyPage() {
       <div className="max-w-4xl mx-auto px-6 relative z-20 -mt-20 space-y-8">
         {/* INTRO CARD */}
         <div className="bg-white p-8 md:p-12 rounded-[2rem] shadow-xl border border-gray-100">
-          <p className="text-gray-700 text-lg leading-relaxed font-medium">
+          <p className="text-gray-700 text-lg leading-relaxed font-medium mb-8">
             Benvenuto su <strong>SM.STEAL</strong>. In questa pagina descriviamo
             in modo chiaro come raccogliamo, utilizziamo e proteggiamo i tuoi
             dati personali in conformità con il Regolamento UE 2016/679 (GDPR).
             Niente legalese complesso, solo chiarezza.
           </p>
+          <a
+            href="https://app.legalblink.it/api/documents/69a736ff3499c800239e01ad/privacy-policy-per-siti-web-o-e-commerce-it"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 bg-amber-400 text-black px-8 py-4 rounded-full text-sm font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-xl"
+          >
+            Leggi la Versione Ufficiale su LegalBlink <FileText size={18} />
+          </a>
         </div>
 
         {/* SEZIONE 1: TITOLARE */}

@@ -119,12 +119,14 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3 text-sm font-bold uppercase tracking-tight text-gray-400">
               <li>
-                <Link
-                  href="/privacy"
+                <a
+                  href="https://app.legalblink.it/api/documents/69a736ff3499c800239e01ad/privacy-policy-per-siti-web-o-e-commerce-it"
+                  target="_blank"
+                  rel="noreferrer"
                   className="hover:text-white transition-colors"
                 >
                   Privacy Policy
-                </Link>
+                </a>
               </li>
               <li>
                 <Link
@@ -135,12 +137,14 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/cookie-policy"
+                <a
+                  href="https://app.legalblink.it/api/documents/69a736ff3499c800239e01ad/cookie-policy-it"
+                  target="_blank"
+                  rel="noreferrer"
                   className="hover:text-white transition-colors"
                 >
                   Cookie Policy
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
