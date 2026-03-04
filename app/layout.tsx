@@ -33,14 +33,15 @@ export default function RootLayout({
     <ClerkProvider>
       <QueryProvider>
         <html
-          lang="en"
+          lang="it"
           className={`${geistSans.variable} ${geistMono.variable}`}
         >
           <body className="antialiased font-sans">
             {children}
             <Toaster position="bottom-right" />
             <Analytics />
-            
+
+            {/* <LegalBlinkBanner /> */}
             <LegalBlinkBanner />
           </body>
         </html>

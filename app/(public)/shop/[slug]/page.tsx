@@ -52,7 +52,7 @@ export async function generateMetadata({
   const mainPhoto = listing.photos.find((p) => p.isMain) || listing.photos[0];
 
   return {
-    title: `${brandName} ${modelName} | sm.steal`,
+    title: `${brandName} ${modelName} | Heat Lab`,
     description: `Acquista ${brandName} ${modelName} a partire da €${minPrice}. Sneakers originali verificate.`,
     openGraph: {
       title: `${brandName} ${modelName}`,

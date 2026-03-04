@@ -9,9 +9,9 @@ export default function LegalBlinkBanner() {
         src="https://app.legalblink.it/api/scripts/lb_cs.js"
         strategy="afterInteractive"
         onLoad={() => {
-          // @ts-ignore
+          // @ts-expect-error - lb_cs is defined by LegalBlink external script
           if (typeof window.lb_cs === "function") {
-            // @ts-ignore
+            // @ts-expect-error - lb_cs is defined by LegalBlink external script
             window.lb_cs("69a736ff3499c800239e01b6");
           }
         }}
