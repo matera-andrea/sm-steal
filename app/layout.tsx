@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import QueryProvider from "./providers/QueryProvider";
 import { Toaster } from "sonner";
 import { Analytics } from "@vercel/analytics/next";
+import LegalBlinkBanner from "./components/common/LegalBlinkBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,8 @@ export default function RootLayout({
             {children}
             <Toaster position="bottom-right" />
             <Analytics />
+            
+            <LegalBlinkBanner />
           </body>
         </html>
       </QueryProvider>
