@@ -6,8 +6,8 @@ import { Mail, ArrowRight } from "lucide-react";
 // --- CONFIGURAZIONE CONTATTI ---
 const CONTACT_INFO = {
   whatsapp: "393471700483", // Inserisci il tuo numero
-  email: "info@smsteal.com", // Inserisci la tua email
-  instagram: "sm.steal", // Il tuo username
+  email: "contact@heatlab.it", // Inserisci la tua email
+  instagram: "heat.lab_", // Il tuo username
   address: "Andria, Italia", // Opzionale
 };
 
@@ -101,7 +101,7 @@ export default function ContactPage() {
                 Instagram
               </h3>
               <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-1">
-                @sm.steal
+                @heat.lab_
               </p>
             </div>
             <p className="text-gray-500 text-sm">

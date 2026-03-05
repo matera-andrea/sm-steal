@@ -9,6 +9,8 @@ import {
   Truck,
   AlertTriangle,
   ShieldCheck,
+  FileText,
+  Info,
 } from "lucide-react";
 
 export default function TermsPage() {
@@ -57,11 +59,11 @@ export default function TermsPage() {
             </h2>
           </div>
           <p className="text-gray-700 leading-relaxed font-medium">
-            Il sito <strong>SM.STEAL</strong> è di proprietà di{" "}
-            <strong>Samuele Matera</strong> (di seguito "Venditore"). L'accesso
-            e l'uso del sito, così come l'acquisto dei prodotti, presuppongono
-            la lettura, la conoscenza e l'accettazione di queste Condizioni
-            Generali di Vendita.
+            Il sito <strong>Heat Lab</strong> è di proprietà di{" "}
+            <strong>Samuele Francesco Matera</strong> (di seguito "Venditore").
+            L'accesso e l'uso del sito, così come l'acquisto dei prodotti,
+            presuppongono la lettura, la conoscenza e l'accettazione di queste
+            Condizioni Generali di Vendita.
           </p>
         </div>
 
@@ -74,16 +76,16 @@ export default function TermsPage() {
             </h3>
             <div className="bg-gray-50 p-6 rounded-2xl border border-gray-200 text-gray-700 text-sm space-y-2 font-mono">
               <p>
-                <strong>Ditta / Titolare:</strong> Samuele Matera
+                <strong>Ditta / Titolare:</strong> Samuele Francesco Matera
               </p>
               <p>
                 <strong>Sede Legale:</strong> Via Saffo 1, Andria (BT)
               </p>
               <p>
-                <strong>P.IVA:</strong> [INSERISCI P.IVA]
+                <strong>P.IVA:</strong> IT09035330720
               </p>
               <p>
-                <strong>Email:</strong> info@smsteal.com
+                <strong>Email:</strong> contact@heatlab.it
               </p>
             </div>
           </section>
@@ -98,15 +100,15 @@ export default function TermsPage() {
             </div>
             <ul className="list-disc pl-5 space-y-3 text-gray-600 font-medium">
               <li>
-                <strong>Autenticità:</strong> SM.STEAL garantisce che tutti i
+                <strong>Autenticità:</strong> Heat Lab garantisce che tutti i
                 prodotti venduti sono 100% originali e autentici. Ogni articolo
                 viene sottoposto a rigorosi controlli (Legit Check) prima della
                 vendita.
               </li>
               <li>
                 <strong>Stato d'uso:</strong> I prodotti possono essere "Nuovi"
-                (Deadstock) o "Usati" (Pre-Loved). Lo stato di conservazione è
-                chiaramente indicato nella scheda prodotto.
+                (Deadstock) o "Usati". Lo stato di conservazione è chiaramente
+                indicato nella scheda prodotto.
               </li>
               <li>
                 <strong>Immagini:</strong> Le immagini dei prodotti usati sono
@@ -153,9 +155,7 @@ export default function TermsPage() {
               4. Prezzi e Pagamenti
             </h3>
             <p className="text-gray-600 font-medium mb-4">
-              I prezzi indicati sul sito sono espressi in Euro (€) e si
-              intendono comprensivi di IVA (se applicabile in base al regime
-              fiscale, es. Regime del Margine per beni usati). I costi di
+              I prezzi indicati sul sito sono espressi in Euro (€). I costi di
               spedizione non sono inclusi nel prezzo del prodotto salvo diversa
               indicazione.
             </p>
@@ -164,13 +164,10 @@ export default function TermsPage() {
             </p>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <li className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm font-bold">
-                Bonifico Bancario
+                Bonifico Bancario Istantaneo
               </li>
               <li className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm font-bold">
-                PayPal (Beni e Servizi)
-              </li>
-              <li className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm font-bold">
-                Carte (via Stripe Link)
+                PayPal
               </li>
             </ul>
           </section>
@@ -184,16 +181,17 @@ export default function TermsPage() {
               </h3>
             </div>
             <p className="text-gray-600 font-medium leading-relaxed">
-              Le spedizioni vengono effettuate tramite corriere espresso (DHL,
-              UPS, Bartolini). I tempi di consegna sono indicativamente di 24-48
-              ore lavorative dalla spedizione. Il Venditore non è responsabile
-              per ritardi dovuti al corriere o cause di forza maggiore, tuttavia
-              forniamo assistenza completa in caso di smarrimento del pacco
-              (spedizioni assicurate su richiesta).
+              Le spedizioni vengono effettuate tramite corriere espresso
+              tracciato (DHL, UPS, Bartolini). I tempi di consegna sono
+              indicativamente di 24-48 ore lavorative dalla spedizione. Il costo
+              standard della spedizione è di 10€. In caso di smarrimento del
+              pacco da parte del corriere, il Venditore si occuperà di gestire
+              il reclamo e garantirà il rimborso o la sostituzione
+              dell'articolo.
             </p>
           </section>
 
-          {/* ART 6: RESI E RIMBORSI (Critico) */}
+          {/* ART 6: RESI E RIMBORSI */}
           <section className="bg-amber-50 p-8 md:p-10 rounded-[2rem] border-2 border-amber-200/50">
             <div className="flex items-center gap-3 mb-4">
               <AlertTriangle className="text-amber-600" />
@@ -203,33 +201,40 @@ export default function TermsPage() {
             </div>
             <div className="text-gray-800 font-medium space-y-4 text-sm leading-relaxed">
               <p>
-                Data la natura dei beni (prodotti da collezione, edizioni
-                limitate e beni usati "visti e piaciuti"),
-                <strong>
-                  {" "}
-                  SM.STEAL accetta richieste di reso esclusivamente nelle
-                  seguenti circostanze:
-                </strong>
+                Heat Lab offre un servizio di reso su tutti i prodotti in
+                catalogo. Ai sensi della normativa vigente, il Cliente ha il
+                diritto di recedere dal contratto entro{" "}
+                <strong>14 giorni</strong> dal ricevimento dei prodotti.
               </p>
-              <ul className="list-disc pl-5 space-y-1">
+              <ul className="list-disc pl-5 space-y-2">
                 <li>
-                  Il prodotto ricevuto non corrisponde alla descrizione (es.
-                  taglia errata, modello errato).
+                  <strong>Procedura:</strong> Per richiedere il reso, contattare
+                  il servizio clienti tramite WhatsApp o e-mail specificando il
+                  motivo della richiesta. Una volta approvato, verrà fornita
+                  un'etichetta di spedizione per il rientro.
                 </li>
                 <li>
-                  Il prodotto presenta difetti gravi non segnalati nelle foto o
-                  nella descrizione (autenticità fallita).
+                  <strong>Costi:</strong> Le spese e gli oneri di restituzione
+                  sono a carico del cliente e verranno detratti dall'importo
+                  totale del rimborso. Il rimborso non include i costi di
+                  spedizione sostenuti per l'ordine iniziale.
+                </li>
+                <li>
+                  <strong>Tempistiche:</strong> Gli articoli devono essere
+                  restituiti entro 5 giorni lavorativi dalla ricezione
+                  dell'etichetta.
+                </li>
+                <li>
+                  <strong>Condizioni:</strong> Il prodotto deve essere in
+                  perfette condizioni, correttamente imballato nella confezione
+                  originale (con doppia scatola per le sneakers) e completo di
+                  tutti gli accessori. Non devono essere presenti segni di
+                  utilizzo.
                 </li>
               </ul>
               <p>
-                Non si accettano resi per "ripensamento" o "taglia errata
-                ordinata dal cliente" una volta che il prodotto è stato spedito,
-                salvo diversi accordi presi esplicitamente in fase di trattativa
-                su WhatsApp.
-                <br />
-                <br />
-                Eventuali resi autorizzati devono essere rispediti nelle
-                medesime condizioni: box originale intatto, accessori inclusi.
+                Il rimborso verrà accreditato sul metodo di pagamento
+                originariamente utilizzato.
               </p>
             </div>
           </section>
@@ -250,6 +255,19 @@ export default function TermsPage() {
               del Consumatore, se ubicati nel territorio dello Stato.
             </p>
           </section>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-4 py-10 border-t border-gray-200">
+          <Link href="/privacy">
+            <button className="inline-flex items-center gap-2 bg-black text-white px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest hover:bg-amber-400 hover:text-black transition-all shadow-lg">
+              Privacy Policy <FileText size={14} />
+            </button>
+          </Link>
+          <Link href="/cookies">
+            <button className="inline-flex items-center gap-2 bg-white text-black border border-black px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest hover:bg-gray-100 transition-all">
+              Cookie Policy <Info size={14} />
+            </button>
+          </Link>
         </div>
       </div>
     </main>

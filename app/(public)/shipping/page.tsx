@@ -144,14 +144,10 @@ export default function ShippingReturnsPage() {
           <div className="space-y-8">
             <div className="prose prose-p:text-gray-600 prose-p:font-medium max-w-none">
               <p>
-                A causa della natura esclusiva dei prodotti (Edizioni Limitate,
-                Collezionismo, Beni Usati in conto vendita),{" "}
-                <strong>
-                  SM.STEAL non offre resi o rimborsi per "ripensamento" o
-                  "taglia errata ordinata dal cliente"
-                </strong>
-                , salvo diversi accordi scritti presi esplicitamente prima
-                dell'acquisto.
+                Heat Lab offre un servizio di reso su tutti i prodotti in
+                catalogo, nel rispetto della normativa vigente. Puoi richiedere
+                il reso entro <strong>14 giorni</strong> dalla ricezione del
+                prodotto. Le spese di restituzione sono a carico del cliente.
               </p>
             </div>
 
@@ -159,7 +155,7 @@ export default function ShippingReturnsPage() {
               {/* QUANDO ACCETTIAMO IL RESO */}
               <div className="bg-green-50 p-6 rounded-2xl border border-green-100">
                 <h3 className="flex items-center gap-2 font-black uppercase text-green-700 mb-4 text-sm">
-                  <CheckCircle2 size={18} /> Reso Accettato Se:
+                  <CheckCircle2 size={18} /> Reso Accettato (Gratuito) Se:
                 </h3>
                 <ul className="space-y-3 text-sm font-medium text-green-800/80">
                   <li className="flex items-start gap-2">
@@ -187,17 +183,17 @@ export default function ShippingReturnsPage() {
                 <ul className="space-y-3 text-sm font-medium text-red-800/80">
                   <li className="flex items-start gap-2">
                     <span className="mt-1.5 w-1.5 h-1.5 bg-red-500 rounded-full shrink-0" />
-                    Hai ordinato la taglia sbagliata (ti consigliamo di
-                    chiederci le misure in cm prima).
+                    Il prodotto è stato indossato o utilizzato (oltre la normale
+                    prova su superficie pulita).
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="mt-1.5 w-1.5 h-1.5 bg-red-500 rounded-full shrink-0" />
-                    Hai cambiato idea dopo la spedizione.
+                    Il sigillo di garanzia o i tag originali sono stati rimossi.
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="mt-1.5 w-1.5 h-1.5 bg-red-500 rounded-full shrink-0" />
-                    Il prodotto è stato indossato, o il sigillo di garanzia/tag
-                    è stato rimosso.
+                    Mancano accessori, scatola originale o il box è stato
+                    danneggiato durante il rientro.
                   </li>
                 </ul>
               </div>
@@ -208,22 +204,28 @@ export default function ShippingReturnsPage() {
               <h3 className="font-black uppercase text-sm mb-3">
                 Procedura di Reso
               </h3>
-              <p className="text-gray-600 text-sm font-medium mb-4">
-                Se rientri nei casi di reso accettato, hai{" "}
-                <strong>14 giorni</strong> dalla ricezione per contattarci.
-              </p>
               <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600 font-medium bg-gray-50 p-6 rounded-2xl border border-gray-200">
                 <li>
-                  Scrivici su WhatsApp o via Email indicando il numero ordine e
-                  il problema.
+                  Scrivici su WhatsApp o via Email entro <strong>14 giorni</strong>{" "}
+                  dalla ricezione, indicando il numero ordine e il motivo del reso.
                 </li>
-                <li>Inviaci foto dettagliate del difetto o dell'errore.</li>
                 <li>
-                  Attendi la nostra autorizzazione (RMA) e l'etichetta di
-                  spedizione prepagata (se errore nostro).
+                  Attendi l'approvazione e riceverai l'etichetta di spedizione.
                 </li>
-                <li>Imballa il prodotto nella doppia scatola originale.</li>
+                <li>
+                  Restituisci il prodotto entro <strong>5 giorni lavorativi</strong>{" "}
+                  dalla ricezione dell'etichetta.
+                </li>
+                <li>
+                  Imballa il prodotto nella doppia scatola originale (Double Box)
+                  con tutti gli accessori.
+                </li>
               </ol>
+              <p className="text-gray-500 text-xs mt-4">
+                * Le spese di restituzione verranno trattenute dall'importo del
+                rimborso. Il rimborso verrà emesso sul metodo di pagamento
+                originale o come store credit (valido 12 mesi).
+              </p>
             </div>
           </div>
         </section>

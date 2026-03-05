@@ -53,9 +53,21 @@ const faqCategories: FaqCategory[] = [
           "Spediamo in tutta Italia tramite corriere espresso tracciato (DHL, UPS o Bartolini). La consegna avviene solitamente in 24/48 ore lavorative dal momento della spedizione. Il costo standard è di 10€, ma è spesso gratuito per ordini superiori a una certa cifra o durante promozioni speciali.",
       },
       {
-        question: "Posso effettuare un reso?",
+        question: "Come funziona il servizio di reso?",
         answer:
-          "Trattando articoli da collezione e limitati (spesso in conto vendita), accettiamo resi solo in caso di errore nostro (es. taglia inviata sbagliata) o se il prodotto presenta difetti non segnalati. Non accettiamo resi per 'cambio idea' o 'taglia errata ordinata dal cliente'. Ti consigliamo di chiederci tutte le misure in cm su WhatsApp prima di acquistare.",
+          "HeatLab offre un servizio di reso su tutti i prodotti in catalogo. Puoi richiedere il reso entro 14 giorni dal ricevimento contattando il nostro servizio clienti tramite WhatsApp o e-mail (pagina contatti), specificando il motivo della richiesta. Una volta approvato il reso, ti verrà fornita un’etichetta di spedizione da utilizzare per restituire i prodotti.",
+      },
+      {
+        question:
+          "Quali sono le spese di restituzione e le modalità di rimborso?",
+        answer:
+          "Le spese e gli oneri di restituzione sono a carico del cliente e verranno detratti dall’importo totale del rimborso, che non include i costi di spedizione sostenuti per l’ordine iniziale. Gli articoli devono essere restituiti entro cinque giorni lavorativi dalla ricezione dell’etichetta di ritorno. Il rimborso verrà accreditato sul metodo di pagamento originariamente utilizzato.",
+      },
+      {
+        question:
+          "Quali sono le condizioni per l’esercizio del diritto di recesso?",
+        answer:
+          "È essenziale che il prodotto sia restituito in perfette condizioni, correttamente imballato nella confezione originale (con doppia scatola per le sneakers) e completo di tutti gli accessori. Non devono essere presenti segni di utilizzo, se non quelli compatibili con una normale prova (es. su superficie pulita). HeatLab si riserva il diritto di applicare penali fino al 100% del valore per articoli restituiti errati, non conformi o con segni di utilizzo non compatibili.",
       },
       {
         question: "Cosa succede se il pacco viene smarrito?",
@@ -70,13 +82,11 @@ const faqCategories: FaqCategory[] = [
     items: [
       {
         question: "Quali metodi di pagamento accettate?",
-        answer:
-          "Accettiamo Bonifico Bancario Istantaneo e PayPal. Per PayPal, consigliamo l'opzione 'Beni e Servizi' che offre la protezione acquisti al cliente (con una piccola commissione a carico dell'acquirente). Accettiamo anche carte tramite link di pagamento sicuro Stripe se richiesto.",
+        answer: "Accettiamo Bonifico Bancario Istantaneo e PayPal. ",
       },
       {
         question: "È possibile pagare a rate?",
-        answer:
-          "Al momento non offriamo piani rateali diretti (come Klarna) tramite la vendita WhatsApp. Stiamo lavorando per integrare queste soluzioni nel prossimo futuro.",
+        answer: "Al momento non offriamo piani rateali diretti.",
       },
     ],
   },
@@ -87,12 +97,12 @@ const faqCategories: FaqCategory[] = [
       {
         question: "Le scarpe sono originali?",
         answer:
-          "Assolutamente sì. 100% Legit. Ogni singolo paio viene ispezionato manualmente dal nostro team di esperti prima di essere messo in vendita. Controlliamo cuciture, materiali, etichette, box e odore. Non trattiamo repliche, factory flaws non segnalati o prodotti dubbi. La tua sicurezza è il nostro business.",
+          "Assolutamente sì. 100% Legit. Ogni singolo paio viene ispezionato manualmente prima di essere messo in vendita. Controlliamo cuciture, materiali, etichette, box e odore. Non trattiamo repliche, factory flaws non segnalati o prodotti dubbi. La tua sicurezza è il nostro business.",
       },
       {
         question: "Le scarpe sono nuove o usate?",
         answer:
-          "Vendiamo sia prodotti 'Deadstock' (Nuovi, mai indossati, con box originale) che 'Pre-Loved' (Usati). Lo stato è sempre chiaramente indicato nell'annuncio: NEW, LIKE NEW, VERY GOOD, etc. Per i prodotti usati, forniamo foto dettagliate di ogni imperfezione su richiesta.",
+          "Vendiamo sia prodotti 'Deadstock' (Nuovi, mai indossati, con box originale) che Usati. Lo stato è sempre chiaramente indicato nell'annuncio: NEW, LIKE NEW, VERY GOOD, etc. Per i prodotti usati, forniamo foto dettagliate di ogni imperfezione su richiesta.",
       },
     ],
   },
@@ -194,8 +204,8 @@ export default function FaqPage() {
             Non hai trovato la risposta?
           </h2>
           <p className="text-gray-500 mb-8 font-medium">
-            Nessun problema. Il nostro team è disponibile su WhatsApp per
-            chiarire ogni dubbio.
+            Nessun problema. siamo disponibili su WhatsApp per chiarire ogni
+            dubbio
           </p>
           <Link href="/contact-us">
             <button className="bg-black text-white px-10 py-4 rounded-full font-black uppercase tracking-widest text-xs hover:bg-amber-400 hover:text-black transition-all shadow-xl hover:shadow-2xl">
