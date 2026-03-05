@@ -79,9 +79,6 @@ export default function TermsPage() {
                 <strong>Ditta / Titolare:</strong> Samuele Francesco Matera
               </p>
               <p>
-                <strong>Sede Legale:</strong> Via Saffo 1, Andria (BT)
-              </p>
-              <p>
                 <strong>P.IVA:</strong> IT09035330720
               </p>
               <p>
