@@ -161,10 +161,13 @@ export default function TermsPage() {
             </p>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <li className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm font-bold">
-                Bonifico Bancario Istantaneo
+                Bonifico Bancario
               </li>
               <li className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm font-bold">
                 PayPal
+              </li>
+              <li className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm font-bold">
+                Revolut
               </li>
             </ul>
           </section>
@@ -179,9 +182,9 @@ export default function TermsPage() {
             </div>
             <p className="text-gray-600 font-medium leading-relaxed">
               Le spedizioni vengono effettuate tramite corriere espresso
-              tracciato (DHL, UPS, Bartolini). I tempi di consegna sono
+              tracciato (Sda, UPS, Bartolini). I tempi di consegna sono
               indicativamente di 24-48 ore lavorative dalla spedizione. Il costo
-              standard della spedizione è di 10€. In caso di smarrimento del
+              standard della spedizione è di 6,00€. In caso di smarrimento del
               pacco da parte del corriere, il Venditore si occuperà di gestire
               il reclamo e garantirà il rimborso o la sostituzione
               dell'articolo.

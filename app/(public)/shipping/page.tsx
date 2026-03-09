@@ -32,8 +32,8 @@ export default function ShippingReturnsPage() {
             Spedizioni & <span className="text-amber-400">Resi.</span>
           </h1>
           <p className="text-gray-300 text-lg font-medium max-w-2xl">
-            Tutto quello che devi sapere su come il tuo grail arriva a casa tua
-            e sulle nostre politiche di restituzione.
+            Tutto quello che devi sapere su come le tue sneakers arrivano a
+            casa tua e sulle nostre politiche di restituzione.
           </p>
         </div>
       </section>
@@ -81,7 +81,7 @@ export default function ShippingReturnsPage() {
                   </h3>
                   <p className="text-gray-600 text-sm font-medium leading-relaxed">
                     Ci affidiamo esclusivamente ai migliori:{" "}
-                    <strong>DHL Express, UPS e Bartolini</strong>. Riceverai il
+                    <strong>Sda, UPS e Bartolini</strong>. Riceverai il
                     codice di tracciamento via email o WhatsApp appena il pacco
                     parte.
                   </p>
@@ -99,14 +99,14 @@ export default function ShippingReturnsPage() {
                   <ul className="text-gray-600 text-sm font-medium space-y-2">
                     <li className="flex justify-between border-b border-gray-100 pb-1">
                       <span>Italia (24/48h)</span>
-                      <strong>€10,00</strong>
+                      <strong>€6,00</strong>
                     </li>
                     <li className="flex justify-between border-b border-gray-100 pb-1">
                       <span>Europa (3-5 gg)</span>
-                      <strong>€18,00</strong>
+                      <strong>€15,00</strong>
                     </li>
                     <li className="flex justify-between text-amber-600">
-                      <span>Ritiro a Mano (BT/FG)</span>
+                      <span>Ritiro a Mano (BT/BA/FG)</span>
                       <strong>Gratis</strong>
                     </li>
                   </ul>
@@ -115,7 +115,6 @@ export default function ShippingReturnsPage() {
 
               <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
                 <p className="text-xs font-medium text-gray-500">
-                  <strong className="text-black">Nota sul Double Box:</strong>{" "}
                   Tutte le scarpe vengono spedite in doppia scatola per
                   proteggere il box originale da urti e danni durante il
                   trasporto.
@@ -166,11 +165,7 @@ export default function ShippingReturnsPage() {
                   <li className="flex items-start gap-2">
                     <span className="mt-1.5 w-1.5 h-1.5 bg-green-500 rounded-full shrink-0" />
                     L'articolo presenta difetti gravi non segnalati nella
-                    descrizione o nelle foto (per l'usato).
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-1.5 w-1.5 h-1.5 bg-green-500 rounded-full shrink-0" />
-                    L'articolo si rivela non autentico (Fake). Garanzia a vita.
+                    descrizione o nelle foto.
                   </li>
                 </ul>
               </div>
@@ -240,8 +235,8 @@ export default function ShippingReturnsPage() {
                 Dubbi sulla taglia?
               </h2>
               <p className="text-black/80 font-medium max-w-md mx-auto mt-2">
-                Prima di acquistare, scrivici. Ti manderemo le misure in cm
-                della soletta interna (insole) per evitare errori.
+                Prima di acquistare, scrivici. Ti aiuteremo a scegliere la
+                taglia perfetta per te!
               </p>
             </div>
             <Link href="/contact-us">
