@@ -37,8 +37,8 @@ export default function TermsPage() {
             Termini & <span className="text-amber-400">Condizioni.</span>
           </h1>
           <p className="text-gray-300 text-lg font-medium max-w-2xl">
-            Le regole del gioco. Leggi attentamente le condizioni che regolano
-            l'acquisto dei nostri prodotti.
+            Leggi attentamente le condizioni che regolano l'acquisto dei nostri
+            prodotti.
           </p>
           <p className="text-gray-500 text-sm mt-4 font-mono">
             Ultimo aggiornamento: {currentDate}
@@ -211,7 +211,7 @@ export default function TermsPage() {
                   <strong>Procedura:</strong> Per richiedere il reso, contattare
                   il servizio clienti tramite WhatsApp o e-mail specificando il
                   motivo della richiesta. Una volta approvato, verrà fornita
-                  un'etichetta di spedizione per il rientro.
+                  un'etichetta di spedizione per la restituzione.
                 </li>
                 <li>
                   <strong>Costi:</strong> Le spese e gli oneri di restituzione

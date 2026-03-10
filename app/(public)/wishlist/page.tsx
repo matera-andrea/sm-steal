@@ -74,10 +74,11 @@ export default function WishlistPage() {
 
                 <div className="relative z-10 max-w-md space-y-4">
                   <h2 className="text-4xl font-black uppercase italic tracking-tight text-gray-900">
-                    La tua rotation è vuota
+                    La tua wishlist è vuota.
                   </h2>
                   <p className="text-gray-500 font-medium">
-                    Non hai ancora salvato nessun prodotto. Esplora il nostro catalogo e salva i kicks che desideri copiare in futuro.
+                    Non hai ancora salvato nessun prodotto. Esplora il nostro
+                    catalogo e aggiungi i tuoi preferiti alla wishlist!
                   </p>
                 </div>
 

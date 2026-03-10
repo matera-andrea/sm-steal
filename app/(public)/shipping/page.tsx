@@ -29,7 +29,7 @@ export default function ShippingReturnsPage() {
             <ArrowLeft size={12} /> Torna alla Home
           </Link>
           <h1 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter leading-none mb-6">
-            Spedizioni & <span className="text-amber-400">Resi.</span>
+              i & <span className="text-amber-400">Resi.</span>
           </h1>
           <p className="text-gray-300 text-lg font-medium max-w-2xl">
             Tutto quello che devi sapere su come le tue sneakers arrivano a
@@ -67,7 +67,7 @@ export default function ShippingReturnsPage() {
                   <p className="text-gray-600 text-sm font-medium leading-relaxed">
                     Tutti gli ordini vengono elaborati entro{" "}
                     <strong>24 ore lavorative</strong> dalla ricezione del
-                    pagamento. Se ordini entro le 12:00, spesso spediamo in
+                    pagamento. Se ordini entro le 12:00, l'ordine sarà evaso in
                     giornata.
                   </p>
                 </div>
@@ -112,14 +112,6 @@ export default function ShippingReturnsPage() {
                   </ul>
                 </div>
               </div>
-
-              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                <p className="text-xs font-medium text-gray-500">
-                  Tutte le scarpe vengono spedite in doppia scatola per
-                  proteggere il box originale da urti e danni durante il
-                  trasporto.
-                </p>
-              </div>
             </div>
           </div>
         </section>
@@ -147,6 +139,20 @@ export default function ShippingReturnsPage() {
                 catalogo, nel rispetto della normativa vigente. Puoi richiedere
                 il reso entro <strong>14 giorni</strong> dalla ricezione del
                 prodotto. Le spese di restituzione sono a carico del cliente.
+              </p>
+              <p>
+                Condizione essenziale per l'esercizio del diritto di recesso è
+                l'integrità del prodotto da restituire: il bene deve essere
+                restituito in perfetto stato di conservazione ed eventuali spese
+                di ripristino del prodotto potrebbero essere addebitate al
+                cliente.
+              </p>
+              <p>
+                HeatLab si riserva il diritto di applicare penali fino al{" "}
+                <strong>100% del valore del prodotto</strong> per articoli
+                restituiti errati, non conformi o con accessori mancanti, così
+                come per articoli che presentano segni di utilizzo non
+                compatibili con la normale prova.
               </p>
             </div>
 
@@ -219,7 +225,8 @@ export default function ShippingReturnsPage() {
               <p className="text-gray-500 text-xs mt-4">
                 * Le spese di restituzione verranno trattenute dall'importo del
                 rimborso. Il rimborso verrà emesso sul metodo di pagamento
-                originale o come store credit (valido 12 mesi).
+                originale o come store credit (valido 12 mesi) a seconda delle
+                preferenze espresse nella richiesta di reso.
               </p>
             </div>
           </div>
