@@ -123,6 +123,14 @@ export default function Footer() {
                   Contattaci
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/shipping"
+                  className="hover:text-white transition-colors"
+                >
+                  Spedizioni e Resi
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -156,14 +164,6 @@ export default function Footer() {
                   Termini di Servizio
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/shipping"
-                  className="hover:text-white transition-colors"
-                >
-                  Spedizioni e Resi
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
@@ -171,8 +171,7 @@ export default function Footer() {
         {/* Barra inferiore */}
         <div className="mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">
           <div>
-            © {new Date().getFullYear()} Heat Lab — Tutti i
-            diritti riservati
+            © {new Date().getFullYear()} Heat Lab — Tutti i diritti riservati
           </div>
           <div className="flex gap-6">
             <span>Samuele Francesco Matera - P.IVA: IT09035330720</span>
