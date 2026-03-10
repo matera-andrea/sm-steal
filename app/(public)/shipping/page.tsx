@@ -29,7 +29,7 @@ export default function ShippingReturnsPage() {
             <ArrowLeft size={12} /> Torna alla Home
           </Link>
           <h1 className="text-5xl md:text-7xl font-black uppercase italic tracking-tighter leading-none mb-6">
-              i & <span className="text-amber-400">Resi.</span>
+              Spedizioni & <span className="text-amber-400">Resi.</span>
           </h1>
           <p className="text-gray-300 text-lg font-medium max-w-2xl">
             Tutto quello che devi sapere su come le tue sneakers arrivano a
