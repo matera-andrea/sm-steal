@@ -146,8 +146,7 @@ export async function GET(request: NextRequest) {
           take: limit,
           orderBy: [
             { isFeatured: "desc" },
-            { hasStock: "desc" },
-            { createdAt: "desc" },
+            { item: { sneakerModel: { name: "asc" } } }
           ],
           include: listingInclude,
         }),
