@@ -36,7 +36,7 @@ export default function ShopTopBar({
   onSortChange,
 }: ShopTopBarProps) {
   return (
-    <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 py-6 mb-8 transition-all">
+    <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 py-3 md:py-6 mb-4 md:mb-8 transition-all">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-black">
         {/* 1. Titolo */}
         <div className="flex items-baseline gap-2 w-full md:w-auto">

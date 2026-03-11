@@ -35,17 +35,17 @@ export default function ProductCard({ listing }: ProductCardProps) {
         {" "}
         {/* h-full per allineare le card */}
         {/* IMAGE CONTAINER */}
-        <div className="relative aspect-square overflow-hidden rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.05)] group-hover:shadow-[0_0_20px_rgba(0,0,0,0.1)] transition-shadow duration-300">
+        <div className="relative aspect-square overflow-hidden rounded-xl md:rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.05)] group-hover:shadow-[0_0_20px_rgba(0,0,0,0.1)] transition-shadow duration-300">
           <Image
             src={photoUrl}
             alt={displayTitle}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
-            className="object-contain p-4 w-full h-full group-hover:scale-105 transition-transform duration-300"
+            className="object-contain p-2 md:p-4 w-full h-full group-hover:scale-105 transition-transform duration-300"
           />
         </div>
         {/* INFO CONTAINER */}
-        <div className="mt-4 flex flex-col gap-1">
+        <div className="mt-2 md:mt-4 flex flex-col gap-0 md:gap-1">
           {/* Titolo Principale (Brand + Modello) */}
           <h3 className="text-sm font-black uppercase italic leading-tight text-black">
             {modelName}
@@ -53,13 +53,13 @@ export default function ProductCard({ listing }: ProductCardProps) {
 
           {/* Sottotitolo (Extra Name) se presente */}
           {extraName && (
-            <p className="text-xs font-bold uppercase tracking-wide text-gray-400 line-clamp-1">
+            <p className="text-[10px] md:text-xs font-bold uppercase tracking-wide text-gray-400 line-clamp-1">
               {extraName}
             </p>
           )}
 
           {/* Prezzo */}
-          <p className="text-lg font-black mt-1">
+          <p className="text-base md:text-lg font-black mt-0.5 md:mt-1">
             {startingPrice > 0 ? `Da €${startingPrice}` : "Esaurito"}
           </p>
         </div>

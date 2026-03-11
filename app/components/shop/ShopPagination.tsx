@@ -14,7 +14,7 @@ export default function ShopPagination({
   isLoading,
 }: ShopPaginationProps) {
   return (
-    <div className="mt-24 flex justify-center items-center gap-8 border-t border-gray-100 pt-12 text-black">
+    <div className="mt-12 md:mt-24 mb-16 md:mb-0 flex justify-center items-center gap-8 border-t border-gray-100 pt-8 md:pt-12 text-black">
       <button
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1 || isLoading}

@@ -144,9 +144,6 @@ Sono ancora disponibili? Grazie!`;
             <div className="lg:sticky lg:top-28 space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-700">
               <header className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <span className="bg-black text-white text-[10px] font-black uppercase px-2 py-1 rounded">
-                    {listing.item.category}
-                  </span>
                   {listing.isFeatured && (
                     <span className="bg-amber-400 text-black text-[10px] font-black uppercase px-2 py-1 rounded">
                       In Evidenza
@@ -155,14 +152,16 @@ Sono ancora disponibili? Grazie!`;
                 </div>
 
                 <div>
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-[0.9] pr-4">
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-800 to-black pr-4">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black uppercase italic tracking-tighter leading-[1.1] md:leading-[0.9] -ml-2 overflow-visible">
+                    <span className="text-transparent bg-clip-text bg-linear-to-r from-gray-800 to-black px-2 py-1 box-decoration-clone">
                       {modelName}
                     </span>
                   </h1>
                   {extraName && (
-                    <p className="text-2xl md:text-3xl font-black uppercase italic tracking-tighter text-gray-400 mt-1 leading-none">
-                      {extraName}
+                    <p className="text-2xl md:text-3xl font-black uppercase italic tracking-tighter text-gray-400 mt-1 leading-none -ml-1 overflow-visible">
+                      <span className="px-1 py-1 box-decoration-clone">
+                        {extraName}
+                      </span>
                     </p>
                   )}
                 </div>

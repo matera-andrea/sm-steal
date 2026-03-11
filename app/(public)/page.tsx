@@ -15,8 +15,8 @@ export default async function Home() {
     <main className="min-h-screen bg-white">
       <HeroSlideshow slides={slides} />
 
-      <section className="container mx-auto py-20 px-4">
-        <div className="flex justify-between items-end mb-12">
+      <section className="container mx-auto py-8 md:py-20 px-4">
+        <div className="flex justify-between items-end mb-6 md:mb-12">
           <div>
             <h2 className="text-4xl font-black uppercase italic tracking-tight">
               Nuovi Arrivi
@@ -27,7 +27,7 @@ export default async function Home() {
             href="/shop"
             className="text-sm font-bold uppercase tracking-widest hover:text-amber-500 transition-colors"
           >
-            Vedi Tutto →
+            Vedi Tutto
           </Link>
         </div>
         <Suspense
