@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Image as ImageIcon } from "lucide-react";
+import { Loader2, Image as ImageIcon, X } from "lucide-react";
 
 // DND Kit Imports
 import {
@@ -30,6 +30,8 @@ interface Slide {
   url: string;
   title?: string;
   subtitle?: string;
+  subtitleIsShopLink?: boolean;
+  titleIsAmber?: boolean;
   order: number;
   target: SlideTarget;
 }
@@ -53,6 +55,11 @@ export default function SlideshowManager() {
   const [title, setTitle] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [target, setTarget] = useState<SlideTarget>("all");
+  const [subtitleIsShopLink, setSubtitleIsShopLink] = useState(false);
+  const [titleIsAmber, setTitleIsAmber] = useState(false);
+
+  // Edit mode state
+  const [editingSlide, setEditingSlide] = useState<Slide | null>(null);
 
   // Sensori per DnD (Pointer per mouse/touch, Keyboard per accessibilità)
   const sensors = useSensors(
@@ -125,6 +132,8 @@ export default function SlideshowManager() {
       formData.append("title", title);
       formData.append("subtitle", subtitle);
       formData.append("target", target);
+      formData.append("subtitleIsShopLink", String(subtitleIsShopLink));
+      formData.append("titleIsAmber", String(titleIsAmber));
       await fetch("/api/slideshow", { method: "POST", body: formData });
 
       // Reset e Refetch
@@ -133,6 +142,8 @@ export default function SlideshowManager() {
       setTitle("");
       setSubtitle("");
       setTarget("all");
+      setSubtitleIsShopLink(false);
+      setTitleIsAmber(false);
       queryClient.invalidateQueries({ queryKey: ["admin-slides"] });
     } catch (e) {
       console.error("Errore caricamento slide", e);
@@ -144,9 +155,60 @@ export default function SlideshowManager() {
   const handleDelete = async (id: string) => {
     if (!confirm("Eliminare slide?")) return;
     await fetch(`/api/slideshow/${id}`, { method: "DELETE" });
-    // Ottimisticamente rimuovi dalla lista locale
     setLocalSlides((prev) => prev.filter((s) => s.id !== id));
+    // If we were editing the deleted slide, exit edit mode
+    if (editingSlide?.id === id) handleCancelEdit();
     queryClient.invalidateQueries({ queryKey: ["admin-slides"] });
+  };
+
+  // --- HANDLER: Edit (populate form) ---
+  const handleEdit = (slide: { id: string; url: string; title?: string; subtitle?: string; subtitleIsShopLink?: boolean; titleIsAmber?: boolean; order: number; target: string }) => {
+    setEditingSlide({ ...slide, target: (slide.target || "all") as SlideTarget });
+    setTitle(slide.title || "");
+    setSubtitle(slide.subtitle || "");
+    setSubtitleIsShopLink(slide.subtitleIsShopLink || false);
+    setTitleIsAmber(slide.titleIsAmber || false);
+    setTarget((slide.target || "all") as SlideTarget);
+    setPreviewUrl(slide.url);
+    setFile(null);
+  };
+
+  // --- HANDLER: Cancel Edit ---
+  const handleCancelEdit = () => {
+    setEditingSlide(null);
+    setTitle("");
+    setSubtitle("");
+    setSubtitleIsShopLink(false);
+    setTitleIsAmber(false);
+    setTarget("all");
+    setPreviewUrl(null);
+    setFile(null);
+  };
+
+  // --- HANDLER: Update (PUT) ---
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingSlide) return;
+    setIsSubmitting(true);
+    try {
+      await fetch(`/api/slideshow/${editingSlide.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          subtitle,
+          subtitleIsShopLink,
+          titleIsAmber,
+          target,
+        }),
+      });
+      handleCancelEdit();
+      queryClient.invalidateQueries({ queryKey: ["admin-slides"] });
+    } catch (e) {
+      console.error("Errore aggiornamento slide", e);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -181,6 +243,7 @@ export default function SlideshowManager() {
                       key={slide.id}
                       slide={slide}
                       onDelete={handleDelete}
+                      onEdit={handleEdit}
                     />
                   ))}
                 </div>
@@ -189,16 +252,24 @@ export default function SlideshowManager() {
           )}
         </div>
 
-        {/* ... Form Upload ... (Codice invariato) */}
         <div className="lg:col-span-5">
-          {/* ... Incolla qui il form che hai già ... */}
           <div className="bg-gray-50 p-6 rounded-[2.5rem] border border-gray-100 sticky top-10">
-            {/* ... codice form ... */}
-            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-gray-400 mb-6">
-              Add New Slide
-            </h2>
-            <form onSubmit={handleUpload} className="space-y-6">
-              {/* ... Box Immagine ... */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xs font-black uppercase tracking-[0.3em] text-gray-400">
+                {editingSlide ? "Modifica Slide" : "Add New Slide"}
+              </h2>
+              {editingSlide && (
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="p-1 text-gray-400 hover:text-black transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              )}
+            </div>
+            <form onSubmit={editingSlide ? handleUpdate : handleUpload} className="space-y-6">
+              {/* Image box */}
               <div className="relative aspect-video bg-white rounded-2xl border-2 border-dashed border-gray-200 hover:border-black transition-colors overflow-hidden group">
                 {previewUrl ? (
                   <Image
@@ -244,6 +315,35 @@ export default function SlideshowManager() {
                 />
               </div>
 
+              {/* Toggles */}
+              <div className="space-y-3">
+                {/* Title Amber Toggle */}
+                <label className="flex items-center gap-3 bg-white p-4 rounded-xl cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={titleIsAmber}
+                    onChange={(e) => setTitleIsAmber(e.target.checked)}
+                    className="w-4 h-4 accent-amber-500"
+                  />
+                  <span className="text-xs font-bold uppercase text-gray-400">
+                    Rendi il titolo ambra
+                  </span>
+                </label>
+
+                {/* Subtitle Link Toggle */}
+                <label className="flex items-center gap-3 bg-white p-4 rounded-xl cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={subtitleIsShopLink}
+                    onChange={(e) => setSubtitleIsShopLink(e.target.checked)}
+                    className="w-4 h-4 accent-black"
+                  />
+                  <span className="text-xs font-bold uppercase text-gray-400">
+                    Rendi il sottotitolo un link a /shop
+                  </span>
+                </label>
+              </div>
+
               {/* Target Device */}
               <div className="space-y-2">
                 <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">
@@ -269,15 +369,27 @@ export default function SlideshowManager() {
 
               <button
                 type="submit"
-                disabled={!file || isSubmitting}
-                className="w-full py-4 bg-black text-white font-black uppercase tracking-[0.2em] text-xs rounded-xl hover:bg-amber-400 hover:text-black transition-all"
+                disabled={editingSlide ? isSubmitting : (!file || isSubmitting)}
+                className="w-full py-4 bg-black text-white font-black uppercase tracking-[0.2em] text-xs rounded-xl hover:bg-amber-400 hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
-                  <Loader2 className="animate-spin" />
+                  <Loader2 className="animate-spin mx-auto" />
+                ) : editingSlide ? (
+                  "Salva Modifiche"
                 ) : (
                   "Add Slide"
                 )}
               </button>
+
+              {editingSlide && (
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="w-full py-3 border-2 border-gray-200 text-gray-400 font-black uppercase tracking-[0.2em] text-xs rounded-xl hover:border-black hover:text-black transition-all"
+                >
+                  Annulla Modifica
+                </button>
+              )}
             </form>
           </div>
         </div>

@@ -9,6 +9,8 @@ import { checkAdmin } from "@/app/lib/apiAdminCheck";
 const slideshowSchema = z.object({
   title: z.string().max(200).default(""),
   subtitle: z.string().max(500).default(""),
+  subtitleIsShopLink: z.preprocess((val) => val === "true", z.boolean()).default(false),
+  titleIsAmber: z.preprocess((val) => val === "true", z.boolean()).default(false),
   target: z.enum(["all", "desktop", "mobile"]).default("all"),
 });
 
@@ -51,6 +53,8 @@ export async function POST(request: NextRequest) {
     const validation = slideshowSchema.safeParse({
       title: formData.get("title"),
       subtitle: formData.get("subtitle"),
+      subtitleIsShopLink: formData.get("subtitleIsShopLink"),
+      titleIsAmber: formData.get("titleIsAmber"),
       target: formData.get("target"),
     });
     if (!validation.success) {
@@ -59,7 +63,7 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    const { title, subtitle, target } = validation.data;
+    const { title, subtitle, subtitleIsShopLink, titleIsAmber, target } = validation.data;
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const fileExtension = file.name.split(".").pop();
@@ -77,6 +81,8 @@ export async function POST(request: NextRequest) {
           url: publicUrl,
           title: title || "",
           subtitle: subtitle || "",
+          subtitleIsShopLink,
+          titleIsAmber,
           target,
           order: 0,
         },

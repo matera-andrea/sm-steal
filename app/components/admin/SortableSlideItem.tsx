@@ -2,7 +2,7 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Trash2 } from "lucide-react";
+import { GripVertical, Pencil, Trash2 } from "lucide-react";
 import Image from "next/image";
 
 const TARGET_LABELS: Record<string, string> = {
@@ -16,15 +16,19 @@ interface Slide {
   url: string;
   title?: string;
   subtitle?: string;
-  target?: string;
+  subtitleIsShopLink?: boolean;
+  titleIsAmber?: boolean;
+  order: number;
+  target: string;
 }
 
 interface Props {
   slide: Slide;
   onDelete: (id: string) => void;
+  onEdit: (slide: Slide) => void;
 }
 
-export function SortableSlideItem({ slide, onDelete }: Props) {
+export function SortableSlideItem({ slide, onDelete, onEdit }: Props) {
   const {
     attributes,
     listeners,
@@ -79,12 +83,20 @@ export function SortableSlideItem({ slide, onDelete }: Props) {
       </div>
 
       {/* Actions */}
-      <button
-        onClick={() => onDelete(slide.id)}
-        className="p-2 text-gray-300 hover:text-red-500 transition-colors"
-      >
-        <Trash2 size={18} />
-      </button>
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => onEdit(slide)}
+          className="p-2 text-gray-300 hover:text-amber-500 transition-colors"
+        >
+          <Pencil size={16} />
+        </button>
+        <button
+          onClick={() => onDelete(slide.id)}
+          className="p-2 text-gray-300 hover:text-red-500 transition-colors"
+        >
+          <Trash2 size={18} />
+        </button>
+      </div>
     </div>
   );
 }

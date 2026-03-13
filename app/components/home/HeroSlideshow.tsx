@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Slide {
@@ -9,6 +10,8 @@ interface Slide {
   url: string;
   title?: string | null;
   subtitle?: string | null;
+  subtitleIsShopLink?: boolean;
+  titleIsAmber?: boolean;
   target?: string | null;
 }
 
@@ -106,16 +109,25 @@ function SlideshowPlayer({ slides }: { slides: Slide[] }) {
         <div className="max-w-3xl space-y-4">
           {/* Title */}
           {slide?.title && (
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-black uppercase tracking-tighter italic leading-[0.95]">
+            <h1 className={`text-4xl sm:text-5xl md:text-7xl font-black uppercase tracking-tighter italic leading-[0.95] ${slide.titleIsAmber ? "text-amber-400" : "text-white"}`}>
               {slide.title}
             </h1>
           )}
 
           {/* Subtitle */}
           {slide?.subtitle && (
-            <p className="text-sm sm:text-base md:text-lg text-white/70 font-light max-w-xl leading-relaxed">
-              {slide.subtitle}
-            </p>
+            slide.subtitleIsShopLink ? (
+              <Link
+                href="/shop"
+                className="text-sm sm:text-base md:text-lg text-white/70 font-light max-w-xl leading-relaxed"
+              >
+                {slide.subtitle}
+              </Link>
+            ) : (
+              <p className="text-sm sm:text-base md:text-lg text-white/70 font-light max-w-xl leading-relaxed">
+                {slide.subtitle}
+              </p>
+            )
           )}
 
           {/* Accent bar */}

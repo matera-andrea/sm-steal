@@ -5,6 +5,9 @@ import { ClerkProvider } from "@clerk/nextjs";
 import QueryProvider from "./providers/QueryProvider";
 import { Toaster } from "sonner";
 import LegalBlinkBanner from "./components/common/LegalBlinkBanner";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,6 +44,8 @@ export default function RootLayout({
 
             {/* <LegalBlinkBanner /> */}
             <LegalBlinkBanner />
+            <Analytics />
+            <SpeedInsights />
           </body>
         </html>
       </QueryProvider>

@@ -32,19 +32,7 @@ function XIcon({ className }: { className?: string }) {
   );
 }
 
-function YoutubeIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      role="img"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-    </svg>
-  );
-}
+
 
 export default function AboutPage() {
   return (
@@ -185,7 +173,7 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
           {/* Instagram Card */}
           <a
             href="https://instagram.com/heat.lab_"
@@ -209,7 +197,7 @@ export default function AboutPage() {
 
           {/* X (Twitter) Card */}
           <a
-            href="https://x.com/sm.steal"
+            href="https://x.com/matera00samu"
             target="_blank"
             rel="noreferrer"
             className="group p-8 rounded-[2rem] border-2 border-gray-100 hover:border-black transition-all hover:bg-black hover:text-white flex flex-col items-center gap-6"
@@ -220,32 +208,11 @@ export default function AboutPage() {
             <div>
               <p className="font-black uppercase text-xl italic">X / Twitter</p>
               <p className="text-xs font-bold uppercase tracking-widest opacity-60 mt-1">
-                Aggiornamenti & Leak
+                @matera00samu
               </p>
             </div>
             <div className="w-full py-3 rounded-full border border-gray-200 group-hover:border-white/20 text-xs font-black uppercase tracking-widest mt-auto">
               Seguici
-            </div>
-          </a>
-
-          {/* Youtube Card */}
-          <a
-            href="https://youtube.com/@sm.steal"
-            target="_blank"
-            rel="noreferrer"
-            className="group p-8 rounded-[2rem] border-2 border-gray-100 hover:border-black transition-all hover:bg-black hover:text-white flex flex-col items-center gap-6"
-          >
-            <div className="p-4 bg-gray-50 rounded-full group-hover:bg-white/10 transition-colors">
-              <YoutubeIcon className="w-8 h-8" />
-            </div>
-            <div>
-              <p className="font-black uppercase text-xl italic">YouTube</p>
-              <p className="text-xs font-bold uppercase tracking-widest opacity-60 mt-1">
-                Review & Unboxing
-              </p>
-            </div>
-            <div className="w-full py-3 rounded-full border border-gray-200 group-hover:border-white/20 text-xs font-black uppercase tracking-widest mt-auto">
-              Iscriviti
             </div>
           </a>
         </div>
