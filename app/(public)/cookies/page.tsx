@@ -197,6 +197,24 @@ export default function CookiePolicyPage() {
           </div>
         </section>
 
+[AGGIUNTA]
+        {/* ANALYTICS E PERFORMANCE */}
+        <section className="bg-white p-8 md:p-10 rounded-[2rem] shadow-md border border-gray-100">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="p-3 bg-purple-100 text-purple-600 rounded-xl">
+              <Globe size={24} />
+            </div>
+            <h2 className="text-2xl font-black uppercase italic tracking-tighter">
+              Analytics e monitoraggio delle performance
+            </h2>
+          </div>
+          <div className="text-gray-600 text-sm font-medium leading-relaxed space-y-4">
+            <p>
+              Il Sito utilizza i servizi <strong>Vercel Analytics</strong> e <strong>Vercel Speed Insights</strong>, forniti da Vercel Inc., al fine di analizzare il traffico e monitorare le performance tecniche del sito. Tali strumenti misurano le metriche di utilizzo raccogliendo dati tecnici e di navigazione esclusivamente in forma aggregata e anonimizzata. Per il loro funzionamento, questi servizi non si avvalgono di cookie di profilazione né di tecnologie equivalenti volte all'identificazione dell'utente, limitandosi al tracciamento tecnico strettamente necessario per l'ottimizzazione e il corretto mantenimento del Sito.
+            </p>
+          </div>
+        </section>[/AGGIUNTA]
+
         {/* DIRITTI */}
         <section className="bg-amber-50 p-8 md:p-10 rounded-[2rem] border-2 border-amber-200/50 shadow-lg">
           <div className="flex items-center gap-4 mb-8">

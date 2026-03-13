@@ -179,6 +179,11 @@ export default function PrivacyPolicyPage() {
             <p>
               <strong>Al fine di garantire la sicurezza dell&apos;infrastruttura di rete, prevenire abusi informatici (es. attacchi DDoS) e gestire il limite di richieste contemporanee al server (rate-limiting), il Titolare tratta automaticamente alcuni dati tecnici di navigazione, tra cui l&apos;Indirizzo IP dell&apos;utente e i metadati della richiesta. Tali dati vengono analizzati ed elaborati temporaneamente tramite fornitori di servizi cloud specializzati. La base giuridica di questo trattamento è il legittimo interesse del Titolare del Trattamento alla tutela e alla sicurezza dei propri sistemi informatici, ritenuto prevalente in quanto necessario a garantire la disponibilità e l&apos;integrità del servizio offerto agli utenti.</strong>
             </p>
+[AGGIUNTA]
+            <p>
+              Sempre nell&apos;ambito del funzionamento tecnico, il Sito utilizza i servizi <strong>Vercel Analytics</strong> e <strong>Vercel Speed Insights</strong>, forniti da Vercel Inc., per finalità di analytics e monitoraggio delle performance. Tali strumenti raccolgono dati tecnici relativi alla navigazione (come le metriche di caricamento delle pagine e le interazioni di base) elaborandoli in forma aggregata e anonimizzata. Questo processo non è volto all&apos;identificazione personale dell&apos;utente. La base giuridica di tale trattamento è il legittimo interesse del Titolare a misurare, ottimizzare e migliorare costantemente le prestazioni tecniche del Sito.
+            </p>
+[/AGGIUNTA]
           </div>
         </section>
 
